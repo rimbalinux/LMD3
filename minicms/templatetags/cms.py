@@ -59,6 +59,7 @@ def show_menu_lang(context, name='menu-lang'):
                 title, url = line.rsplit(' ', 1)
             except:
                 continue
+            url += '?destination=%s' % request.path
             menu.append({'title': tr(title.strip(), request), 'url': url})
     except Block.DoesNotExist:
         pass
@@ -69,7 +70,8 @@ def show_menu_lang(context, name='menu-lang'):
     # Normalize path
     path = request.path.rstrip('/') + '/'
     for item in menu:
-        if request.session.get('lang','id') == item['url'].split('/')[-1]:
+        # url = '/lang/en?destination=/hp/memilih-handphone
+        if request.session.get('lang','id') == item['url'].split('?')[0].split('/')[-1]:
             active = item
             active_len = len(url)
     if active is not None:
