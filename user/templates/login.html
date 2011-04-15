@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{% t "Masuk" %}{% endblock %}
+
+{% block content %}
+
+<br />
+<br />
+{% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
+
+{% endblock %}
+
+{% block sidebar %}
+<p />
+<form method="post" name="form1">
+  <label>{% t "Nama pengguna" %}:</label>
+  <input name="username">
+  <label>{% t "Sandi" %}:</label>
+  <input name="password" type="password">
+  <input type="submit" value="{% t "Masuk" %}">
+</form>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.form1.username.focus();
+</script>
+{% endblock %}

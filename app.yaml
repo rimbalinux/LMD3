@@ -1,0 +1,37 @@
+application: livelihoodmembersdatabase 
+version: 3
+runtime: python
+api_version: 1
+
+builtins:
+- remote_api: on
+
+inbound_services:
+- warmup
+
+handlers:
+- url: /remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
+
+- url: /_ah/queue/deferred
+  script: djangoappengine/deferred/handler.py
+  login: admin
+
+- url: /blank.html
+  static_files: blank.html
+  upload: blank.html
+
+- url: /media/admin
+  static_dir: django/contrib/admin/media/
+  expiration: '0'
+
+- url: /media
+  static_dir: _generated_media/
+  expiration: '365d'
+
+- url: /images
+  static_dir: images/
+
+- url: /.*
+  script: djangoappengine/main/main.py
