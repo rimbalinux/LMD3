@@ -4,22 +4,24 @@
 {% block title %}{%t "Wilayah nomor handphone" %}{% endblock %}
 
 {% block content %}
-<h1>{%t "Wilayah nomor handphone" %}</h1>
-{% load easy_maps_tags %}
-{% easy_map lokasi 600 400 7 using "easy_maps/map.html" %}
-{% endblock %}
 
-{% block sidebar %}
-<p />
 <form method="post" name="form1">
-  <label>{% t "Nomor handphone" %}:</label>
-  <input name="msisdn" value="{{ msisdn }}" />
-  <p>{% t "Contoh: 08179140068, +628179140068" %}</p>
-  <h2>{{ msisdn }} {{ wilayah }}</h2>
-  <input type="submit" class="form-submit" value="{% t "Lihat wilayahnya" %}" />
+    <fieldset class="module aligned">
+        <div class="form-row">
+            <div>
+                <label for="msisdn" class="required">{% t "Nomor handphone" %}:</label>
+                <input name="msisdn" class="vTextField" value="{{ msisdn }}" />
+                <p class="help">{% t "Contoh: 08179140068, +628179140068" %}</p>
+            </div>
+        </div>
+        <div class="form-row">
+            <h2>{{ msisdn }} {{ wilayah }}</h2>
+        </div>
+    </fieldset>
+    <div class="submit-row">
+        <input type="submit" class="form-submit" value="{% t "Lihat wilayahnya" %}" />
+    </div>
 </form>
-{% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
-
 {% endblock %}
 
 {% block js %}
