@@ -10,7 +10,7 @@ sitemaps = {
 }
 
 urlpatterns = patterns('',
-    (r'^$','msisdn.views.area'),
+    (r'^$', 'msisdn.views.area'),
     ('^_ah/warmup$', 'djangoappengine.views.warmup'),
     (r'^admin/', include('urlsadmin')),
     (r'^blog/', include('blog.urls')),
