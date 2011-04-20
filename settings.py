@@ -51,14 +51,17 @@ INSTALLED_APPS = (
     'blog',
     'disqus',
     'djangotoolbox',
-    'mediagenerator',
+    #'mediagenerator',
     'robots',
     'simplesocial',
     'redirects',
-    'msisdn',
     'user',
     'translate',
     'easy_maps',
+    'migrasi',
+    'livecenter',
+    'attachment',
+    'home',
 )
 
 if has_djangoappengine:
@@ -74,7 +77,7 @@ REST_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'mediagenerator.middleware.MediaMiddleware',
+    #'mediagenerator.middleware.MediaMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangotoolbox.middleware.RedirectMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,8 +113,8 @@ MEDIA_BUNDLES = (
 )
 
 ROOT_MEDIA_FILTERS = {
-    'js': 'mediagenerator.filters.yuicompressor.YUICompressor',
-    'css': 'mediagenerator.filters.yuicompressor.YUICompressor',
+    #'js': 'mediagenerator.filters.yuicompressor.YUICompressor',
+    #'css': 'mediagenerator.filters.yuicompressor.YUICompressor',
 }
 
 YUICOMPRESSOR_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),

@@ -1,8 +1,5 @@
-from models import Users
-from google.appengine.ext import search
-
+from migrasi.models import Users
 from django.contrib.auth.models import User
-
 from django.views.generic.simple import direct_to_template
 
 

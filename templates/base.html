@@ -1,7 +1,7 @@
 <!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-{% load media cms blog %}
+{% load cms blog %}
 {% load lang %}
 <html xmlns="http://www.w3.org/1999/xhtml"
     dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}"
@@ -17,7 +17,7 @@
       {% if google_custom_search_id %}
         <link rel="stylesheet" type="text/css" href="http://www.google.com/cse/style/look/greensky.css" />
       {% endif %}
-      {% include_media 'main.css' %}
+      <link rel="stylesheet" type="text/css" href="/stylesheets/design.css" />
     {% endblock %}
 
     {% block preload_js %}

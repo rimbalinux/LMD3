@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+{% endblock %}
+
+{% block content %}
+
+<h2>{% t "Pusat Mata Pencaharian" %}</h2>
+
+<div id="livecenters">
+    <span id="total">{% t "Jumlah" %}: {{ livecenters.count }}</span>
+{% easy_map lokasi 900 400 7 using "map.html" %}
+
+<ul class="uiListView icon-left">
+  {% for item in livecenters %}
+    <li id="gr{{item.key.id}}">
+      <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+      <span class="block">
+      <span class="title"><a href="/livecenter/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span> 
+      <span class="body">{% t item.description %}</span>
+      <span class="body">{{ item.district.dl_name }}</span>
+      </span>
+    </li>
+  {% endfor %}
+</ul>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+function addMarkers() {
+  var geo_positions = new Array();
+  {% for item in livecenters %}
+  geo_positions.push(Array({{item.geo_pos}}));
+  {% endfor %}
+
+  var mapicon = "/images/map_marker.png";
+  for (var i = 0; i < geo_positions.length; i++) {
+    var latLng = new google.maps.LatLng(geo_positions[i][0],geo_positions[i][1]);
+    var marker = new google.maps.Marker({
+      position: latLng,
+      icon: mapicon,
+      map: map
+    });
+  }
+}
+</script>
+{% endblock %}

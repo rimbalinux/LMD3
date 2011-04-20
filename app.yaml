@@ -23,6 +23,9 @@ handlers:
   script: djangoappengine/deferred/handler.py
   login: admin
 
+- url: /stylesheets
+  static_dir: stylesheets
+
 - url: /blank.html
   static_files: blank.html
   upload: blank.html

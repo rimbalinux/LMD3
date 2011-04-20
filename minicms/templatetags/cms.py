@@ -60,7 +60,7 @@ def show_menu_lang(context, name='menu-lang'):
             except:
                 continue
             url += '?destination=%s' % request.path
-            menu.append({'title': tr(title.strip(), request), 'url': url})
+            menu.append({'title': title.strip(), 'url': url})
     except Block.DoesNotExist:
         pass
 

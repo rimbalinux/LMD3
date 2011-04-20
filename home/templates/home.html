@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{%t "Mata Pencaharian" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+{% endblock %}
+
+
+{% block content %}
+<h2>{% t "Selamat datang" %}</h2>
+
+{% easy_map lokasi 600 400 7 using "map.html" %}
+
+{% endblock %}
+
+{% block sidebar %}
+
+<div id="about">
+{% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
+</div>
+
+{% endblock %}
