@@ -26,6 +26,9 @@ handlers:
 - url: /stylesheets
   static_dir: stylesheets
 
+- url: /static
+  static_dir: static
+
 - url: /blank.html
   static_files: blank.html
   upload: blank.html

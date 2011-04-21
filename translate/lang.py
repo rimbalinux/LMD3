@@ -9,6 +9,8 @@ class UrlOpener(urllib.FancyURLopener):
 base_uri = "http://ajax.googleapis.com/ajax/services/language/translate"
 
 def translate(phrase, src="id", to="en"):
+    if src == to:
+        return phrase
     data = urllib.urlencode({'v': '1.0', 'langpair': '%s|%s' % (src, to), 'q': phrase.encode('utf-8')})
     resp = json.load(UrlOpener().open('%s?%s' % (base_uri, data)))
     try:

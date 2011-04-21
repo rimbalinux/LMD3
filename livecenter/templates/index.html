@@ -14,7 +14,8 @@
 
 <div id="livecenters">
     <span id="total">{% t "Jumlah" %}: {{ livecenters.count }}</span>
-{% easy_map lokasi 900 400 7 using "map.html" %}
+
+{% easy_map lokasi 900 400 7 using "index_map.html" %}
 
 <ul class="uiListView icon-left">
   {% for item in livecenters %}
@@ -30,25 +31,4 @@
 </ul>
 </div>
 
-{% endblock %}
-
-{% block js %}
-<script type="text/javascript">
-function addMarkers() {
-  var geo_positions = new Array();
-  {% for item in livecenters %}
-  geo_positions.push(Array({{item.geo_pos}}));
-  {% endfor %}
-
-  var mapicon = "/images/map_marker.png";
-  for (var i = 0; i < geo_positions.length; i++) {
-    var latLng = new google.maps.LatLng(geo_positions[i][0],geo_positions[i][1]);
-    var marker = new google.maps.Marker({
-      position: latLng,
-      icon: mapicon,
-      map: map
-    });
-  }
-}
-</script>
 {% endblock %}

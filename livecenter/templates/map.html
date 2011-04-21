@@ -32,9 +32,8 @@
 
             {% block extra_js %}
             var positions = new Array();
-            {% for item in livecenters %}
-              {% if item.geo_pos|stringformat:"s" != "nan,nan" %}positions.push(Array({{ item.geo_pos }}));{% endif %}
-            {% endfor %}
+
+            {% block set-positions %}{% endblock %}
 
             for (var i = 0; i < positions.length; i++) {
                 var marker = new google.maps.Marker({

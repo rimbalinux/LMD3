@@ -115,17 +115,32 @@ blockquote {
 
 .columns {
   padding: 0px 25px;
-  width: 920px;
+  width: 980px;
 }
 
 #content {
-  width: 635px;
-  margin-right: 35px;
+  width: 620px;
+  margin: 0 5px;
 }
 
 #sidebar {
-  width: 250px;
+  width: 340px;
   float: right;
+}
+
+.sidebox label {
+  color: #999999;
+  font-size: 10px;
+}
+
+.sidebox {
+  background-color: #f9f9f9;
+  margin-top: 10px;
+  padding: 5px;
+}
+
+label {
+  display: block;
 }
 
 body {
@@ -336,6 +351,43 @@ div.profile-img-div.figure.align-left {
 .profile-img {
   padding: 5px;
   border: 1px solid #f0edda;
+}
+
+.profile_pic {
+  overflow: hidden;
+  text-align: center;
+}
+
+.profile_pic img {
+  max-width: 300px;
+}
+
+.icon_small.contact {
+  background-position: 0 -16px;
+}
+
+.icon_small {
+  background: url("/images/icons_small.gif") no-repeat scroll 0 0 transparent;
+  display: inline-block;
+  height: 16px;
+  margin: 0 5px 0 0;
+  width: 16px;
+}
+
+ul.uiListView.icon-left-small li .icon {
+  left: 0;
+  position: absolute;
+  top: 2px;
+}
+
+img.small {
+  margin-right: 3px;
+  vertical-align: middle;
+  width: 30px;
+}
+
+.small {
+  font-size: 10px;
 }
 
 .project-links {

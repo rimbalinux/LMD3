@@ -41,7 +41,7 @@
     {% block extra-head %}{% endblock %}
   </head>
 
-  <body>
+  <body {% block body-attr %}{% endblock %}>
     <div id="header">
       {% if google_custom_search_id %}
         <div id="search">
