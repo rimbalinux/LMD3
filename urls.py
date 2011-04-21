@@ -21,6 +21,8 @@ urlpatterns = patterns('',
     (r'^migrasi/user', 'migrasi.views.user'),
     (r'^livecenter/$', 'livecenter.views.index'),
     (r'^livecenter/show/(?P<pid>.*)$', 'livecenter.views.show'),
+    (r'^people/$', 'people.views.index'),
+    (r'^group/$', 'group.views.index'),
     (r'^img/(?P<file_id>.*)$', 'attachment.views.image'),
     (r'^$', 'home.views.index'),
 )

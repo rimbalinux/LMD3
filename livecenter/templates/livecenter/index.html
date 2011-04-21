@@ -15,7 +15,7 @@
 <div id="livecenters">
     <span id="total">{% t "Jumlah" %}: {{ livecenters.count }}</span>
 
-{% easy_map lokasi 900 400 7 using "index_map.html" %}
+{% easy_map lokasi 900 400 7 using "livecenter/map/index.html" %}
 
 <ul class="uiListView icon-left">
   {% for item in livecenters %}

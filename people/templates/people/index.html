@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{% t "Anggota" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2>{% t "Anggota" %}</h2>
+
+<div id="livecenters">
+    <span id="total">{% t "Jumlah" %}: {{ people_count }}</span>
+
+{% easy_map lokasi 900 400 7 using "people/map/index.html" %}
+
+<div class="tabber">
+    <div class="tabbertab">
+        <h4>{% t "Anggota" %}</h4>
+        <ul class="uiListView icon-left">
+            {% for item in people %}
+              <li id="gr{{ item.key.id }}">
+                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="block">
+                <span class="title"><a href="/people/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
+                <span class="body">{{ item.district.dl_name }} / {{ item.member_type }}</span>
+                <span class="body"><span class="tag">LC</span><a href="/livecenter/show/{{ item.livecenter.key }}">{{ item.livecenter.name }}</a></span>
+                </span>
+              </li>
+            {% empty %}
+              <li>{% t "Belum ada anggota" %}</li>
+            {% endfor %}
+        </ul>
+        {% include "livecenter/paging.html" %}
+    </div>
+</div>
+
+</div>
+
+{% endblock %}

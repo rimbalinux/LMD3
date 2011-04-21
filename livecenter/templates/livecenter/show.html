@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<h2><a href="/livecenter">{% t "Pusat Mata Pencaharian" %}</a> / {{ livecenter.name }}</h2>
+
+{% easy_map lokasi 600 300 7 using "livecenter/map/show.html" %} 
+
+<div class="tabber">
+    <div class="tabbertab">
+        <h2>{% t "Anggota" %}</h2>
+        <ul class="uiListView icon-left"> 
+            {% for item in members %}
+        	    {% if item.groups %}
+                    <li id="gr{{ item.key.id }}">
+                        <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                        <span class="block">
+                        <span class="title"><a href="/people/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
+                        <span class="body">{{ item.member_type }}</span>
+                        <span class="body">{{ item.district.dl_name }}</span>
+                        </span>
+                    </li>
+    	        {% endif %}
+            {% empty %}
+                <li>{% t "Belum ada anggota" %}</li>
+            {% endfor %}
+        </ul>
+        {% include "livecenter/paging.html" %}
+    </div>
+
+    <div class="tabbertab">
+        <h2>{% t "Gugusan" %}</h2>
+        <ul class="uiListView icon-left">
+            {% for item in livecenter.clusters %}
+              <li id="cr{{ item.key.id }}">
+                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="block">
+                    <span class="title"> {{ item.name }}</span>
+                    <span class="body">{{ item.info }}</span>
+                </span>
+              </li>
+            {% empty %}
+              <li>{% t "Belum ada gugusan" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="tabbertab">
+        <h2>{% t "Kelompok" %}</h2>
+        <ul class="uiListView icon-left">
+            {% for item in livecenter.groups %}
+              <li id="gr{{ item.key.id }}">
+                <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
+                <span class="block">
+                  <span class="title"><a href="/group/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
+                  <span class="body">{{ item.info }}</span>
+                </span>
+              </li>
+            {% empty %}
+              <li>{% t "Belum ada kelompok" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="tabbertab">
+        <h2>{% t "Keuangan mikro" %}</h2>
+            <ul class="uiListView icon-left">
+                {% for item in microfinance %}
+                  <li id="gr{{item.key.id}}">
+                    <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                    <span class="block">
+                      <span class="title"><a href="/microfinance/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
+                      <span class="body">{{ item.district.dl_name }} / {{ item.sub_district.dl_name}}</span>
+                    </span>
+                  </li>
+                {% empty %}
+                  <li>{% t "Belum ada data" %}</li>
+                {% endfor %}
+                {% if microfinance %}
+                <li><a href="/livecenter/show_microfinance/{{livecenter.key}}" style="float:right;" title="{% t "Tampilkan yang ada di " %} {{livecenter.district.dl_name}}" >{% t "Tampilkan semua" %}</a></li>
+                {% endif %}
+            </ul>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="profile_pic">
+    <img src="/img/{{ livecenter.key }}" />
+</div>
+
+<div class="sidebox">
+    <h4><i class="icon_small contact"></i><strong>{% t "Info kontak" %}</strong></h4>
+    <p><label>{% t "Alamat" %}</label>{{ livecenter.address }}</p>
+    <p><label>{% t "Kabupaten" %}</label>{{ livecenter.district.dl_name }}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{ livecenter.sub_district.dl_name }}</p>
+    <p><label>{% t "Desa" %}</label>{{ livecenter.village.dl_name }}</p>
+    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{ livecenter.geo_pos }}</span></p>
+</div>
+
+<div class="sidebox">
+    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ members_count }}</h4>
+    <h4><i class="icon_small category"></i><strong>{% t "Jumlah gugusan" %}</strong>: {{ livecenter.clusters.count }}</h4>
+    <h4><i class="icon_small group"></i><strong>{% t "Jumlah kelompok" %}</strong>: {{ livecenter.groups.count }}</h4>
+</div>
+
+<div class="sidebox">
+    <h4><i class="icon_small category"></i><strong>{% t "Kategori" %}</strong></h4>
+    {% if livecenter.category %}
+      <ul class="uiListView icon-left-small">
+        {% for item in livecenter.categories %}
+          <li>
+            <span class="icon"><img src="/img/{{ item.key }}" class="small" /></span>
+            <span class="title">{{ item.name }}</span>
+            <span class="body">{{ item.description }}</span>
+          </li>
+        {% empty %}
+          <li>{% t "Belum ada kategori" %}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+</div>
+
+<div class="sidebox">
+    <h4><i class="icon_small home"></i><strong>{% t "Pusat mata pencaharian yang terkait" %}</strong></h4>
+    <ul class="uiListView icon-left-small">
+        {% for item in related_livecenter %}
+            <li>
+              <span class="icon"><img src="/img/{{ item.key }}" class="small" /></span>
+              <span class="title"><a href="/livecenter/show/{{ item.key }}">{{ item.name }}</a></span>
+              <span class="body">{{ item.district.dl_name }}</span>
+            </li>
+        {% empty %}
+            <li>{% t "Belum ada" %}</li>
+    {% endfor %}
+</ul>
+</div>
+
+
+{% endblock %}

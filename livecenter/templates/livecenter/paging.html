@@ -1,0 +1,12 @@
+{% load lang %}
+{% if prev or next %}
+<div class="paging" align="right">
+{% if prev %}
+<a href="{{ page_url }}?q={{ keyword }}&page={{ prev }}">{% t "Sebelumnya" %}</span></a>
+{% endif %}
+{% if next %}
+<a href="{{ page_url }}?q={{ keyword }}&page={{ next }}">{% t "Selanjutnya" %}</a>
+{% endif %}
+</div>
+<div class="clear">&nbsp;</div>
+{% endif %}

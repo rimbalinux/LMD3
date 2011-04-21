@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'livecenter',
     'attachment',
     'home',
+    'people',
 )
 
 if has_djangoappengine:

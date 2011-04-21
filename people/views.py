@@ -1,4 +1,5 @@
-from .models import LiveCenter, MicroFinance, Person
+from livecenter.models import Person
+from livecenter.views import DEFAULT_LOCATION
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
@@ -6,13 +7,15 @@ from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
 
 
-DEFAULT_LOCATION = [4.0287, 96.7181]
-
-
 def index(request):
-    items = LiveCenter.all().order('name')
-    return direct_to_template(request, 'livecenter/index.html', {
-        'livecenters': items,
+    q = 'q' in request.GET and request.GET['q']
+    page = 'page' in request.GET and request.GET['page']
+    prev, people, next = SearchablePagerQuery(Person).search(q).order('-last_modified').fetch(8, page)
+    return direct_to_template(request, 'people/index.html', {
+        'people': people,
+        'people_count': counter.get('site_member_count'),
+        'prev': prev,
+        'next': next,
         'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
         })
 
@@ -23,7 +26,7 @@ def show(request, pid):
     q = 'q' in request.GET and request.GET['q']
     page = 'page' in request.GET and request.GET['page']
     prev, members, next = SearchablePagerQuery(Person).filter('livecenter = ', lc.key()).order('-last_modified').fetch(15, page)
-    return direct_to_template(request, 'livecenter/show.html', {
+    return direct_to_template(request, 'show.html', {
         'members': members,
         'members_count': counter.get('lc_member_count_%s' % lc.key().id()),
         'livecenter': lc,

@@ -1,0 +1,7 @@
+{% extends 'livecenter/map/base.html' %}
+
+{% block set-positions %}
+{% for item in livecenters %}
+  {% if item.geo_pos|stringformat:"s" != "nan,nan" %}positions.push(Array({{ item.geo_pos }}));{% endif %}
+{% endfor %}
+{% endblock %}
