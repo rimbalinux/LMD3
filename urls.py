@@ -23,6 +23,8 @@ urlpatterns = patterns('',
     (r'^livecenter/show/(?P<pid>.*)$', 'livecenter.views.show'),
     (r'^people/$', 'people.views.index'),
     (r'^group/$', 'group.views.index'),
+    (r'^product/$', 'product.views.index'),
+    (r'^microfinance/$', 'microfinance.views.index'),
     (r'^img/(?P<file_id>.*)$', 'attachment.views.image'),
     (r'^$', 'home.views.index'),
 )

@@ -63,6 +63,9 @@ INSTALLED_APPS = (
     'attachment',
     'home',
     'people',
+    'group',
+    'product',
+    'microfinance',
 )
 
 if has_djangoappengine:

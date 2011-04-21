@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{% t "Kelompok" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2>{% t "Kelompok" %}</h2>
+
+<div id="livecenters">
+    <span id="total">{% t "Jumlah" %}: {{ groups_count }}</span>
+
+{% easy_map lokasi 900 400 7 using "group/map/index.html" %}
+
+<div class="tabber">
+    <div class="tabbertab">
+        <h4>{% t "Kelompok" %}</h4>
+        <ul class="uiListView icon-left">
+            {% for item in groups %}
+                <li id="gr{{ item.key.id }}">
+                  <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
+                  <span class="block">
+                      <span class="title"><a href="/group/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span> 
+                      <span class="body">{{ item.livecluster.category.name }}</span>
+                      <span class="body">{{ item.info }}</span>
+              </li>
+            {% empty %}
+              <li>{% t "Belum ada kelompok" %}</li>
+            {% endfor %}
+        </ul>
+        {% include "livecenter/paging.html" %}
+    </div>
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+
+{% block title %}{% t "Produk" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2>{% t "Produk" %}</h2>
+
+<div id="livecenters">
+    <span id="total">{% t "Jumlah" %}: {{ product_count }}</span>
+
+{% easy_map lokasi 900 400 7 using "product/map/index.html" %}
+
+<div class="tabber">
+    <div class="tabbertab">
+        <h4>{% t "Produk" %}</h4>
+        <ul class="uiListView">
+            {% for nama, jml in product_list %}
+              <li>
+              <span class="title"><a href="/product/name/{{ nama|urlencode }}" class="preview">{{ nama }} ({{ jml }})</a></span>
+              </li>
+            {% empty %}
+              <li>{% t "Belum ada produk" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+</div>
+
+{% endblock %}
