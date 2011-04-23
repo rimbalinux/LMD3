@@ -68,9 +68,10 @@
             <ul class="menu">
               {% show_menu %}
               {% if user.username %}
-              <li><a href="/logout">{% t "Keluar" %} {{ user.username }}</a>
+                {% if user.is_staff %}<li><a href="/admin">{% t "Admin" %}</a></li>{% endif %}
+                <li><a href="/logout">{% t "Keluar" %} {{ user.username }}</a></li>
               {% else %}
-              <li {% if request.path == "/login/" %}class="active-menu-item"{% endif %}><a href="/login">{% t "Masuk" %}</a>
+                <li {% if request.path == "/login/" %}class="active-menu-item"{% endif %}><a href="/login">{% t "Masuk" %}</a></li>
               {% endif %}
             </ul>
           </div>

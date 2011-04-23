@@ -33,3 +33,4 @@ def show(request, pid):
         'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
         'lokasi': str(lc.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })
+

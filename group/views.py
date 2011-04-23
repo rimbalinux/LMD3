@@ -1,4 +1,5 @@
-from livecenter.models import LiveGroup 
+from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
+        GroupTraining
 from livecenter.views import DEFAULT_LOCATION
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
@@ -20,19 +21,17 @@ def index(request):
         })
 
 def show(request, pid):
-    lc = db.get(pid)
-    if not lc:
-        return HttpResponseRedirect('/livecenter')
-    q = 'q' in request.GET and request.GET['q']
-    page = 'page' in request.GET and request.GET['page']
-    prev, members, next = SearchablePagerQuery(Person).filter('livecenter = ', lc.key()).order('-last_modified').fetch(15, page)
-    return direct_to_template(request, 'show.html', {
-        'members': members,
-        'members_count': counter.get('lc_member_count_%s' % lc.key().id()),
-        'livecenter': lc,
-        'prev': prev,
-        'next': next,
-        'microfinance': MicroFinance.all().filter('district', lc.district.key()).fetch(10),
-        'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
-        'lokasi': str(lc.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
+    item = db.get(pid)
+    if not item:
+        return HttpResponseRedirect('/group')
+    category = item.livecluster.category
+    return direct_to_template(request, 'group/show.html', {
+        'group': item,
+        'member_count': item.members.count(),
+        'livecenter': LiveCenter.all().filter('__key__', item.livecluster.livecenter[0]).get(),
+        'other_groups': LiveGroup.all().filter('livecluster', item.livecluster ).filter('__key__ !=', item.key()),
+        'customfields': MetaForm.all().order('__key__').filter('container', category.key()).filter('meta_type', 'group'),
+        'report': Report_Group.all().filter('livecluster', item.livecluster ).filter('name_group', item.key()),
+        'training': GroupTraining.all().filter('group', item.key()),
+        'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })

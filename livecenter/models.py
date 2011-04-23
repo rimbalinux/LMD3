@@ -198,3 +198,52 @@ class MicroFinance(search.SearchableModel):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
+
+"""
+Group Report include the historical database
+"""
+class Report_Group(search.SearchableModel, db.Expando):
+    livecluster = db.ReferenceProperty(LiveCluster, collection_name='group_report')
+    containers = db.ListProperty(db.Key,default=[])
+    name_group = db.ReferenceProperty(LiveGroup, collection_name='group_report')
+    #added by Jufri Wahyudi
+    name = db.StringProperty()
+    year = db.StringProperty()
+    info = db.TextProperty()
+    #end of added
+
+class PersonTraining(search.SearchableModel):
+    person = db.ReferenceProperty(Person, collection_name='training')
+    manajemen_usaha = db.IntegerProperty(default=0)
+    pembukuan = db.IntegerProperty(default=0)
+    produksi = db.IntegerProperty(default=0)
+    pemanfaatan_limbah = db.IntegerProperty(default=0)
+    pengemasan = db.IntegerProperty(default=0)
+    akses_pasar = db.IntegerProperty(default=0)
+    keuangan_mikro = db.IntegerProperty(default=0)
+    hitung_hpp_harga_jual = db.IntegerProperty(default=0)  
+    navigasi = db.IntegerProperty(default=0)
+    keselamatan_laut = db.IntegerProperty(default=0)
+    penanganan_atas_kapal = db.IntegerProperty(default=0)
+    kontrol_kualitas = db.IntegerProperty(default=0)
+    rawat_mesin = db.IntegerProperty(default=0)
+    rescue = db.IntegerProperty(default=0)
+
+class GroupTraining(search.SearchableModel):
+    group = db.ReferenceProperty(LiveGroup, collection_name='g_training')
+    manajemen_usaha = db.IntegerProperty(default=0)
+    pembukuan = db.IntegerProperty(default=0)
+    produksi = db.IntegerProperty(default=0)
+    pemanfaatan_limbah = db.IntegerProperty(default=0)
+    pengemasan = db.IntegerProperty(default=0)
+    akses_pasar = db.IntegerProperty(default=0)
+    keuangan_mikro = db.IntegerProperty(default=0)
+    hitung_hpp_harga_jual = db.IntegerProperty(default=0)  
+    navigasi = db.IntegerProperty(default=0)
+    keselamatan_laut = db.IntegerProperty(default=0)
+    penanganan_atas_kapal = db.IntegerProperty(default=0)
+    kontrol_kualitas = db.IntegerProperty(default=0)
+    rawat_mesin = db.IntegerProperty(default=0)
+    rescue = db.IntegerProperty(default=0)
+
+

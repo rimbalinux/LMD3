@@ -78,3 +78,39 @@ div#tabitems > div {
 #livecenters {
     display: block;
 }
+
+.tag {
+  -moz-border-radius: 2px 2px 2px 2px;
+  background-color: #AAAAAA;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 2px;
+}
+
+a.uiButton {
+  color: #333333;
+  text-decoration: none;
+}
+
+.uiButton, .uiButton_blue {
+  font-family: "Segoe UI","Lucida Grande","Lucida Sans",calibri,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.uiButton {
+  padding: 3px 6px;
+}
+                            
+input[type="button"], input[type="submit"], input[type="reset"], input[type="image"], .uiButton, .uiButton:hover, .uiButton_blue, .uiButton_blue:hover {
+  background: url("/images/sprite.gif") repeat-x scroll 0 0 transparent;
+  border: 1px solid #999999;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+.tabberlive .tabbertab h4 {
+  display: none;
+}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+{% load livecenter %}
+
+{% block title %}{% t "Produk" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+{% endblock %}
+
+{% block content %}
+<h2><a href="/product">{% t "Produk" %}</a> / {{ product.name|t:request }}</h2>
+
+{% easy_map lokasi 600 300 7 using "product/map/show.html" %}
+
+<div class="tabber">
+    <div class="tabbertab">
+        <h4>{% t "Produk" %}</h4>
+        <table class="uiListView">
+            <tr><td class="label">{% t "Siklus laporan" %}</td><td>{{product.year}}</td></tr>
+            <tr><td class="label">{% t "Nama produk" %}</td><td>{{product.name}}</td></tr>
+            {% for i in customfields %}
+              <tr><td class="label"><span class="trans">{{i.title}}</span></td>
+                  <td><span class="trans">{{product|metaview:i}}</span></td>
+              </tr>
+            {% endfor %}
+            <tr><td class="label"><span class="trans">{% t "Catatan" %}</span></td><td><span class="trans">{{product.info}}</span></td></tr>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="profile_pic">
+  <img src="/img/{{product.key}}" />
+</div>
+
+<ul class="uiListView icon-left">
+    <li>
+      <span class="avatar normal"><img src="/img/{{person.key}}" /></span>
+      <span class="title"><a href="/people/show/{{person.key}}">{{ person.name }}</a></span>
+      <span class="body">{{person.member_type}} / {{person.district.dl_name}}</span>
+      <span class="body">
+        <span class="tag">LC</span>
+        <a href="/livecenter/show/{{person.livecenter.key}}">{{ person.livecenter.name }}</a>
+      </span>
+   </li>
+</ul>
+
+<div class="sidebox">
+    <h4><i class="icon_small contact"></i><strong>{% t "Kontak" %}</strong></h4>
+    <p><label>{% t "Alamat" %}</label>{{person.address}}</p>
+    <p><label>{% t "Kabupaten" %}</label>{{person.district.dl_name}}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{person.sub_district.dl_name}}</p>
+    <p><label>{% t "Desa" %}</label>{{person.village.dl_name}}</p>
+    <p><label>{% t "Telepon selular" %}</label>{{person.mobile}}</p>
+    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{person.geo_pos}}</span></p>
+</div>
+
+{% if person.livegroup %}
+<div class="sidebox">
+    <h4><i class="icon_small category"></i><strong>{% t "Kategori / Gugusan" %}</strong></h4>
+    <ul class="uiListView icon-left-small">
+        {% for item in person.groups %}
+          <li>
+            <span class="icon"><img src="/img/{{item.livecluster.key}}" class="small" /></span>
+            <span class="title"><a href="/livecenter/show/{{person.livecenter.key}}">{{ item.livecluster.name }}</a></span>
+            <span class="body">{{person.livecenter.info}}</span>
+          </li>
+        {% empty %}
+          <li>{% t "Belum bergabung ke gugusan manapun" %}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+
+
+{% endblock %}

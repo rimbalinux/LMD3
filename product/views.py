@@ -1,5 +1,5 @@
 from .models import Product
-from livecenter.models import LiveGroup
+from livecenter.models import LiveGroup, MetaForm
 from livecenter.views import DEFAULT_LOCATION
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
@@ -35,19 +35,12 @@ def index(request):
         })
 
 def show(request, pid):
-    lc = db.get(pid)
-    if not lc:
-        return HttpResponseRedirect('/livecenter')
-    q = 'q' in request.GET and request.GET['q']
-    page = 'page' in request.GET and request.GET['page']
-    prev, members, next = SearchablePagerQuery(Person).filter('livecenter = ', lc.key()).order('-last_modified').fetch(15, page)
-    return direct_to_template(request, 'show.html', {
-        'members': members,
-        'members_count': counter.get('lc_member_count_%s' % lc.key().id()),
-        'livecenter': lc,
-        'prev': prev,
-        'next': next,
-        'microfinance': MicroFinance.all().filter('district', lc.district.key()).fetch(10),
-        'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
-        'lokasi': str(lc.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
+    item = db.get(pid)
+    if not item:
+        return HttpResponseRedirect('/product')
+    return direct_to_template(request, 'product/show.html', {
+        'customfields': MetaForm.all().order('__key__').filter('meta_type', 'product').filter('container', item.category.key()),
+        'product': item,
+        'person': item.person,
+        'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })

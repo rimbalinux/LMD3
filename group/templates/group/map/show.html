@@ -1,0 +1,5 @@
+{% extends 'livecenter/map/base.html' %}
+
+{% block set-positions %}
+{% if group.geo_pos %}positions.push(Array({{ group.geo_pos }}));{% endif %}
+{% endblock %}
