@@ -16,12 +16,37 @@
 
 {% easy_map lokasi 600 300 7 using "livecenter/map/show.html" %} 
 
+{% if user.is_staff %}
+    <p>
+    <a href="/livecenter/edit/{{livecenter.key}}" title="edit {{livecenter.name}}" class="uiButton uiTip"><span>{% t "Ubah keterangan" %}</span></a>
+    <a href="/livecenter/category_edit/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="Manage Categories"><span>{% t "Ubah kategori" %}</span></a>
+    <a href="/cluster/create/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="Add New Cluster"><span>{% t "Tambah gugusan" %}</span></a>
+    <a href="#categoryselect" rel="facebox" class="uiButton uiTip" title="Add New Group"><span langtag="add-groups">{% t "Tambah kelompok" %}</span></a>
+    <a href="/people/create" class="uiButton uiTip" title="Add New Member"><span>{% t "Tambah anggota" %}</span></a>
+    </p>
+    <br />
+    <p>
+    <a href="/livecenter/member/{{livecenter.key}}" class="uiButton uiTip" title="View Members Map"><span>{% t "Peta anggota" %}</span></a>
+    <a href="/livecenter/map/{{livecenter.key}}" class="uiButton uiTip" title="View Groups Map"><span>{% t "Peta kelompok" %}</span></a><br />
+    </p>
+    <p>
+    <br />
+    <a href="/livecenter/nogroup/{{livecenter.key}}" class="uiButton uiTip" title="View Ungrouped Members"><span>{% t "Anggota tanpa kelompok" %}</span></a>
+    <a href="/livecenter/nomobile/{{livecenter.key}}" class="uiButton uiTip" title="View Members haven't Mobile"><span>{% t "Anggota tanpa telepon selular" %}</span></a> 
+    <a href="/livecenter/mobile_list/{{livecenter.key}}" class="uiButton uiTip" title="View List of Member's Mobile"><span>{% t "Daftar telepon selular" %}</span></a>
+    <a href="/livecenter/lc_report/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="View Report Livecenter's Product"><span>{% t "Buat laporan" %}</span></a>
+    <a href="/location" class="uiButton uiTip" title="View, Edit and Delete Location"><span>{% t "Lokasi" %}</span></a>
+    </p>
+    <p>&nbsp;</p>
+{% endif %}
+
+
 <div class="tabber">
     <div class="tabbertab">
         <h2>{% t "Anggota" %}</h2>
         <ul class="uiListView icon-left"> 
             {% for item in members %}
-        	    {% if item.groups %}
+                {% if item.groups %}
                     <li id="gr{{ item.key.id }}">
                         <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                         <span class="block">
@@ -30,7 +55,7 @@
                         <span class="body">{{ item.district.dl_name }}</span>
                         </span>
                     </li>
-    	        {% endif %}
+                {% endif %}
             {% empty %}
                 <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}

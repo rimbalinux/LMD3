@@ -114,3 +114,34 @@ input[type="button"], input[type="submit"], input[type="reset"], input[type="ima
 .tabberlive .tabbertab h4 {
   display: none;
 }
+
+.right {
+  float: right;
+}
+
+.uiRemove {
+  background: url("/images/act.gif") no-repeat scroll 0 -64px transparent;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+}
+
+.cavatar img {
+  width: 80px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+select, option, textarea {
+  border: 1px solid #BDC7D8;
+  font-family: "Segoe UI","Lucida Grande","Lucida Sans",calibri,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  font-size: 11px;
+  padding: 3px;
+}
+
+#fdistrict span {
+  float: left;
+  margin-right: 15px;
+}

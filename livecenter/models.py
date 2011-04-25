@@ -4,6 +4,14 @@ from google.appengine.ext import db, search
 from attachment.models import Attachment
 
 
+"""
+GeoLocation storage
+"""
+class GeoPosition(db.Model):
+    containers  = db.ListProperty(db.Key,default=[])
+    geotype     = db.StringProperty(default='address')
+    geo_pos     = db.GeoPtProperty()
+
 """ Location data """
 class LivelihoodLocation(db.Model):
     dl_id = db.IntegerProperty()

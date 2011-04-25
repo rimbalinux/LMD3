@@ -14,8 +14,7 @@
 
 <h2>{% t "Kelompok" %}</h2>
 
-<div id="livecenters">
-    <span id="total">{% t "Jumlah" %}: {{ groups_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ groups_count }}</span>
 
 {% easy_map lokasi 900 400 7 using "group/map/index.html" %}
 
@@ -25,6 +24,9 @@
         <ul class="uiListView icon-left">
             {% for item in groups %}
                 <li id="gr{{ item.key.id }}">
+                  {% if user.is_staff %}
+                  <span class="right"><a href="/group/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                  {% endif %}
                   <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
                   <span class="block">
                       <span class="title"><a href="/group/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span> 
@@ -37,8 +39,6 @@
         </ul>
         {% include "livecenter/paging.html" %}
     </div>
-</div>
-
 </div>
 
 {% endblock %}

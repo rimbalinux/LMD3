@@ -14,10 +14,14 @@
 
 <h2>{% t "Anggota" %}</h2>
 
-<div id="livecenters">
-    <span id="total">{% t "Jumlah" %}: {{ people_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ people_count }}</span>
 
 {% easy_map lokasi 900 400 7 using "people/map/index.html" %}
+
+{% if user.is_staff %}
+<p><a href="/people/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah anggota" %}</span></a></p>
+<p>&nbsp;</p>
+{% endif %}
 
 <div class="tabber">
     <div class="tabbertab">
@@ -25,6 +29,9 @@
         <ul class="uiListView icon-left">
             {% for item in people %}
               <li id="gr{{ item.key.id }}">
+                {% if user.is_staff %}
+                  <span class="right"><a href="/people/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                {% endif %}
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">
                 <span class="title"><a href="/people/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
@@ -38,8 +45,6 @@
         </ul>
         {% include "livecenter/paging.html" %}
     </div>
-</div>
-
 </div>
 
 {% endblock %}

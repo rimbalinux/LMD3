@@ -64,11 +64,6 @@ label {
   font-weight: bold;
 }
 
-input[type="text"], input[type="password"] {
-  width: 170px;
-  font-size: 12px;
-}
-
 input, textarea {
   padding: 2px 0 2px 2px;
 }

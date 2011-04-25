@@ -14,10 +14,14 @@
 
 <h2>{% t "Keuangan Mikro" %}</h2>
 
-<div id="livecenters">
-    <span id="total">{% t "Jumlah" %}: {{ items_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ items_count }}</span>
 
-{% easy_map lokasi 900 400 7 using "livecenter/map/base.html" %}
+{% easy_map lokasi 900 400 7 using "microfinance/map/index.html" %}
+
+{% if user.is_staff %}
+<p><a href="/microfinance/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah Keuangan Mikro" %}</span></a></p>
+<p>&nbsp;</p>
+{% endif %}
 
 <div class="tabber">
     <div class="tabbertab">
@@ -25,6 +29,9 @@
         <ul class="uiListView icon-left">
             {% for item in items %}
               <li id="gr{{ item.key.id }}">
+                {% if user.is_staff %}
+                <span class="right"><a href="/microfinance/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                {% endif %}
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">
                 <span class="title"><a href="/microfinance/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
@@ -38,8 +45,6 @@
 
         {% include "livecenter/paging.html" %}
     </div>
-</div>
-
 </div>
 
 {% endblock %}

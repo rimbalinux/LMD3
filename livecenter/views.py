@@ -1,19 +1,23 @@
-from .models import LiveCenter, MicroFinance, Person
+from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation
+from .utils import getLocation
 from django.views.generic.simple import direct_to_template
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
+import json
 
 
 DEFAULT_LOCATION = [4.0287, 96.7181]
 
+def default_location():
+    return ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
 
 def index(request):
     items = LiveCenter.all().order('name')
     return direct_to_template(request, 'livecenter/index.html', {
         'livecenters': items,
-        'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
+        'lokasi': default_location(), 
         })
 
 def show(request, pid):
@@ -31,6 +35,54 @@ def show(request, pid):
         'next': next,
         'microfinance': MicroFinance.all().filter('district', lc.district.key()).fetch(10),
         'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
-        'lokasi': str(lc.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
+        'lokasi': str(lc.geo_pos).strip('nan,nan') or default_location(),
         })
 
+def create(request):
+    if request.POST: 
+        return save(request)
+    return direct_to_template(request, 'livecenter/create.html', {
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0)
+        })
+
+def save(request):
+    lc = LiveCenter()
+    lc.name = request.POST['name']
+    lc.description = request.POST['description']
+    lc.district = getLocation(request.POST['district']).key()
+    lc.sub_district = getLocation(request.POST['sub_district']).key()
+    lc.village = getLocation(request.POST['village']).key()
+    lc.geo_pos = request.POST['geo_pos'] or default_location() 
+    lc.put()
+    counter.update('site_lc_count', 1)
+    if 'photo' in request.POST and request.POST['photo']:
+        att = Attachment()
+        att.containers.append(lc.key())
+        att.filename = 'photo_%s' % lc.key().id()
+        att.filesize = 1024
+        att.file = db.Blob(request.POST['photo'])
+        att.put()
+    return HttpResponseRedirect('/livecenter')
+
+def delete(request, pid=None):
+    if not pid:
+        return HttpResponseRedirect('/livecenter')
+    item = db.get( pid )
+    if not item:
+        return HttpResponseRedirect('/livecenter')
+    counter.update('site_lc_count', -1)
+    item.delete()
+    return HttpResponseRedirect('/livecenter')
+
+def district(request, pid):
+    json_data = []
+    pid = int(pid)
+    districts = LivelihoodLocation().all().order('dl_name').\
+        filter('dl_parent = ', pid)
+    for district in districts:
+        json_data.append({
+            'dl_id' : int(district.dl_id),
+            'dl_name' : str(district.dl_name),
+            'dl_key' : str(district.key())
+            })
+    return HttpResponse(json.encode(json_data))
