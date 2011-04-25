@@ -1,4 +1,5 @@
-from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation
+from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
+        Attachment
 from .utils import getLocation
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
@@ -92,7 +93,7 @@ def save(request, pid=None):
     att.containers.append(lc.key())
     att.filename = 'photo_%s' % lc.key().id()
     att.filesize = 1024
-    att.file = db.Blob(request.FILES['photo'])
+    att.file = db.Blob(request.FILES['photo'].read())
     att.put()
     return lc 
 

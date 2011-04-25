@@ -130,7 +130,7 @@ $(function(){
         {% include "livecenter/location_form.html" %}
         <p><label>{% t "Keterangan" %}</label><textarea cols="45" rows="3" name="description">{{ livecenter.description }}</textarea></p>
         {% if livecenter %}
-          <img src="/img/{{ livecenter.key }}" />
+        <div class="profile_pic"><img src="/img/{{ livecenter.key }}" /></div>
         {% endif %}
         <p><label>{% t "Foto" %}</label><input type="file" name="photo" /></p>
         <p class="formsetaction">
