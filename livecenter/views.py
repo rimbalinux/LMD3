@@ -40,29 +40,61 @@ def show(request, pid):
 
 def create(request):
     if request.POST: 
-        return save(request)
+        save(request)
+        return HttpResponseRedirect('/livecenter/show/' + lc.key())
     return direct_to_template(request, 'livecenter/create.html', {
-        'districts': LivelihoodLocation().all().filter('dl_parent = ',0)
+        'pagetitle': 'Tambah Mata Pencaharian',
+        'district_sel': 0,
+        'subdistrict_sel': 0,
+        'village_sel': 0,
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
         })
 
-def save(request):
-    lc = LiveCenter()
+def edit(request, pid):
+    if request.POST:
+        lc = save(request, pid)
+        if lc:
+            return HttpResponseRedirect('/livecenter/show/%s' % lc.key())
+        return HttpResponseRedirect('/livecenter')
+    lc = db.get(pid)
+    return direct_to_template(request, 'livecenter/create.html', {
+        'pagetitle': 'Ubah ' + lc.name,
+        'livecenter': lc,
+        'geo_pos': lc.geo_pos,
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
+        'district_sel': lc.district.dl_id,
+        'subdistrict_sel': lc.sub_district.dl_id,
+        'village_sel': lc.village.dl_id,
+        })
+
+def save(request, pid=None):
+    if pid:
+        lc = db.get(pid)
+        if not lc:
+            return
+    else:
+        lc = LiveCenter()
     lc.name = request.POST['name']
+    lc.address = request.POST['address']
     lc.description = request.POST['description']
     lc.district = getLocation(request.POST['district']).key()
     lc.sub_district = getLocation(request.POST['sub_district']).key()
     lc.village = getLocation(request.POST['village']).key()
     lc.geo_pos = request.POST['geo_pos'] or default_location() 
     lc.put()
-    counter.update('site_lc_count', 1)
-    if 'photo' in request.POST and request.POST['photo']:
+    if not pid:
+        counter.update('site_lc_count', 1)
+    if not request.FILES['photo']:
+        return lc
+    att = Attachment.all().filter('containers', lc.key()).get()
+    if not att:
         att = Attachment()
-        att.containers.append(lc.key())
-        att.filename = 'photo_%s' % lc.key().id()
-        att.filesize = 1024
-        att.file = db.Blob(request.POST['photo'])
-        att.put()
-    return HttpResponseRedirect('/livecenter')
+    att.containers.append(lc.key())
+    att.filename = 'photo_%s' % lc.key().id()
+    att.filesize = 1024
+    att.file = db.Blob(request.FILES['photo'])
+    att.put()
+    return lc 
 
 def delete(request, pid=None):
     if not pid:
