@@ -69,7 +69,7 @@
             {% for item in livecenter.clusters %}
               <li id="cr{{ item.key.id }}">
                 {% if user.is_staff %}
-                <span class="right"><a href="/cluster/delete/{{item.key}}" class="uiRemove acRemove uiTip" title=" {% t "Hapus" %} {{item.name}}"></a></span>
+                <span class="right"><a href="/cluster/delete/{{item.key}}?destination={{request.path}}" class="uiRemove acRemove uiTip" title=" {% t "Hapus" %} {{item.name}}"></a></span>
                 {% endif %}
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">

@@ -21,3 +21,9 @@ def save(request, pid):
     item.category = db.Key(request.POST['category'])
     item.put()
     save_file_upload(request, 'photo', item)
+    
+def delete(request, pid=None):
+    item = db.get(db.Key(pid))
+    if item:
+        item.delete()
+    return HttpResponseRedirect(request.GET['destination'])
