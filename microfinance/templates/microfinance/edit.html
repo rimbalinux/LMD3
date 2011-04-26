@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{% t pagetitle %}{% endblock %}
+{% block loadscript %}
+<script type="text/javascript">
+    district_sel = {{district_sel}};
+    subdistrict_sel = {{subdistrict_sel}};
+
+	if(district_sel > subdistrict_sel){
+		district_sel = {{subdistrict_sel}};
+		subdistrict_sel = {{district_sel}};
+	}
+</script>
+{% endblock %}
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
+<script type="text/javascript" src="/static/js/tabber.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.4.1.js"></script>
+<script type="text/javascript">
+var district_sel = {{ district_sel }};
+var subdistrict_sel = {{ subdistrict_sel }};
+
+$(function(){
+    if ($('#fdistrict').length){
+    	// dependen dropdown
+    	$('#district').bind('change',function(){
+    			var me = this[this.selectedIndex];
+    			if(me.value !=""){
+    				$.ajax({
+    					type: 'GET',
+    					url:'/livecenter/district/'+$(me).val(),
+    					success:function(json){
+    						var data = eval('(' + json + ')');
+    						$('#sub_district').empty()
+                            $('#sub_district').append($('<option />').val("").text('{% t "Pilih kecamatan" %}'));
+    						for(var i = 0;i< data.length;i++){
+    							$('#sub_district').append($('<option />').val(data[i].dl_id).text(data[i].dl_name));
+    						}
+    						if (subdistrict_sel){
+    							$('#sub_district').val('0');
+    							$('#sub_district').val(subdistrict_sel);
+    							$('#sub_district').change();
+    						}
+    					},
+    					error:function(){
+    						alert('error guys')
+    					}
+    				});	
+    			}
+    	});
+    	//var addBinding = function(){
+
+    	//};
+    	
+    	if (district_sel) {
+    	   _ds = $('#district');
+    	   _ds.val(district_sel);
+    	   _ds.change();
+        }
+
+	}
+
+	function setGeoPos(){
+		n1 = $('#n1').val();
+		n2 = ($('#n2').val()/60);
+		e1 = $('#e1').val();
+		e2 = ($('#e2').val()/60);
+		var n = 0;
+		n = (Number(n1)+Number(n2)).toString();
+		var e = 0;
+		e = (Number(e1)+Number(e2)).toString();
+		$('#geo_pos').val(n+","+e);
+	}
+	$('#n1').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#n2').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#e1').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#e2').bind('keyup',function(){
+		setGeoPos();
+	});
+
+	var pos = $('#geo_pos').val();
+	if( $('#geo_pos').length && pos ){
+		geopoint = pos.split(',');
+		n1val = geopoint[0].split(".")[0];
+		n2val = "0."+geopoint[0].split(".")[1];
+		e1val = geopoint[1].split(".")[0];
+		e2val = "0."+geopoint[1].split(".")[1];
+		$('#n1').val(n1val);
+		$('#n2').val(Number(n2val)*60);
+		$('#e1').val(e1val);
+		$('#e2').val(Number(e2val)*60);
+		//alert(n1val+'-'+n2val+'-'+e1val+'-'+e2val);
+	}
+
+});
+
+function validate(cek){
+  if(cek.value == ""){
+     var num = 0;
+     num = parseInt(num) + 1;
+     return cek.value = num;
+  }else{
+  var num = cek.value;
+  num = parseInt(num) + 1;
+  return cek.value = num;
+  }
+}
+function validate_min(cek){
+  if(cek.value == ""){
+     var num = 0;
+     num = parseInt(num) - 1;
+     return cek.value = num;
+  }else{
+  var num = cek.value;
+  num = parseInt(num) - 1;
+  return cek.value = num;
+  }
+}
+
+</script>
+{% endblock %}
+
+{% block content %}
+<h2>{% t pagetitle %}</h2>
+<div class="formsheet">
+<form name="fgrid" id="fgrid" method="POST" class="validate" enctype="multipart/form-data">
+<p><label>{% t "Nama Organisasi" %}</label><input type="text" name="name_org" value="{{micro.name_org}}" class="xd" pattern="[a-zA-Z1-9 ]{3,}" required="required" /></p>
+
+<span><label>{% t "Nama Kontak" %}</label><input type="text" name="contact_name" value="{{micro.contact_name}}" pattern="[a-zA-Z0-9 ]{3,}" /></span>
+<span ><label>{% t "Nomor Kontak" %}</label><input type="text" name="mobile" value="{{micro.mobile}}" /></span>
+<span class="clear"></span>
+
+<p><label>{% t "Alamat" %}</label><textarea cols="45" rows="3" name="address">{{micro.address}}</textarea></p>
+<p class="formsetaction">
+<p>
+<fieldset id="fdistrict"><legend>{% t "Lokasi" %}</legend>
+    <span>
+        <label for="district">{% t "Kabupaten" %}</label>
+	<select name="district" id="district" required="required">
+        <option value="0">{% t "Pilih" %}</option>
+	{% for district in districts %}
+	<option value="{{district.dl_id}}" {%if district.dl_id == district_sel %}selected="selected"{%endif%}>{{district.dl_name}}</option>
+	{% endfor %}
+	</select>
+	</span>
+	<span>
+        <label>{% t "Kecamatan" %}</label>
+	<select id="sub_district" name="sub_district" required="required">
+        <option value="">{% t "Pilih" %}</option>
+	</select>
+	</span>
+</fieldset>
+</p>
+<p>
+<fieldset id="fgeopos"><legend>{% t "Koordinat GPS" %}</legend>
+    <span>{% t "Utara" %}</span> : <input name="n1" id="n1" type="text" class="auto" alt="n3x3p0S" size="3" />
+      <input name="n2" id="n2" type="text" class="auto" alt="n2x3p4S" size="10" /> &nbsp;
+      <span>{% t "Timur" %}</span> : <input name="e1" id="e1" type="text" class="auto" alt="n3x3p0S" size="3" />
+      <input name="e2" id="e2" type="text" class="auto" alt="n2x3p4S" size="10" />
+    </fieldset>
+    <input name="geo_pos" id="geo_pos" type="hidden" value="{{ geo_pos}}" />
+</p>
+<fieldset class="grid">
+<span class="c"><label>{% t "Jenis LKM" %}</label><input type="text" name="kind_lkm" value="{{micro.kind_lmd}}" /></span>
+<span class="c"><label>{% t "Total Asset" %} (IDR)</label><input type="text" name="total_asset" value="{{micro.total_asset}}" /></span>
+<span class="clear"></span>
+<span class="c"><label>{% t "Total Penyediaan Dana Pinjaman" %} (IDR)</label><input type="text" name="total_sedia_dana_pinjaman" value="{{micro.total_sedia_dana_pinjaman}}" /></span>
+<span class="c"><label>{% t "Total Penyaluran" %} (IDR)</label><input type="text" name="total_penyaluran" value="{{micro.total_penyaluran}}" /></span>
+<span class="clear"></span>
+<span class="c"><label>{% t "Sektor Usaha yang Dibiayai" %}</label><input type="text" name="sektor_usaha" value="{{micro.sektor_usaha}}"></span>
+<span class="c"><label>{% t "Persyaratan Peminjaman" %}</label><select name="persyaratan_pinjaman"><option value="Type A" {%if micro.persyaratan_pinjaman == "Type A" %}selected="selected"{%endif%}>{% t "Tipe A" %}</option><option value="Type B" {%if micro.persyaratan_pinjaman == "Type B" %}selected="selected"{%endif%}>{% t "Tipe B" %}</option><option value="Type C" {%if micro.persyaratan_pinjaman == "Type C" %}selected="selected"{%endif%}>{% t "Tipe C" %}</option></select></span>
+<span class="clear"></span>
+<span class="c"><label>{% t "Persyaratan Agunan" %}</label><select name="persyaratan_agunan"><option value="Ya" {%if micro.persyaratan_agunan == "Ya" %}selected="selected"{%endif%}>{% t "Ya" %}</option><option value="Tidak" {%if micro.persyaratan_agunan == "Tidak" %}selected="selected"{%endif%}>{% t "Tidak" %}</option></select></span>
+<span class="c"><label>{% t "Jangkauan Wilayah Usaha" %}</label><input type="text" name="jangkauan_wilayah_usaha" value="" /></span>
+<span class="c"><label>{% t "Nilai Maksimal Pinjaman" %} (IDR)</label><input type="text" name="nilai_maks_pinjaman" value="" /></span>
+<span class="clear"></span>
+<span class="c"><label>{% t "Jangka Waktu Pinjaman" %}</label><input type="text" name="jangka_wkt_pinjaman" value="{{micro.jangka_wkt_pinjaman}}" /></span>
+<span class="c"><label>{% t "Bunga Pinjaman" %} (%)</label><input type="text" name="margin_bunga" value="{{micro.margin_bunga}}" /></span>
+<span class="clear"></span>
+<span class="c"><label>{% t "bantuan untuk Penerima Manfaat JFPR" %}</label><select name="bantuan_penerima_mamfaat_jfpr"><option value="Ada" {%if micro.bantuan_penerima_mamfaat_jfpr == "Ada" %}selected="selected"{%endif%}>{% t "Ada" %}</option><option value="Belum" {%if micro.bantuan_penerima_mamfaat_jfpr == "Belum" %}selected="selected"{%endif%}>{% t "Belum" %}</option></select></span>
+
+<span class="clear"></span>
+<span class="c"><label>{% t "Training" %}</label></span>
+<span class="clear"></span>
+<span><label>A. {% t "Manajemen Usaha" %}</label><input type="input" name="manajemen_usaha" value="{{micro.manajemen_usaha}}" readonly> <input type="button" name="plus" onclick="validate(manajemen_usaha)" value="+" /><input type="button" name="minus" onclick="validate_min(manajemen_usaha)" value="-" /></span>
+<span class="clear"></span>
+<span><label>B. {% t "Pembukuan" %}</label><input type="input" name="pembukuan" value="{{micro.pembukuan}}" readonly> <input type="button" name="plus" onclick="validate(pembukuan)" value="+" /><input type="button" name="minus" onclick="validate_min(pembukuan)" value="-" /></span>
+<span class="clear"></span>
+<span><label>C. {% t "Akses Pasar" %}</label><input type="input" name="akses_pasar" value="{{micro.akses_pasar}}" readonly> <input type="button" name="plus" onclick="validate(akses_pasar)" value="+" /><input type="button" name="minus" onclick="validate_min(akses_pasar)" value="-" /></span>
+<span class="clear"></span>
+<span><label>D. {% t "Keuangan Mikro" %}</label><input type="input" name="keuangan_mikro" value="{{micro.keuangan_micro}}" readonly> <input type="button" name="plus" onclick="validate(keuangan_mikro)" value="+" /><input type="button" name="minus" onclick="validate_min(keuangan_mikro)" value="-" /></span>
+
+<span class="clear"></span>
+<span><label>E. {% t "Penguatan Service Excellence" %}</label></span>
+<span><label>   1. {% t "Account Officer" %}</label><input type="input" name="ao" value="{{micro.ao}}" readonly> <input type="button" name="plus" onclick="validate(ao)" value="+" /><input type="button" name="minus" onclick="validate_min(ao)" value="-" /></span>
+<span class="clear"></span>
+<span><label>   2. {% t "Customer Service" %}</label><input type="input" name="cs" value="{{micro.cs}}" readonly> <input type="button" name="plus" onclick="validate(cs)" value="+" /><input type="button" name="minus" onclick="validate_min(cs)" value="-" /></span>
+<span class="clear"></span>
+<span><label>   3. {% t "Teller" %}</label><input type="input" name="tl" value="{{micro.tl}}" readonly> <input type="button" name="plus" onclick="validate(tl)" value="+" /><input type="button" name="minus" onclick="validate_min(tl)" value="-" /></span>
+<span class="clear"></span>
+<span><label>F. {% t "Kelayakan Usaha" %}</label><input type="input" name="kelayakan_usaha" value="{{micro.kelayakan_usaha}}" readonly> <input type="button" name="plus" onclick="validate(kelayakan_usaha)" value="+" /><input type="button" name="minus" onclick="validate_min(kelayakan_usaha)" value="-" /></span>
+</fieldset>
+<p><label>{% t "Foto" %}</label><input type="file" name="photo" /></p>
+<input type="submit" value="{% t "Simpan" %}" class="uiButton_blue" />
+<a href="/microfinance" class="uiButton" >{% t "Batal" %}</a>
+</p>
+
+</form>
+</div>
+{% endblock %}

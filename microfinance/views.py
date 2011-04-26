@@ -1,4 +1,5 @@
-from livecenter.models import MicroFinance 
+from livecenter.models import *
+from livecenter.utils import getLocation
 from livecenter.views import DEFAULT_LOCATION
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
@@ -6,6 +7,8 @@ from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
 
+def default_location():
+    return ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
 
 def index(request):
     q = 'q' in request.GET and request.GET['q']
@@ -43,7 +46,7 @@ def show(request, pid):
         ['Jangkauan wilayah usaha', item.jangkauan_wilayah_usaha],
         ['Nilai pinjaman maksimum', item.nilai_maks_pinjaman],
         ['Jangka waktu pinjaman', item.jangka_wkt_pinjaman],
-        ['Bunga pinjaman', '%.2f %%' % item.margin_bunga],
+        ['Bunga pinjaman', '%s %%' % item.margin_bunga],
         ['Bantuan untuk penerima manfaat JFPR', item.bantuan_penerima_mamfaat_jfpr],
         ['Pelatihan', '<none>'],
         ['Pengelolaan usaha', '%d kali' % item.manajemen_usaha],
@@ -63,3 +66,104 @@ def show(request, pid):
         'keuangan': keuangan,
         'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
         })
+
+def create(request):
+    if request.POST: 
+        micro = save(request)
+        return HttpResponseRedirect('/microfinance/show/%s' % micro.key())
+    return direct_to_template(request, 'microfinance/create.html', {
+        'pagetitle': 'Tambah Keuangan Mikro',
+        'district_sel': 0,
+        'subdistrict_sel': 0,
+        'village_sel': 0,
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
+        })
+
+def edit(request, pid):
+    if request.POST:
+        micro = save(request, pid)
+        if micro:
+            return HttpResponseRedirect('/microfinance/show/%s' % micro.key())
+        return HttpResponseRedirect('/microfinance')
+    micro = db.get(pid)
+    return direct_to_template(request, 'microfinance/edit.html', {
+        'pagetitle': 'Ubah ' + micro.name_org,
+        'micro': micro,
+        'geo_pos': micro.geo_pos,
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
+        'district_sel': micro.district.dl_id,
+        'subdistrict_sel': micro.sub_district.dl_id,
+        })
+
+def save(request, pid=None):
+    if pid:
+        micro = db.get(pid)
+        if not micro:
+            return
+    else:
+        micro = MicroFinance()
+    micro.name_org = request.POST['name_org']
+    micro.contact_name = request.POST['contact_name']
+    micro.geo_pos = request.POST['geo_pos'] or default_location() 
+    micro.district = getLocation(request.POST['district']).key()
+    micro.sub_district = getLocation(request.POST['sub_district']).key()
+    micro.kind_lkm = request.POST['kind_lkm']
+    if request.POST['total_asset']:
+        micro.total_asset = int(request.POST['total_asset'])
+    if request.POST['total_sedia_dana_pinjaman']:
+	micro.total_sedia_dana_pinjaman  = int(request.POST['total_sedia_dana_pinjaman'])
+    if request.POST['total_penyaluran']:
+	micro.penyaluran  = int(request.POST['total_penyaluran'])
+    micro.sektor_usaha = request.POST['sektor_usaha']
+    micro.persyaratan_pinjaman = request.POST['persyaratan_pinjaman']
+    micro.persyaratan_agunan = request.POST['persyaratan_agunan']
+    micro.jangkauan_wilayah_usaha = request.POST['jangkauan_wilayah_usaha']
+    micro.nilai_maks_pinjaman = request.POST['nilai_maks_pinjaman']
+    micro.jangka_wkt_pinjaman = request.POST['jangka_wkt_pinjaman']
+    micro.margin_bunga = request.POST['margin_bunga']
+    micro.bantuan_penerima_mamfaat_jfpr = request.POST['bantuan_penerima_mamfaat_jfpr']
+    if request.POST['manajemen_usaha']:
+	micro.manajemen_usaha  = int(request.POST['manajemen_usaha'])
+    if request.POST['pembukuan']:
+	micro.pembukuan  = int(request.POST['pembukuan'])
+    if request.POST['akses_pasar']:
+	micro.akses_pasar  = int(request.POST['akses_pasar'])
+    if request.POST['keuangan_mikro']:
+	micro.keuangan_mikro  = int(request.POST['keuangan_mikro'])
+    if request.POST['ao']:
+	micro.ao  = int(request.POST['ao'])
+    if request.POST['cs']:
+	micro.cs  = int(request.POST['cs'])
+    if request.POST['tl']:
+	micro.tl  = int(request.POST['tl'])
+    if request.POST['kelayakan_usaha']:
+	micro.kelayakan_usaha  = int(request.POST['kelayakan_usaha'])
+    if request.POST['address']:
+	micro.address  = request.POST['address']
+    if request.POST['mobile']:
+	micro.mobile   = request.POST['mobile']
+    micro.put()
+    if not pid:
+        counter.update('site_micro_count', 1)
+    if 'photo' in request.FILES:
+	att = Attachment.all().filter('containers', micro.key()).get()
+	if not att:
+	    att = Attachment()
+	att.containers.append(micro.key())
+	att.filename = 'photo_%s' % micro.key().id()
+	att.filesize = 1024
+	att.file = db.Blob(request.FILES['photo'].read())
+	att.put()
+	return micro
+    else:
+	return micro
+
+def delete(request, pid=None):
+    if not pid:
+        return HttpResponseRedirect('/microfinance')
+    item = db.get( pid )
+    if not item:
+        return HttpResponseRedirect('/microfinance')
+    counter.update('site_micro_count', -1)
+    item.delete()
+    return HttpResponseRedirect('/microfinance')
