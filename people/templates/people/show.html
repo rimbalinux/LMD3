@@ -85,7 +85,7 @@
             {% if user.is_staff %}
               <tr><td class="label"><span>{% t "Email" %}</span></td><td>{{person.email}}</td></tr>
               <tr><td class="label"><span>{% t "Pendidikan terakhir" %}</span></td><td>{{person.education}}</td></tr>
-              <tr><td class="label"><span>{% t "Penghasilan bulanan" %}</span></td><td>{{person.monthly_income}}</td></tr>
+              <tr><td class="label"><span>{% t "Penghasilan bulanan" %}</span></td><td>{% money person.monthly_income %}</td></tr>
             {% endif %}
         </table>
     </div>

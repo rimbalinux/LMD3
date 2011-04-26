@@ -43,8 +43,8 @@ def show(request, pid):
 
 def create(request):
     if request.POST: 
-        save(request)
-        return HttpResponseRedirect('/livecenter/show/' + lc.key())
+        lc = save(request)
+        return HttpResponseRedirect('/livecenter/show/%s' % lc.key())
     return direct_to_template(request, 'livecenter/create.html', {
         'pagetitle': 'Tambah Mata Pencaharian',
         'district_sel': 0,
@@ -83,7 +83,8 @@ def save(request, pid=None):
     lc.district = getLocation(request.POST['district']).key()
     lc.sub_district = getLocation(request.POST['sub_district']).key()
     lc.village = getLocation(request.POST['village']).key()
-    lc.geo_pos = request.POST['geo_pos'] or default_location() 
+    if request.POST['geo_pos']:
+        lc.geo_pos = request.POST['geo_pos']
     lc.put()
     if not pid:
         counter.update('site_lc_count', 1)
@@ -148,3 +149,50 @@ def cluster_save(request, pid):
     item.livecenter.append(db.Key(pid))
     item.put()
     save_file_upload(request, 'photo', item)
+    
+def people(request, pid):
+    if request.POST:
+        people_save(request, pid)
+        return HttpResponseRedirect('/livecenter/show/%s' % pid)
+    return direct_to_template(request, 'livecenter/people.html', {
+        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
+        'livecenter': db.get(pid),
+        'district_sel': 0,
+        'subdistrict_sel': 0,
+        'village_sel': 0,
+        })
+
+def people_save(request, pid):
+    item = Person()
+    item.name         = request.POST['name']
+    item.description  = request.POST['description']
+    item.district     = getLocation(request.POST['district']).key()
+    item.sub_district = getLocation(request.POST['sub_district']).key()
+    item.village      = getLocation(request.POST['village']).key()
+    if request.POST['geo_pos']:
+        item.geo_pos = request.POST['geo_pos']
+    #item.livecenter   = db.Key(request.POST['livecenter'])
+    item.livecenter   = db.Key(pid)
+    item.gender       = request.POST['gender']
+    item.birth_place  = request.POST['birth_place']
+    item.education    = request.POST['education']
+    item.spouse_name  = request.POST['spouse_name']
+    item.member_type  = request.POST['member_type']
+    item.info         = request.POST['info']
+    if request.POST['address']:
+        item.address  = request.POST['address']
+    if request.POST['mobile']:
+        item.mobile   = request.POST['mobile']
+    if request.POST['email']:
+        item.email    = request.POST['email']
+    if request.POST['birth_year']:
+        item.birth_year   = int(request.POST['birth_year'])
+    if request.POST['monthly_income']:
+        item.monthly_income = int(request.POST['monthly_income'])
+    if request.POST['children_num']:
+        item.children_num = int(request.POST['children_num'])
+    item.put()
+    counter.update('site_member_count', 1)
+    counter.update('lc_member_count_%s' % item.livecenter.key().id(), 1)
+    save_file_upload(request, 'photo', item)
+    return item

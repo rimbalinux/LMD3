@@ -7,6 +7,7 @@
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
 {% include "tabber.html" %}
+{% include "facebox.html" %}
 {% endblock %}
 
 {% block content %}
@@ -17,13 +18,13 @@
 
 {% easy_map lokasi 900 400 7 using "livecenter/map/index.html" %}
 
-{% if user.is_staff %}
-<p><a href="/livecenter/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah Pusat Mata Pencaharian" %}</span></a></p>
-{% endif %}
 
 <div class="tabber">
     <div class="tabbertab">
         <h4>{% t "Pusat Mata Pencaharian" %}</h4>
+        {% if user.is_staff %}
+        <p><a href="/livecenter/create" class="uiButton" rel="facebox"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
+        {% endif %}
         <ul class="uiListView icon-left">
           {% for item in livecenters %}
             <li id="gr{{item.key.id}}">
