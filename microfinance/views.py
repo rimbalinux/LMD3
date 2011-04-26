@@ -111,9 +111,9 @@ def save(request, pid=None):
     if request.POST['total_asset']:
         micro.total_asset = int(request.POST['total_asset'])
     if request.POST['total_sedia_dana_pinjaman']:
-	micro.total_sedia_dana_pinjaman  = int(request.POST['total_sedia_dana_pinjaman'])
+        micro.total_sedia_dana_pinjaman  = int(request.POST['total_sedia_dana_pinjaman'])
     if request.POST['total_penyaluran']:
-	micro.penyaluran  = int(request.POST['total_penyaluran'])
+        micro.penyaluran  = int(request.POST['total_penyaluran'])
     micro.sektor_usaha = request.POST['sektor_usaha']
     micro.persyaratan_pinjaman = request.POST['persyaratan_pinjaman']
     micro.persyaratan_agunan = request.POST['persyaratan_agunan']
@@ -123,40 +123,38 @@ def save(request, pid=None):
     micro.margin_bunga = request.POST['margin_bunga']
     micro.bantuan_penerima_mamfaat_jfpr = request.POST['bantuan_penerima_mamfaat_jfpr']
     if request.POST['manajemen_usaha']:
-	micro.manajemen_usaha  = int(request.POST['manajemen_usaha'])
+        micro.manajemen_usaha  = int(request.POST['manajemen_usaha'])
     if request.POST['pembukuan']:
-	micro.pembukuan  = int(request.POST['pembukuan'])
+        micro.pembukuan  = int(request.POST['pembukuan'])
     if request.POST['akses_pasar']:
-	micro.akses_pasar  = int(request.POST['akses_pasar'])
+        micro.akses_pasar  = int(request.POST['akses_pasar'])
     if request.POST['keuangan_mikro']:
-	micro.keuangan_mikro  = int(request.POST['keuangan_mikro'])
+        micro.keuangan_mikro  = int(request.POST['keuangan_mikro'])
     if request.POST['ao']:
-	micro.ao  = int(request.POST['ao'])
+        micro.ao  = int(request.POST['ao'])
     if request.POST['cs']:
-	micro.cs  = int(request.POST['cs'])
+        micro.cs  = int(request.POST['cs'])
     if request.POST['tl']:
-	micro.tl  = int(request.POST['tl'])
+        micro.tl  = int(request.POST['tl'])
     if request.POST['kelayakan_usaha']:
-	micro.kelayakan_usaha  = int(request.POST['kelayakan_usaha'])
+        micro.kelayakan_usaha  = int(request.POST['kelayakan_usaha'])
     if request.POST['address']:
-	micro.address  = request.POST['address']
+        micro.address  = request.POST['address']
     if request.POST['mobile']:
-	micro.mobile   = request.POST['mobile']
+        micro.mobile   = request.POST['mobile']
     micro.put()
     if not pid:
         counter.update('site_micro_count', 1)
     if 'photo' in request.FILES:
-	att = Attachment.all().filter('containers', micro.key()).get()
-	if not att:
-	    att = Attachment()
-	att.containers.append(micro.key())
-	att.filename = 'photo_%s' % micro.key().id()
-	att.filesize = 1024
-	att.file = db.Blob(request.FILES['photo'].read())
-	att.put()
-	return micro
-    else:
-	return micro
+        att = Attachment.all().filter('containers', micro.key()).get()
+        if not att:
+            att = Attachment()
+        att.containers.append(micro.key())
+        att.filename = 'photo_%s' % micro.key().id()
+        att.filesize = 1024
+        att.file = db.Blob(request.FILES['photo'].read())
+        att.put()
+    return micro
 
 def delete(request, pid=None):
     if not pid:

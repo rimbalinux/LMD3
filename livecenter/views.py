@@ -1,5 +1,5 @@
 from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
-        Attachment
+        Attachment, LiveCluster, LiveCategory
 from .utils import getLocation
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
@@ -85,7 +85,7 @@ def save(request, pid=None):
     lc.put()
     if not pid:
         counter.update('site_lc_count', 1)
-    if not request.FILES['photo']:
+    if 'photo' not in request.FILES:
         return lc
     att = Attachment.all().filter('containers', lc.key()).get()
     if not att:
@@ -119,3 +119,19 @@ def district(request, pid):
             'dl_key' : str(district.key())
             })
     return HttpResponse(json.encode(json_data))
+
+def category(request, pid):
+    if request.POST:
+        category_save(request, pid)
+        return HttpResponseRedirect('/livecenter/show/%s' % pid)
+    return direct_to_template(request, 'livecenter/category.html', {
+        'livecenter': db.get(pid),
+        'categories': LiveCategory.all().filter('no_ancestor', True),
+        })
+
+def category_save(request, pid):
+    lc = db.get( pid )
+    lc.category[:] = []
+    for cat in request.POST.getlist('category'):
+        lc.category.append(db.Key(cat))
+    lc.save()

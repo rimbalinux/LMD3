@@ -6,8 +6,12 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+
 <link rel="stylesheet" type="text/css" href="/stylesheets/tabber.css" />
 <script type="text/javascript" src="/static/js/tabber.js"></script>
+
+{% include "livecenter/facebox.html" %}
+
 {% endblock %}
 
 
@@ -18,8 +22,8 @@
 
 {% if user.is_staff %}
     <p>
-    <a href="/livecenter/edit/{{livecenter.key}}" title="edit {{livecenter.name}}" class="uiButton uiTip"><span>{% t "Ubah keterangan" %}</span></a>
-    <a href="/livecenter/category_edit/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="Manage Categories"><span>{% t "Ubah kategori" %}</span></a>
+    <a href="/livecenter/edit/{{livecenter.key}}" title="{% t "Ubah" %} {{livecenter.name}}" class="uiButton uiTip"><span>{% t "Ubah keterangan" %}</span></a>
+    <a href="/livecenter/category/{{livecenter.key}}" rel="facebox" class="uiButton">{% t "Ubah kategori" %}</a>
     <a href="/cluster/create/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="Add New Cluster"><span>{% t "Tambah gugusan" %}</span></a>
     <a href="#categoryselect" rel="facebox" class="uiButton uiTip" title="Add New Group"><span langtag="add-groups">{% t "Tambah kelompok" %}</span></a>
     <a href="/people/create" class="uiButton uiTip" title="Add New Member"><span>{% t "Tambah anggota" %}</span></a>
