@@ -1,0 +1,28 @@
+{% load lang %}
+<h3><i class="icon_small category"></i>{% t "Gugusan baru untuk " %} {{livecenter.name}}</h3>
+<form name="fcategory" action="/livecenter/cluster/{{livecenter.key}}" class="validate" method="POST" enctype="multipart/form-data">
+    <p><label>{% t "Kategori" %}</label>
+    <select name="category">
+        <option value="">{% t "Pilih" %}</option>
+        {% for cat in categories %}
+            <optgroup label="{{cat.name}}">
+                {% for ent in cat.enterprises %}
+                {% if ent.key in livecenter.category %}
+                <option value="{{ent.key}}">{{ent.name}}</option>
+                {% endif %}
+                {% endfor %}
+            </optgroup>
+        {% endfor %}
+    </select>
+</p>
+<p><label>{% t "Nama gugusan" %}</label>
+	<input type="text" name="name" class="xe" value="" required="required" />
+</p>
+<p><label>{% t "Keterangan" %}</label>
+<textarea class="xe" rows="4" name="info"></textarea></p>
+<p><label langtag="cat-create-photo">{% t "Foto" %}</label>
+<input type="file" name="photo" /></p>
+<p class="formsetaction">
+<input type="submit" value=" {% t "Simpan" %} " class="uiButton_blue" />
+</p>
+</form>

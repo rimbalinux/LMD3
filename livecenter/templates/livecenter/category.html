@@ -1,0 +1,17 @@
+{% load lang %}
+<h4><strong>{% t "Tentukan kategori untuk" %}</strong> {{livecenter.name}}</h4>
+<form method="POST" action="/livecenter/category/{{livecenter.key}}">
+<ul class="metapick">
+{% for category in categories %}
+<li><b>{{category.name}}</b></li>
+    <ul>
+    {% for ent in category.enterprises %}
+    <li><input type="checkbox" {% if ent.key in livecenter.category %} checked="checked" {% endif %} name="category" value="{{ent.key}}" />{{ent.name}}</li>
+    {% endfor %}
+    </ul>
+{% endfor %}
+</ul>
+<p class="formaction">
+  <input type="submit" value=" {% t "Simpan" %} " class="uiButton_blue" />
+</p>
+</form>
