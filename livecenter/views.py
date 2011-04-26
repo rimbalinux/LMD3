@@ -1,5 +1,7 @@
 from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
         Attachment, LiveCluster, LiveCategory
+from attachment.models import Attachment
+from attachment.utils import save_file_upload
 from .utils import getLocation
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
@@ -87,14 +89,7 @@ def save(request, pid=None):
         counter.update('site_lc_count', 1)
     if 'photo' not in request.FILES:
         return lc
-    att = Attachment.all().filter('containers', lc.key()).get()
-    if not att:
-        att = Attachment()
-    att.containers.append(lc.key())
-    att.filename = 'photo_%s' % lc.key().id()
-    att.filesize = 1024
-    att.file = db.Blob(request.FILES['photo'].read())
-    att.put()
+    save_file_upload(request, 'photo', lc)
     return lc 
 
 def delete(request, pid=None):
@@ -135,3 +130,21 @@ def category_save(request, pid):
     for cat in request.POST.getlist('category'):
         lc.category.append(db.Key(cat))
     lc.save()
+    
+def cluster(request, pid):
+    if request.POST:
+        cluster_save(request, pid)
+        return HttpResponseRedirect('/livecenter/show/%s' % pid)
+    return direct_to_template(request, 'livecenter/cluster.html', {
+        'livecenter': db.get(db.Key(pid)),
+        'categories': LiveCategory.all().filter('no_ancestor', True),
+        })
+    
+def cluster_save(request, pid):    
+    item = LiveCluster()
+    item.name = request.POST['name']
+    item.info = request.POST['info']
+    item.category = db.Key(request.POST['category'])
+    item.livecenter.append(db.Key(pid))
+    item.put()
+    save_file_upload(request, 'photo', item)

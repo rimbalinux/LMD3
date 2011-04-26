@@ -145,3 +145,17 @@ select, option, textarea {
   float: left;
   margin-right: 15px;
 }
+
+ul.metapick{
+  max-height: 350px;
+  overflow: auto;
+  list-style-type: none;
+  padding: 3px;
+  border-top: 2px solid #F4C97F;
+}
+
+ul.metapick li {
+  clear: both;
+  padding: 4px;
+  border-bottom: 1px solid #ccc;
+}

@@ -8,4 +8,5 @@ urlpatterns = patterns('livecenter.views',
     (r'^edit/(?P<pid>.*)$', 'edit'),
     (r'^delete/(?P<pid>.*)$', 'delete'),
     (r'^category/(?P<pid>.*)$', 'category'),
+    (r'^cluster/(?P<pid>.*)$', 'cluster'),
 )
