@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load livecenter %}
 
 {% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
 
@@ -12,15 +13,11 @@
 
 
 {% block content %}
-<h2><a href="/livecenter">{% t "Pusat Mata Pencaharian" %}</a> / {{ livecenter.name }}</h2>
+<h2>{{ livecenter.name }}</h2>
 
 {% easy_map lokasi 600 300 7 using "livecenter/map/show.html" %} 
 
 {% if user.is_staff %}
-    <p>
-    <a href="#categoryselect" rel="facebox" class="uiButton uiTip" title="Add New Group"><span langtag="add-groups">{% t "Tambah kelompok" %}</span></a>
-    </p>
-    <br />
     <p>
     <a href="/livecenter/member/{{livecenter.key}}" class="uiButton uiTip" title="View Members Map"><span>{% t "Peta anggota" %}</span></a>
     <a href="/livecenter/map/{{livecenter.key}}" class="uiButton uiTip" title="View Groups Map"><span>{% t "Peta kelompok" %}</span></a><br />
@@ -38,7 +35,7 @@
 
 
 <div class="tabber">
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "anggota" %}">
         <h2>{% t "Anggota" %}</h2>
         {% if user.is_staff %}
         <a href="/livecenter/people/{{livecenter.key}}" class="uiButton" rel="facebox">{% t "Tambah" %}</a>
@@ -62,10 +59,10 @@
         {% include "livecenter/paging.html" %}
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "gugusan" %}">
         <h2>{% t "Gugusan" %}</h2>
         {% if user.is_staff %}
-            <a href="/livecenter/cluster/{{livecenter.key}}" rel="facebox" class="uiButton">{% t "Tambah" %}</a>
+            <a href="/livecenter/cluster/{{livecenter.key}}" rel="facebox" class="uiButton right">{% t "Tambah gugusan" %}</a>
         {% endif %}
         <ul class="uiListView icon-left">
             {% for item in livecenter.clusters %}
@@ -77,7 +74,10 @@
                 <span class="block">
                     {% if user.is_staff %}
                     <span class="title"><a href="/group/show_cluster/{{ item.key }}" gid="{{item.key}}" class="preview" >{{ item.name }}</a></span>
-                    <span class="body"><a href="/cluster/edit/{{ item.key }}?destination={{ request.path }}" gid="{{item.key}}" class="preview" rel="facebox">{% t "Ubah" %} {{ item.name }}</a></span>
+                    <span class="body right">
+                        <a href="/cluster/edit/{{ item.key }}?destination={{ request.path }}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
+                        <a href="/group/create/{{ livecenter.key }}/{{ item.key }}?destination={{tab_kelompok}}" rel="facebox" class="uiButton">{% t "Tambah kelompok" %}</a>
+                    </span>
                     {% else %}
                       <span class="title"> {{ item.name }}</span>
                     {% endif %}
@@ -90,14 +90,19 @@
         </ul>
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "kelompok" %}">
         <h2>{% t "Kelompok" %}</h2>
         <ul class="uiListView icon-left">
             {% for item in livecenter.groups %}
               <li id="gr{{ item.key.id }}">
+                {% if user.is_staff %}
+                <span class="right">
+                    <a href="/group/delete/{{item.key}}?destination={{ tab_kelompok }}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a>
+                </span>
+                {% endif %}
                 <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
                 <span class="block">
-                  <span class="title"><a href="/group/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
+                  <span class="title"><a href="/group/show/{{ item.key }}" class="preview">{{ item.name }}</a></span> 
                   <span class="body">{{ item.info }}</span>
                 </span>
               </li>
@@ -107,7 +112,7 @@
         </ul>
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "keuangan" %}">
         <h2>{% t "Keuangan mikro" %}</h2>
             <ul class="uiListView icon-left">
                 {% for item in microfinance %}

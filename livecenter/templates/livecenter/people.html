@@ -1,7 +1,7 @@
 {% load lang %}
 <h2><i class="icon_small home"></i>{% t "Anggota baru di " %} {{livecenter.name}}</h2>
 <div class="formsheet">
-    <form name="fgrid" id="fgrid" method="POST" class="validate" enctype="multipart/form-data">
+    <form name="fgrid" id="fgrid" action="/livecenter/people/{{livecenter.key}}" method="POST" class="validate" enctype="multipart/form-data">
         <p>
             <label>{% t "Nama lengkap" %}</label>
             <input type="text" name="name" value="" class="xd" pattern="[a-zA-Z1-9 ]{3,}" required="required" />

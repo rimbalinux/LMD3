@@ -6,12 +6,13 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+{% include "facebox.html" %}
 {% include "tabber.html" %}
 {% endblock %}
 
 
 {% block content %}
-<h2><a href="/people">{% t "Pusat Mata Pencaharian" %}</a> / {{ person.name }}</h2>
+<h2>{{ person.name }}</h2>
 
 {% easy_map lokasi 600 300 7 using "people/map/show.html" %} 
 
@@ -101,7 +102,13 @@
 </div>
 
 <div class="sidebox">
-    <h4><i class="icon_small contact"></i><strong>{% t "Info kontak" %}</strong></h4>
+    <h4>
+      <i class="icon_small contact"></i>
+      {% t "Info kontak" %}
+      {% if user.is_staff %}
+          <a href="/people/edit/{{person.key}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
+      {% endif %}
+    </h4>
     <p><label>{% t "Alamat" %}</label>{{ person.address }}</p>
     <p><label>{% t "Kabupaten" %}</label>{{ person.district.dl_name }}</p>
     <p><label>{% t "Kecamatan" %}</label>{{ person.sub_district.dl_name }}</p>
@@ -137,6 +144,27 @@
       {% empty %}
         <li>{% t "Belum bergabung ke gugusan manapun" %}</li>
       {% endfor %}
+    </ul>
+</div>
+
+<div class="sidebox">
+    <h4>
+      <i class="icon_small group"></i>
+      {% t "Kelompok" %}
+      {% if user.is_staff %}
+          <a href="/people/group/{{person.key}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
+      {% endif %}
+    </h4>
+    <ul class="uiListView icon-left-small">
+        {% for item in person.groups %}
+          <li>
+            <span class="icon"><img src="/img/{{item.key}}" class="small" /></span>
+            <span class="title"><a href="/group/show/{{item.key}}">{{ item.name }}</a></span>
+            <span class="body">{{item.info}}</span>
+          </li>
+        {% empty %}
+          <li>{% t "Belum bergabung di kelompok manapun" %}</li>
+        {% endfor %}
     </ul>
 </div>
 

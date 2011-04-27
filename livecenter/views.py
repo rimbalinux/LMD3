@@ -1,5 +1,5 @@
 from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
-        Attachment, LiveCluster, LiveCategory
+        Attachment, LiveCluster, LiveCategory, MetaForm, LiveGroup
 from attachment.models import Attachment
 from attachment.utils import save_file_upload
 from .utils import getLocation
@@ -9,6 +9,7 @@ from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
 import json
+import urllib
 
 
 DEFAULT_LOCATION = [4.0287, 96.7181]
@@ -22,6 +23,9 @@ def index(request):
         'livecenters': items,
         'lokasi': default_location(), 
         })
+
+def destination(pid, tabname):
+    return urllib.quote('/livecenter/show/%s?tab=%s' % (pid, tabname))
 
 def show(request, pid):
     lc = db.get(pid)
@@ -39,6 +43,7 @@ def show(request, pid):
         'microfinance': MicroFinance.all().filter('district', lc.district.key()).fetch(10),
         'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
         'lokasi': str(lc.geo_pos).strip('nan,nan') or default_location(),
+        'tab_kelompok': destination(pid, 'kelompok'), 
         })
 
 def create(request):
@@ -116,6 +121,9 @@ def district(request, pid):
             })
     return HttpResponse(json.encode(json_data))
 
+############
+# Category #
+############
 def category(request, pid):
     if request.POST:
         category_save(request, pid)
@@ -131,7 +139,10 @@ def category_save(request, pid):
     for cat in request.POST.getlist('category'):
         lc.category.append(db.Key(cat))
     lc.save()
-    
+
+###########
+# Cluster #
+###########
 def cluster(request, pid):
     if request.POST:
         cluster_save(request, pid)
@@ -149,11 +160,15 @@ def cluster_save(request, pid):
     item.livecenter.append(db.Key(pid))
     item.put()
     save_file_upload(request, 'photo', item)
-    
+ 
+###########
+# Anggota #
+###########
 def people(request, pid):
     if request.POST:
         p = people_save(request, pid)
-        return HttpResponseRedirect('/livecenter/show/%s' % p.livecenter.key())
+        return HttpResponseRedirect('/people/show/%s' % p.key())
+        #return HttpResponseRedirect('/livecenter/show/%s' % p.livecenter.key())
     return direct_to_template(request, 'livecenter/people.html', {
         'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
         'livecenter': db.get(pid),

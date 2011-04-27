@@ -38,3 +38,18 @@ def show(request, pid):
         'training': PersonTraining.all().filter('person', item.key()),
         'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })
+    
+def group(request, pid):
+    if request.POST:
+        group_save(request, pid)
+        return HttpResponseRedirect('/people/%s' % pid)
+    return direct_to_template(request, 'people/group.html', {
+        'person': db.get(pid),
+        })
+    
+def group_save(request, pid):
+    person = db.get( pid )
+    person.livegroup[:] = []
+    for item in request.POST['group'].getlist():
+        person.livegroup.append(db.Key(item))
+    person.save()
