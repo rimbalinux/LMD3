@@ -22,12 +22,10 @@ def getLocationName(id):
 
 
 def getLocation(id):
-    location = None
     try:
-        location = LivelihoodLocation().all().filter('dl_id = ',int(id)).get()
+        return LivelihoodLocation().all().filter('dl_id = ',int(id)).get()
     except:
-        pass
-    return location
+        return
 
 def save_file_upload(request, field, container, ftype='photo'):
     if request.get(field):

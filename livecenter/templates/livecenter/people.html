@@ -7,6 +7,16 @@
             <input type="text" name="name" value="" class="xd" pattern="[a-zA-Z1-9 ]{3,}" required="required" />
         </p>
         <fieldset class="grid">
+
+<span class="c"><label langtag="create-edit-member-of">Member of</label>
+<select name="livecenter">
+<option value="">Select Livelihood Center</option>
+{% for item in livecenters %}
+    <option value="{{item.key}}" {%ifequal item.key person.livecenter %} selected="selected" {%endifequal%}>{{item.name}}</option>
+{% endfor %}
+</select>
+</span>
+
             <span class="c">
                 <label>{% t "Tipe anggota" %}</label>
                 <input type="text" name="member_type" value="" pattern="[a-zA-Z0-9 ]{3,}" />

@@ -152,11 +152,12 @@ def cluster_save(request, pid):
     
 def people(request, pid):
     if request.POST:
-        people_save(request, pid)
-        return HttpResponseRedirect('/livecenter/show/%s' % pid)
+        p = people_save(request, pid)
+        return HttpResponseRedirect('/livecenter/show/%s' % p.livecenter.key())
     return direct_to_template(request, 'livecenter/people.html', {
         'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
         'livecenter': db.get(pid),
+        'livecenters': LiveCenter().all(),
         'district_sel': 0,
         'subdistrict_sel': 0,
         'village_sel': 0,
@@ -171,14 +172,14 @@ def people_save(request, pid):
     item.village      = getLocation(request.POST['village']).key()
     if request.POST['geo_pos']:
         item.geo_pos = request.POST['geo_pos']
-    #item.livecenter   = db.Key(request.POST['livecenter'])
-    item.livecenter   = db.Key(pid)
+    item.livecenter   = db.Key(request.POST['livecenter'])
+    #item.livecenter   = db.Key(pid)
     item.gender       = request.POST['gender']
     item.birth_place  = request.POST['birth_place']
     item.education    = request.POST['education']
     item.spouse_name  = request.POST['spouse_name']
     item.member_type  = request.POST['member_type']
-    item.info         = request.POST['info']
+    item.info         = request.POST['description']
     if request.POST['address']:
         item.address  = request.POST['address']
     if request.POST['mobile']:
