@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
-{% load livecenter %}
 
 {% block title %}{{ person.name }} | {% t "Anggota" %}{% endblock %}
 
@@ -82,13 +81,13 @@
                     </span>
                 </td>
             </tr>
-            <tr><td class="label"><span>{% t "Tempat dan tahun lahir" %}</span></td><td>{{person.birth_place}} {{person.birth_year}}</td></tr>
-            <tr><td class="label"><span>{% t "Nama pasangan" %}</span></td><td>{{person.spouse_name}}</td></tr>
-            <tr><td class="label"><span>{% t "Jumlah tanggungan" %}</span></td><td>{{person.children_num}}</td></tr>
+            <tr><td class="label">{% t "Tempat dan tahun lahir" %}</td><td>{{person.birth_place}} {{person.birth_year|s}}</td></tr>
+            <tr><td class="label">{% t "Nama pasangan" %}</td><td>{{person.spouse_name}}</td></tr>
+            <tr><td class="label">{% t "Jumlah tanggungan" %}</td><td>{{person.children_num|s}}</td></tr>
             {% if user.is_staff %}
-              <tr><td class="label"><span>{% t "Email" %}</span></td><td>{{person.email}}</td></tr>
-              <tr><td class="label"><span>{% t "Pendidikan terakhir" %}</span></td><td>{{person.education}}</td></tr>
-              <tr><td class="label"><span>{% t "Penghasilan bulanan" %}</span></td><td>{% money person.monthly_income %}</td></tr>
+              <tr><td class="label">{% t "Email" %}</td><td>{{person.email|s}}</td></tr>
+              <tr><td class="label">{% t "Pendidikan terakhir" %}</td><td>{{person.education}}</td></tr>
+              <tr><td class="label">{% t "Penghasilan bulanan" %}</td><td>{% money person.monthly_income %}</td></tr>
             {% endif %}
         </table>
     </div>
@@ -111,11 +110,11 @@
           <a href="/people/edit/{{person.key}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
       {% endif %}
     </h4>
-    <p><label>{% t "Alamat" %}</label>{{ person.address }}</p>
+    <p><label>{% t "Alamat" %}</label>{{ person.address|s }}</p>
     <p><label>{% t "Kabupaten" %}</label>{{ person.district.dl_name }}</p>
     <p><label>{% t "Kecamatan" %}</label>{{ person.sub_district.dl_name }}</p>
     <p><label>{% t "Desa" %}</label>{{ person.village.dl_name }}</p>
-    <p><label>{% t "Telepon selular" %}</label>{{ person.mobile }}</p>
+    <p><label>{% t "Telepon selular" %}</label>{{ person.mobile|s }}</p>
     <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat person.geo_pos %}</span></p>
 </div>
 

@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from django.template.base import Node, TemplateSyntaxError
 import re
 import urllib
-from translate.lang import tr
 
 register = template.Library()
 
@@ -89,31 +88,3 @@ def tabdefault(parser, token):
 def positions(coordinat):
     return coordinat and 'positions.push(Array(%s));' % coordinat or ''
 register.filter(positions)
-
-def singleposformat(p):
-    hour = int(p)
-    minute = (p - hour)*60
-    return "%d&deg; %.3f'" % (hour, minute)
-
-class GeoposNode(Node):
-    def __init__(self, coordinat):
-        self.coordinat = template.Variable(coordinat)
-
-    def render(self, context):
-        request = context['request']
-        coordinat = self.coordinat.resolve(context)
-        if not coordinat:
-            return ''
-        latitude, longitude = map(lambda x: singleposformat(float(x)),
-                str(coordinat).split(','))
-        return '%s %s, %s %s' % (
-                tr('Utara', request), latitude,
-                tr('Timur', request), longitude)
-
-@register.tag
-def posformat(parser, token):
-    try:
-        tag, coordinat = token.split_contents()
-    except ValueError:
-        raise TemplateSyntaxError('Penggunaan: {% posformat <geopos> %}')
-    return GeoposNode(coordinat)
