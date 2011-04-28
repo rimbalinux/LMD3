@@ -1,5 +1,6 @@
 {% extends 'livecenter/map/base.html' %}
+{% load livecenter %}
 
 {% block set-positions %}
-{% if person.geo_pos|stringformat:"s" != "nan,nan" %}positions.push(Array({{ person.geo_pos }}));{% endif %}
+{{ person.geo_pos|positions }}
 {% endblock %}

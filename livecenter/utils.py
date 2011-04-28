@@ -10,7 +10,12 @@
 from .models import LivelihoodLocation
 from django.http import HttpResponseRedirect
 import urllib
+from .settings import DEFAULT_LOCATION
 
+
+def default_location(geo_pos=None):
+    return geo_pos and str(geo_pos).strip('nan,nan') or \
+           ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
 
 def getLocation(id):
     try:

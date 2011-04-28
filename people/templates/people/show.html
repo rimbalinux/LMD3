@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load livecenter %}
 
 {% block title %}{{ person.name }} | {% t "Anggota" %}{% endblock %}
 
@@ -115,7 +116,7 @@
     <p><label>{% t "Kecamatan" %}</label>{{ person.sub_district.dl_name }}</p>
     <p><label>{% t "Desa" %}</label>{{ person.village.dl_name }}</p>
     <p><label>{% t "Telepon selular" %}</label>{{ person.mobile }}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{ person.geo_pos }}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat person.geo_pos %}</span></p>
 </div>
 
 <div class="sidebox">

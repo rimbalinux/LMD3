@@ -1,16 +1,14 @@
 from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
         LiveCenter
-from livecenter.views import default_location 
-from livecenter.utils import redirect, getLocationKey
+from livecenter.utils import redirect, getLocationKey, default_location
 from attachment.utils import save_file_upload
+from .settings import GENDERS
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
 
-
-GENDERS = ['Male','Female']
 
 def counter_update(lid, i):
     counter.update('site_member_count', i)
@@ -25,7 +23,7 @@ def index(request):
         'people_count': counter.get('site_member_count'),
         'prev': prev,
         'next': next,
-        'lokasi': default_location(), 
+        'lokasi': default_location(),
         })
 
 def show(request, pid):
@@ -45,7 +43,7 @@ def show(request, pid):
         'boat': boat,
         'customfields': customfields,
         'training': PersonTraining.all().filter('person', item.key()),
-        'lokasi': str(item.geo_pos).strip('nan,nan') or default_location(),
+        'lokasi': default_location(item.geo_pos),
         })
 
 def create(request, lid): # lid = livecenter
@@ -74,10 +72,11 @@ def edit(request, pid): # pid = person id
         'person': item,
         'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
         'livecenter': item.livecenter, 
-        'district_sel': item.district.dl_id,
-        'subdistrict_sel': item.sub_district.dl_id,
-        'village_sel': item.village.dl_id,
+        'district_sel': item.district and item.district.dl_id or 0,
+        'subdistrict_sel': item.sub_district and item.sub_district.dl_id or 0,
+        'village_sel': item.village and item.village.dl_id or 0,
         'genders': GENDERS,
+        'geo_pos': item.geo_pos,
         })
 
 def save(request, item):

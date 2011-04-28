@@ -2,7 +2,7 @@ from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
         Attachment, LiveCluster, LiveCategory, MetaForm
 from attachment.models import Attachment
 from attachment.utils import save_file_upload
-from .utils import getLocation
+from .utils import getLocation, default_location
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
 from google.appengine.ext import db
@@ -11,11 +11,6 @@ import counter
 import json
 import urllib
 
-
-DEFAULT_LOCATION = [4.0287, 96.7181]
-
-def default_location():
-    return ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
 
 def index(request):
     items = LiveCenter.all().order('name')
