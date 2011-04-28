@@ -35,14 +35,13 @@
 
 
 <div class="tabber">
-    <div class="tabbertab {% tabdefault "anggota" %}">
+    <div class="tabbertab {% tabdefault "member" %}">
         <h2>{% t "Anggota" %}</h2>
         {% if user.is_staff %}
-        <a href="/livecenter/people/{{livecenter.key}}" class="uiButton" rel="facebox">{% t "Tambah" %}</a>
+        <a href="/people/create/{{livecenter.key}}?destination={{tab_member}}" class="uiButton right" rel="facebox">{% t "Tambah" %}</a>
         {% endif %}
         <ul class="uiListView icon-left"> 
             {% for item in members %}
-                {% if item.groups %}
                     <li id="gr{{ item.key.id }}">
                         <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                         <span class="block">
@@ -51,7 +50,6 @@
                         <span class="body">{{ item.district.dl_name }}</span>
                         </span>
                     </li>
-                {% endif %}
             {% empty %}
                 <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}
@@ -59,7 +57,7 @@
         {% include "livecenter/paging.html" %}
     </div>
 
-    <div class="tabbertab {% tabdefault "gugusan" %}">
+    <div class="tabbertab {% tabdefault "cluster" %}">
         <h2>{% t "Gugusan" %}</h2>
         {% if user.is_staff %}
             <a href="/livecenter/cluster/{{livecenter.key}}" rel="facebox" class="uiButton right">{% t "Tambah gugusan" %}</a>
@@ -68,15 +66,15 @@
             {% for item in livecenter.clusters %}
               <li id="cr{{ item.key.id }}">
                 {% if user.is_staff %}
-                <span class="right"><a href="/cluster/delete/{{item.key}}?destination={{request.path}}" class="uiRemove acRemove uiTip" title=" {% t "Hapus" %} {{item.name}}"></a></span>
+                <span class="right"><a href="/cluster/delete/{{item.key}}?destination={{request.path}}" class="uiRemove" title=" {% t "Hapus" %} {{item.name}}"></a></span>
                 {% endif %}
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">
                     {% if user.is_staff %}
-                    <span class="title"><a href="/group/show_cluster/{{ item.key }}" gid="{{item.key}}" class="preview" >{{ item.name }}</a></span>
+                    <span class="title"><a href="/group/show_cluster/{{ item.key }}" class="preview" >{{ item.name }}</a></span>
                     <span class="body right">
                         <a href="/cluster/edit/{{ item.key }}?destination={{ request.path }}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
-                        <a href="/group/create/{{ livecenter.key }}/{{ item.key }}?destination={{tab_kelompok}}" rel="facebox" class="uiButton">{% t "Tambah kelompok" %}</a>
+                        <a href="/group/create/{{ livecenter.key }}/{{ item.key }}?destination={{tab_group}}" rel="facebox" class="uiButton">{% t "Tambah kelompok" %}</a>
                     </span>
                     {% else %}
                       <span class="title"> {{ item.name }}</span>
@@ -90,14 +88,14 @@
         </ul>
     </div>
 
-    <div class="tabbertab {% tabdefault "kelompok" %}">
+    <div class="tabbertab {% tabdefault "group" %}">
         <h2>{% t "Kelompok" %}</h2>
         <ul class="uiListView icon-left">
             {% for item in livecenter.groups %}
               <li id="gr{{ item.key.id }}">
                 {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/delete/{{item.key}}?destination={{ tab_kelompok }}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a>
+                    <a href="/group/delete/{{item.key}}?destination={{ tab_group }}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a>
                 </span>
                 {% endif %}
                 <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
@@ -112,14 +110,14 @@
         </ul>
     </div>
 
-    <div class="tabbertab {% tabdefault "keuangan" %}">
+    <div class="tabbertab {% tabdefault "microfinance" %}">
         <h2>{% t "Keuangan mikro" %}</h2>
             <ul class="uiListView icon-left">
                 {% for item in microfinance %}
                   <li id="gr{{item.key.id}}">
                     <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                     <span class="block">
-                      <span class="title"><a href="/microfinance/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
+                      <span class="title"><a href="/microfinance/show/{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
                       <span class="body">{{ item.district.dl_name }} / {{ item.sub_district.dl_name}}</span>
                     </span>
                   </li>

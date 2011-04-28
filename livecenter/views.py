@@ -1,5 +1,5 @@
 from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
-        Attachment, LiveCluster, LiveCategory, MetaForm, LiveGroup
+        Attachment, LiveCluster, LiveCategory, MetaForm
 from attachment.models import Attachment
 from attachment.utils import save_file_upload
 from .utils import getLocation
@@ -43,7 +43,9 @@ def show(request, pid):
         'microfinance': MicroFinance.all().filter('district', lc.district.key()).fetch(10),
         'related_livecenter': LiveCenter.all().filter('category IN', lc.category ).filter('__key__ !=', lc.key()).fetch(5),
         'lokasi': str(lc.geo_pos).strip('nan,nan') or default_location(),
-        'tab_kelompok': destination(pid, 'kelompok'), 
+        'tab_member': destination(pid, 'member'),
+        'tab_cluster': destination(pid, 'cluster'),
+        'tab_group': destination(pid, 'group'),
         })
 
 def create(request):
@@ -160,55 +162,3 @@ def cluster_save(request, pid):
     item.livecenter.append(db.Key(pid))
     item.put()
     save_file_upload(request, 'photo', item)
- 
-###########
-# Anggota #
-###########
-def people(request, pid):
-    if request.POST:
-        p = people_save(request, pid)
-        return HttpResponseRedirect('/people/show/%s' % p.key())
-        #return HttpResponseRedirect('/livecenter/show/%s' % p.livecenter.key())
-    return direct_to_template(request, 'livecenter/people.html', {
-        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
-        'livecenter': db.get(pid),
-        'livecenters': LiveCenter().all(),
-        'district_sel': 0,
-        'subdistrict_sel': 0,
-        'village_sel': 0,
-        })
-
-def people_save(request, pid):
-    item = Person()
-    item.name         = request.POST['name']
-    item.description  = request.POST['description']
-    item.district     = getLocation(request.POST['district']).key()
-    item.sub_district = getLocation(request.POST['sub_district']).key()
-    item.village      = getLocation(request.POST['village']).key()
-    if request.POST['geo_pos']:
-        item.geo_pos = request.POST['geo_pos']
-    item.livecenter   = db.Key(request.POST['livecenter'])
-    #item.livecenter   = db.Key(pid)
-    item.gender       = request.POST['gender']
-    item.birth_place  = request.POST['birth_place']
-    item.education    = request.POST['education']
-    item.spouse_name  = request.POST['spouse_name']
-    item.member_type  = request.POST['member_type']
-    item.info         = request.POST['description']
-    if request.POST['address']:
-        item.address  = request.POST['address']
-    if request.POST['mobile']:
-        item.mobile   = request.POST['mobile']
-    if request.POST['email']:
-        item.email    = request.POST['email']
-    if request.POST['birth_year']:
-        item.birth_year   = int(request.POST['birth_year'])
-    if request.POST['monthly_income']:
-        item.monthly_income = int(request.POST['monthly_income'])
-    if request.POST['children_num']:
-        item.children_num = int(request.POST['children_num'])
-    item.put()
-    counter.update('site_member_count', 1)
-    counter.update('lc_member_count_%s' % item.livecenter.key().id(), 1)
-    save_file_upload(request, 'photo', item)
-    return item

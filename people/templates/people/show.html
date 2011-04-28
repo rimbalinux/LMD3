@@ -12,7 +12,8 @@
 
 
 {% block content %}
-<h2>{{ person.name }}</h2>
+<h2>{{ person.name }}
+</h2>
 
 {% easy_map lokasi 600 300 7 using "people/map/show.html" %} 
 
@@ -168,5 +169,11 @@
     </ul>
 </div>
 
+{% if user.is_staff %}
+<div class="sidebox">
+    <h4>{%t "Hati-hati" %}</h4>
+    <a href="/people/delete/{{person.key}}" class="uiButton">{% t "Hapus" %} {{person.name}}</a>
+</div>
+{% endif %}
 
 {% endblock %}

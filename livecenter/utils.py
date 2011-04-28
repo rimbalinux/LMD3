@@ -18,6 +18,10 @@ def getLocation(id):
     except:
         return
 
+def getLocationKey(id):
+    location = getLocation(id)
+    return location and location.key() or None
+
 def redirect(request, default_url='/'):
     return HttpResponseRedirect('destination' in request.GET and \
             urllib.unquote(request.GET['destination']) or default_url)

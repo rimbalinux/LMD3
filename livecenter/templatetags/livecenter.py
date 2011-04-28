@@ -8,6 +8,9 @@ import urllib
 
 register = template.Library()
 
+############
+# Metaform #
+############
 def _metaform(item, meta):
     t = meta.form_type
     try:
@@ -31,6 +34,9 @@ def metaform(item, meta, autoescape=None):
 metaform.needs_autoescape = True
 register.filter(metaform)
  
+############
+# Metaview #
+############
 def metaview(item, meta):
     if meta.form_type == 'file':
         return ''
@@ -41,12 +47,22 @@ def metaview(item, meta):
 metaview.is_safe = True
 register.filter(metaview)
 
+##############
+# Dictionary #
+##############
 def dictval(d, key):
     return d[key] 
 register.filter('dict', dictval)
 
+def dictquery(d):
+    return urllib.urlencode(d)
+register.filter(dictquery)
+
+###############
+# Tab default #
+###############
 def _tabdefault(d, checkval):
-    return 'tab' in d and d['tab'] in [checkval,str(checkval)] \
+    return 'tab' in d and d['tab'] in [checkval, str(checkval)] \
             and 'tabbertabdefault' or ''
 
 class TabdefaultNode(Node):
@@ -65,3 +81,9 @@ def tabdefault(parser, token):
     except ValueError:
         raise TemplateSyntaxError('Penggunaan tag tabdefault: {% tabdefault "namatab" %}')
     return TabdefaultNode(text)
+
+###############
+# Form select #
+###############
+def selected(val, options):
+    return val
