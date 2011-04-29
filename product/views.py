@@ -1,6 +1,6 @@
 from .models import Product
 from livecenter.models import LiveGroup, MetaForm
-from livecenter.views import DEFAULT_LOCATION
+from livecenter.utils import default_location
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
@@ -31,7 +31,7 @@ def index(request):
         'product_count': counter.get('site_product_count'),
         #'prev': prev,
         #'next': next,
-        'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
+        'lokasi': default_location(), 
         })
 
 def show(request, pid):
@@ -42,5 +42,5 @@ def show(request, pid):
         'customfields': MetaForm.all().order('__key__').filter('meta_type', 'product').filter('container', item.category.key()),
         'product': item,
         'person': item.person,
-        'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
+        'lokasi': default_location(), 
         })

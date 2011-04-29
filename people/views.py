@@ -2,6 +2,7 @@ from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
         LiveCenter
 from livecenter.utils import redirect, getLocationKey, default_location
 from attachment.utils import save_file_upload
+from transaction.models import Transaction
 from .settings import GENDERS
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
@@ -43,6 +44,8 @@ def show(request, pid):
         'boat': boat,
         'customfields': customfields,
         'training': PersonTraining.all().filter('person', item.key()),
+        'transactions': Transaction.objects.filter(person=str(item.key())),
+        'tab_transaction': '/people/show/%s?tab=transaction' % item.key(),
         'lokasi': default_location(item.geo_pos),
         })
 

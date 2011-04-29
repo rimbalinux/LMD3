@@ -2,11 +2,9 @@
 
 from django import template
 from django.template.base import Node, TemplateSyntaxError
-from django.utils.encoding import force_unicode
-from translate.lang import translate, tr
+from translate.lang import translate, tr, money as _money
 from django.template.defaultfilters import stringfilter
 from html2text import html2text
-import re
 
 register = template.Library()
 
@@ -38,22 +36,6 @@ def t_(text, request):
 t_.is_safe = True
 t_ = stringfilter(t_)
 register.filter('t', t_)
-
-########################################################
-# Money format                                         # 
-# Gubahan dari django/contrib/templatetags/humanize.py #
-# dengan menambahkan pemisah ribuan.                   #
-########################################################
-"""
-Converts an integer to a string containing commas every three digits.
-For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
-"""
-def _money(value, separator="."):
-    orig = force_unicode(value)
-    new = re.sub("^(-?\d+)(\d{3})", '\g<1>%s\g<2>' % separator, orig)
-    if orig == new:
-        return new
-    return _money(new, separator)
 
 MONEY_LANGUAGE = { 
     'id': ['.',','],

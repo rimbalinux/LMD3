@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     (r'^group/', include('group.urls')),
     (r'^product/', include('product.urls')),
     (r'^microfinance/', include('microfinance.urls')),
+    (r'^transaction/', include('transaction.urls')),
     (r'^img/(?P<file_id>.*)$', 'attachment.views.image'),
     (r'^$', 'home.views.index'),
 )

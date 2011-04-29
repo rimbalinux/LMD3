@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     'product',
     'microfinance',
     'cluster',
+    'transaction',
 )
 
 if has_djangoappengine:

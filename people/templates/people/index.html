@@ -29,7 +29,7 @@
             {% for item in people %}
               <li id="gr{{ item.key.id }}">
                 {% if user.is_staff %}
-                  <span class="right"><a href="/people/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                  <span class="right"><a href="/people/delete/{{item.key}}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a></span>
                 {% endif %}
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">

@@ -1,14 +1,12 @@
 from livecenter.models import *
-from livecenter.utils import getLocation
-from livecenter.views import DEFAULT_LOCATION
+from livecenter.utils import getLocation, default_location
+from attachment.utils import save_file_upload
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
 
-def default_location():
-    return ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
 
 def index(request):
     q = 'q' in request.GET and request.GET['q']
@@ -19,7 +17,7 @@ def index(request):
         'items_count': counter.get('site_micro_count'),
         'prev': prev,
         'next': next,
-        'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
+        'lokasi': default_location(), 
         })
 
 def show(request, pid):
@@ -145,15 +143,7 @@ def save(request, pid=None):
     micro.put()
     if not pid:
         counter.update('site_micro_count', 1)
-    if 'photo' in request.FILES:
-        att = Attachment.all().filter('containers', micro.key()).get()
-        if not att:
-            att = Attachment()
-        att.containers.append(micro.key())
-        att.filename = 'photo_%s' % micro.key().id()
-        att.filesize = 1024
-        att.file = db.Blob(request.FILES['photo'].read())
-        att.put()
+    save_file_upload(request, 'photo', micro)
     return micro
 
 def delete(request, pid=None):

@@ -1,5 +1,6 @@
 import re, urllib
 import simplejson as json
+from django.utils.encoding import force_unicode
 
 
 
@@ -21,3 +22,24 @@ def translate(phrase, src="id", to="en"):
 def tr(kalimat, request):
     to = request.session.get('lang','id')
     return translate(kalimat, to=to)
+
+
+########################################################
+# Money format                                         # 
+# Gubahan dari django/contrib/templatetags/humanize.py #
+# dengan menambahkan pemisah ribuan.                   #
+########################################################
+"""
+Converts an integer to a string containing commas every three digits.
+For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
+"""
+def _money(value, separator):
+    orig = force_unicode(value)
+    new = re.sub("^(-?\d+)(\d{3})", '\g<1>%s\g<2>' % separator, orig)
+    if orig == new:
+        return new
+    return _money(new, separator)
+
+def money(value, separator="."):
+    return _money(str(int(float(value))), separator)
+

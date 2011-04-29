@@ -1,7 +1,6 @@
 from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
         GroupTraining, LiveCluster
-from livecenter.views import default_location
-from livecenter.utils import redirect
+from livecenter.utils import redirect, default_location
 from attachment.utils import save_file_upload
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect

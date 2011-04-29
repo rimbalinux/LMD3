@@ -1,0 +1,41 @@
+{% extends 'form.html' %}
+{% load lang %}
+
+{% block title %}{% t "Transaksi" %}{% endblock %}
+
+{% block fieldset %}
+  <div class="form-row">
+    <div>
+      <label>{% t "Nama" %}:</label>
+      <label>{{person.name}}</label>
+    </div>
+  </div>
+  <div class="form-row">
+    <div>
+        <label for="id_date" class="required">{% t "Tanggal" %}:</label>
+        <input id="id_date" type="text" class="vDateField" name="date" size="10" value="{% now "Y-m-d" %}"/>
+    </div>
+  </div>
+  <div class="form-row">
+    <div>
+        <label for="id_description" class="required">{% t "Keterangan" %}:</label>
+        <input id="id_date" type="text" class="vTextField" name="description" maxlength="100" value="{{transaction.description}}"/>
+    </div>
+  </div>
+  <div class="form-row">
+    <div>
+        <label class="required">{% t "Nominal" %}:</label>
+        <input type="text" name="nominal" size="20" value="{{transaction.nominal}}"/>
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+    <input type="submit" value="{% t "Simpan" %}" />
+{% endblock %}
+
+{% block extra-footer %}
+<script type="text/javascript">
+    document.faceboxform.date.focus();
+</script>
+{% endblock %}
