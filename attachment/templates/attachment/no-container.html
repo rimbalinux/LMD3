@@ -1,0 +1,33 @@
+<html>
+{% load lang %}
+    <body>
+    <form method="post">
+        <ol>
+            {% for att, containers in atts %}
+              <li>
+              <input type="checkbox" name="fid" checked value="{{att.key}}" />
+                <img src="/img/id/{{att.key}}" width="50" height="50" />
+                {% for container, url_check in containers %}
+                  {% if url_check %}
+                    <a href="{{url_check}}">{{container.kind}}</a>
+                  {% else %}
+                    {{container.kind}}
+                  {% endif %}
+                {% endfor  %}
+                <a href="/img/delete/{{att.key}}">Hapus</a>
+              </li>
+            {% endfor %}
+        </ol>
+        {% if sisa %}Masih ada {{sisa}} lagi.{% endif %}
+        <br />
+        {% for kind, count in kinds.items %}
+          {{kind}} {{count}}
+          <br />
+        {% endfor %}
+        <input type="submit" name="delete_checked" value="Hapus yang ditandai" />
+        {% if total_files %}
+        <input type="submit" name="delete_all" value="Hapus {{total_files}} attachment ({% money total_bytes %} bytes) tanpa container" />
+        {% endif %}
+    </form>
+    </body>
+</html>

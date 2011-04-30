@@ -22,7 +22,7 @@ def save(request, pid):
     item.put()
     save_file_upload(request, 'photo', item)
     
-def delete(request, pid=None):
+def delete(request, pid):
     item = db.get(db.Key(pid))
     if item:
         item.delete()
