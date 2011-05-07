@@ -3,35 +3,28 @@
 {% load easy_maps_tags %}
 {% load livecenter %}
 
-{% block title %}{% t "Produk" %}{% endblock %}
+{% block title %}{% t "Kelompok" %}{% endblock %}
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
 {% include "tabber.html" %}
+{% include "facebox.html" %}
 {% endblock %}
 
 {% block content %}
-<h2><a href="/product">{% t "Kelompok" %}</a> / {{ group.name }}</h2>
+<h2><a href="/group">{% t "Kelompok" %}</a> / {{ group.name }}</h2>
 
 {% easy_map lokasi 600 300 7 using "group/map/show.html" %}
-
-{% if user.is_staff %}
-    <a href="/group/edit/{{group.key}}" title="edit {{group.name}}" class="uiButton uiTip"> <span>{% t "Ubah" %}</span> </a>
-    <a href="/group/map/{{group.key}}" title="View Map" class="uiButton uiTip"> <span>{% t "Lihat peta" %}</span> </a>
-    {% if not training %}
-      <a href="/group/add_training/{{group.key}}" rel="facebox" class="uiButton uiTip" title="{% t "Tambah pelatihan" %}"> <span>{% t "Pelatihan" %}</span> </a>
-    {% else %}
-      <a href="/group/edit_training/{{training.0.key}}/{{group.key}}" rel="facebox" class="uiButton uiTip" title="{% t "Ubah pelatihan" %}"> <span>{% t "Ubah pelatihan" %}</span> </a>
-    {% endif %}
-    <a href="/group/add_report/{{group.key}}" title="{% t "Tambah laporan" %}" class="uiButton uiTip"><span>{% t "Tambah laporan" %}</span></a>
-    <a href="/group/generate_report/{{group.key}}" title="{% t "Buat laporan anggota" %}" class="uiButton uiTip" rel="facebox" ><span>{% t "Laporan anggota" %}</span></a>
-{% endif %}
-<a href="/group/barcode/{{group.key}}" title="{% t "Buat kode QR" %}" class="uiButton uiTip" ><span>{% t "Buat kode QR" %}</span></a>
+<p>&nbsp;</p>
+<p>
 
 <div class="tabber">
 
     <div class="tabbertab">
         <h4>{% t "Anggota" %}</h4>
+        {% if user.is_staff %}
+        <a href="/group/map/{{group.key}}" class="uiButton uiTip">{% t "Lihat peta" %}</a>
+        {% endif %}
         <ul class="uiListView icon-left">
           {% for item in group.members %}
             <li id="gr{{item.key.id}}">
@@ -51,25 +44,31 @@
         </ul>
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "keterangan" %}">
         <h4>{% t "Keterangan" %}</h4>
+        {% if user.is_staff %}
+        <a href="/group/edit/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a>
+        {% endif %}
         <table class="uiListView">
             {% for x in customfields %}
             <tr><td class="trans">{{ x.description|t:request }}</td>
-                <td><span class="trans">{{group|metaview:x}}</span></td>
+                <td><span class="trans">: {{group|metaview:x}}</span></td>
             </tr>
             {% endfor %}
         </table>
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "laporan" %}">
         <h4>{% t "Laporan" %}</h4>
+        {% if user.is_staff %}
+        <a href="/group/add_report/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+        {% endif %}
         <ul class="uiListView">
           {% for item in report %}
             <li id="gr{{item.key.id}}">
               {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/report_delete/{{item.key}}/{{item.name_group.key}}" class="uiRemove acRemove uiTip" title="Delete {{item.name}}"></a>
+                    <a href="/group/report_delete/{{item.key}}" class="uiRemove acRemove uiTip" title="Delete {{item.name}}"></a>
                 </span>
               {% endif %}
               <span class="block">
@@ -84,10 +83,18 @@
         </ul>
     </div>
 
-    <div class="tabbertab">
+    <div class="tabbertab {% tabdefault "pelatihan" %}">
         <h4>{% t "Pelatihan" %}</h4>
+        {% if user.is_staff %}
+          {% if training.0.key %}
+            <p><a href="/group/edit_training/{{training.0.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a></p>
+          {% else %}
+          <a href="/group/add_training/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+          {% endif %}
+        {% endif %}
+
         <table class="uiListView">
-            {% for item in training %}
+          {% for item in training %}
             <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{item.manajemen_usaha}} {% t "kali" %}</td></tr>
             <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{item.pembukuan}} {% t "kali" %}</td></tr>
             <tr><td>3.</td><td>{% t "Produksi" %}</td><td>: {{item.produksi}} {% t "kali" %}</td></tr>
@@ -102,9 +109,9 @@
             <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{item.kontrol_kualitas}} {% t "kali" %}</td></tr>
             <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{item.rawat_mesin }} {% t "kali" %}</td></tr>
             <tr><td>14.</td><td>{% t "Penyelamatan" %}</td><td>: {{item.rescue}} {% t "kali" %}</td></tr>
-            {% empty %}
-                <tr><td>{% t "Belum ada pelatihan" %}</td></tr>
-            {% endfor %}
+          {% empty %}
+            <tr><td>{% t "Belum ada pelatihan" %}</td></tr>
+          {% endfor %}
         </table>
     </div>
 
@@ -118,18 +125,31 @@
     <img src="/img/{{group.key}}" />
 </div>
 <div class="sidebox">
-    <h4><i class="icon_small contact"></i><strong>{% t "Keterangan singkat" %}</strong></h4>
+    <h4><i class="icon_small contact"></i>{% t "Keterangan singkat" %}</h4>
     <p>{{group.info}}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{ group.geo_pos }}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat group.geo_pos %}</span></p>
 </div>
 
 <div class="sidebox">
     <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ member_count }}</h4>
 </div>
 
+<div class="sidebox">
+    <h4><i class="icon_small contact"></i>{% t "Kode QR" %}
+    {% if user.is_staff %}
+    <a href="/group/barcode/{{group.key}}" class="uiButton uiTip" >{% t "Buat" %}</a>
+    {% endif %}
+    </h4>
+    <center>
+        <a href="http://qrcode.kaywa.com/img.php?s=4&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.key}}" >
+        <img alt="qrcode" src="http://qrcode.kaywa.com/img.php?s=2&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.key}}" >
+        </a>
+    </center>
+</div>
+
 {% if group.livecluster %}
 <div class="sidebox">
-    <h4><i class="icon_small category"></i><strong langtag="nav-lc">Livecenter</strong></h4>
+    <h4><i class="icon_small category"></i><strong>Livecenter</strong></h4>
     <ul class="uiListView icon-left-small">
         <li><span class="icon"><img src="/img/{{livecenter.key}}" class="small" /></span>
             <span class="title"><a href="/livecenter/show/{{livecenter.key}}">{{ livecenter.name }}</a></span>

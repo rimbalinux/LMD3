@@ -1,0 +1,74 @@
+<html>
+<head>
+{% load lang %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+
+<script language=javascript>
+function validate(cek){
+  if(cek.value == ""){
+     var num = 0;
+     num = parseInt(num) + 1;
+     return cek.value = num;
+  }else{
+  var num = cek.value;
+  num = parseInt(num) + 1;
+  return cek.value = num;
+  }
+}
+function validate_min(cek){
+  if(cek.value == ""){
+     var num = 0;
+     num = parseInt(num) - 1;
+     return cek.value = num;
+  }else{
+  var num = cek.value;
+  num = parseInt(num) - 1;
+  return cek.value = num;
+  }
+}
+</script>
+</head>
+
+<body>
+<h3>{% t pagetitle %}</h3> 
+<form method="POST" action="{{urls}}{{groups.key}}" >
+<span><label>A. {% t "Manajemen Usaha" %}</label><input type="input" name="manajemen_usaha" value="{%if training %}{{training.0.manajemen_usaha}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(manajemen_usaha)" value="+" /><input type="button" name="minus" onclick="validate_min(manajemen_usaha)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>B. {% t "Pembukuan" %}</label><input type="input" name="pembukuan" value="{%if training %}{{training.0.pembukuan}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(pembukuan)" value="+" /><input type="button" name="minus" onclick="validate_min(pembukuan)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>C. {% t "Produksi" %}</label><input type="input" name="produksi" value="{%if training %}{{training.0.produksi}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(produksi)" value="+" /><input type="button" name="minus" onclick="validate_min(produksi)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>D. {% t "Pemanfaatan Limbah" %}</label><input type="input" name="pemanfaatan_limbah" value="{%if training %}{{training.0.pemanfaatan_limbah}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(pemanfaatan_limbah)" value="+" /><input type="button" name="minus" onclick="validate_min(pemanfaatan_limbah)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>E. {% t "Pengemasan" %}</label><input type="input" name="pengemasan" value="{%if training %}{{training.0.pengemasan}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(pengemasan)" value="+" /><input type="button" name="minus" onclick="validate_min(pengemasan)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>F. {% t "Akses Pasar" %}</label><input type="input" name="akses_pasar" value="{%if training %}{{training.0.akses_pasar}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(akses_pasar)" value="+" /><input type="button" name="minus" onclick="validate_min(akses_pasar)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>G. {% t "Keuangan Mikro" %}</label><input type="input" name="keuangan_mikro" value="{%if training %}{{training.0.keuangan_mikro}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(keuangan_mikro)" value="+" /><input type="button" name="minus" onclick="validate_min(keuangan_mikro)" value="-" /></span>
+<span class="clear"></span>
+
+<span><label>H. {% t "Perhitungan Harga Pokok Produksi dan Harga Jual" %}</label><input type="input" name="hitung_hpp_harga_jual" value="{%if training %}{{training.0.hitung_hpp_harga_jual}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(hitung_hpp_harga_jual)" value="+" /><input type="button" name="minus" onclick="validate_min(hitung_hpp_harga_jual)" value="-" /></span>
+
+
+<span><label>I. {% t "Navigasi" %}</label><input type="input" name="navigasi" value="{%if training %}{{training.0.navigasi}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(navigasi)" value="+" /><input type="button" name="minus" onclick="validate_min(navigasi)" value="-" /></span>
+
+<span><label>J. {% t "Keselamatan di Laut" %}</label><input type="input" name="keselamatan_laut" value="{%if training %}{{training.0.keselamatan_laut}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(keselamatan_laut)" value="+" /><input type="button" name="minus" onclick="validate_min(keselamatan_laut)" value="-" /></span>
+
+<span><label>K. {% t "Penanganan di atas Kapal" %}</label><input type="input" name="penanganan_atas_kapal" value="{%if training %}{{training.0.penanganan_atas_kapal}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(penanganan_atas_kapal)" value="+" /><input type="button" name="minus" onclick="validate_min(penanganan_atas_kapal)" value="-" /></span>
+
+<span><label>L. {% t "Kontrol Kualitas" %}</label><input type="input" name="kontrol_kualitas" value="{%if training %}{{training.0.kontrol_kualitas}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(kontrol_kualitas)" value="+" /><input type="button" name="minus" onclick="validate_min(kontrol_kualitas)" value="-" /></span>
+
+<span><label>M. {% t "Perawatan Mesin" %}</label><input type="input" name="rawat_mesin" value="{%if training %}{{training.0.rawat_mesin}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(rawat_mesin)" value="+" /><input type="button" name="minus" onclick="validate_min(rawat_mesin)" value="-" /></span>
+
+<span><label>N. {% t "Rescue" %}</label><input type="input" name="rescue" value="{%if training %}{{training.0.rescue}}{% else %} 0 {% endif %}" readonly> <input type="button" name="plus" onclick="validate(rescue)" value="+" /><input type="button" name="minus" onclick="validate_min(rescue)" value="-" /></span>
+
+<p class="formaction"><input type="submit" value={% t " Simpan " %} class="uiButton_blue" /> 
+</form>
+</body>
+</html>

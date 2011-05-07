@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+{% load livecenter %}
+
+{% block title %}{% t "Produk" %}{% endblock %}
+{% block readyscript %}
+        $("#content").animate( { width:"969px"}, 1000 );
+        $("#sidebar").animate( { width:"1px"}, 1000 );
+{% endblock %}
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/jsDatePick_ltr.min.css" />
+<script type="text/javascript" src="/static/js/jsDatePick.min.1.3.js"></script>
+<script type="text/javascript">
+$("#content").animate( { width:"969px"}, 1000 );
+$("#sidebar").animate( { width:"1px"}, 1000 );
+$(function(){
+	function setGeoPos(){
+		n1 = $('#n1').val();
+		n2 = ($('#n2').val()/60);
+		e1 = $('#e1').val();
+		e2 = ($('#e2').val()/60);
+		var n = 0;
+		n = (Number(n1)+Number(n2)).toString();
+		var e = 0;
+		e = (Number(e1)+Number(e2)).toString();
+		$('#geo_pos').val(n+","+e);
+	}
+	$('#n1').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#n2').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#e1').bind('keyup',function(){
+		setGeoPos();
+	});
+	$('#e2').bind('keyup',function(){
+		setGeoPos();
+	});
+
+	var pos = $('#geo_pos').val();
+	if( $('#geo_pos').length && pos ){
+		geopoint = pos.split(',');
+		n1val = geopoint[0].split(".")[0];
+		n2val = "0."+geopoint[0].split(".")[1];
+		e1val = geopoint[1].split(".")[0];
+		e2val = "0."+geopoint[1].split(".")[1];
+		$('#n1').val(n1val);
+		$('#n2').val(Number(n2val)*60);
+		$('#e1').val(e1val);
+		$('#e2').val(Number(e2val)*60);
+		//alert(n1val+'-'+n2val+'-'+e1val+'-'+e2val);
+	}
+
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+	window.onload = function(){
+		new JsDatePick({
+			useMode:2,
+			target:"date",
+			dateFormat:"%d-%M-%Y"
+		});
+	};
+</script>
+<h2>{% t pagetitle %}</h2>
+{% if not cluster %}
+    <p><br/><strong>Error!</strong><br/><br/>
+    You can not create group on {{category.name}} category.<br/>You have to create cluster for this category first.
+    </p>
+{% else %}
+    <form name="fcategory" class="validate" method="POST" enctype="multipart/form-data">
+    <table width="uiGridView" border="0" cellpadding="0" cellspacing="4">
+<tr><td class="xc">{% t "Gugusan" %}</td><td>
+    <select name="cluster">
+        {% for item in cluster %}
+            <option value="{{item.key}}" {% if item.key == group.livecluster.key %} selected="selected" {%endif%}>{{item.name}}</option>
+        {% endfor %}
+    </select>
+</td></tr>
+    <tr><td><span>{% t "Nama Kelompok" %}</span></td><td>
+    	<input type="text" name="name" class="xe" value="{{group.name_group.name}}" required="required" readonly />
+	<input type="hidden" name="name_key" value="{{group.name_group.key}}" />
+    </td></tr>
+    <tr><td><span>{% t "Nama Laporan" %}</span></td><td>
+    	<input type="text" name="name" class="xe" value="{{group.name}}" required="required" />
+    </td></tr>
+        <tr><td><span>{%t "Laporan Periode" %}</span></td><td>
+    <input type="text" size="12" id="date" name="date" value="{{group.year}}" />
+    </td></tr>
+    {% for x in customfields %}
+    <tr><td><span>{% t x.title %}<br/><i>{% t x.description %}</i></span></td><td>
+        {{group|metaform:x}}</td></tr>
+    {% endfor %}
+
+<tr><td><span>{% t "Sekilas tentang kelompok ini" %}</span></td><td>
+<textarea class="xe" rows="4" name="info">{{group.info}}</textarea></td></tr>
+</table>
+<p class="formsetaction">
+<input type="submit" value={% t " Simpan " %} class="uiButton_blue" />
+<a href="/group/show/{{group.key}}" class="uiButton "> Cancel </a>
+</p>
+</form>
+{% endif %}
+{% endblock %}

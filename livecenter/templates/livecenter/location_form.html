@@ -1,10 +1,16 @@
 {% load lang %}
 <script type="text/javascript" src="/static/js/jquery-1.4.1.js"></script>
 <script type="text/javascript">
+{% if district_sel %}
 var district_sel = {{ district_sel }};
 var subdistrict_sel = {{ subdistrict_sel }};
 var village_sel = {{ village_sel }};
+{% endif %}
+
 $(function(){
+
+    {% if district_sel %}
+
     if ($('#fdistrict').length){
     	// dependen dropdown
     	$('#district').bind('change',function(){
@@ -65,8 +71,9 @@ $(function(){
     	   _ds.val(district_sel);
     	   _ds.change();
         }
+    }
 
-	}
+    {% endif %}
 
 	function setGeoPos(){
 		n1 = $('#n1').val();
@@ -109,6 +116,7 @@ $(function(){
 });
 </script>
 
+{% if districts %}
 <p>
 <fieldset id="fdistrict"><legend>{% t "Lokasi" %}</legend>
     <span>
@@ -134,6 +142,7 @@ $(function(){
 	</span>
 </fieldset>
 </p>
+{% endif %}
 <p>
 <fieldset id="fgeopos"><legend>{% t "Koordinat GPS" %}</legend>
     <span>{% t "Utara" %}</span> : <input name="n1" id="n1" type="text" class="auto" alt="n3x3p0S" size="3" />
@@ -141,5 +150,5 @@ $(function(){
       <span>{% t "Timur" %}</span> : <input name="e1" id="e1" type="text" class="auto" alt="n3x3p0S" size="3" />
       <input name="e2" id="e2" type="text" class="auto" alt="n2x3p4S" size="10" />
     </fieldset>
-    <input type="hidden" name="geo_pos" id="geo_pos" value="{{ geo_pos}}" />
+    <input name="geo_pos" id="geo_pos" type="hidden" value="{{ geo_pos}}" />
 </p>
