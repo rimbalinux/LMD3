@@ -136,9 +136,6 @@
 
 <div class="sidebox">
     <h4><i class="icon_small contact"></i>{% t "Kode QR" %}
-    {% if user.is_staff %}
-    <a href="/group/barcode/{{group.key}}" class="uiButton uiTip" >{% t "Buat" %}</a>
-    {% endif %}
     </h4>
     <center>
         <a href="http://qrcode.kaywa.com/img.php?s=4&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.key}}" >
