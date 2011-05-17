@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi LiveCenter" }}{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>District</th>
+        <th>Sub-district</th>
+        <th>Village</th>
+        <th>Geo Pos</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.district }}</td>
+        <td>{{ target.sub_district }}</td>
+        <td>{{ target.village }}</td>
+        <td>{{ target.geo_pos }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

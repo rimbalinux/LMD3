@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi files" }}{% endblock %}
+
+{% block content %}
+
+{% if example %}
+    <img src="/img/fid/{{example.id}}" width="50" height="50"/>
+    <br />
+{% endif %}
+
+{% if kinds %}
+{% for kind, count in kinds.items %}
+    {{kind}} {{count}}
+    <br />
+{% endfor %}
+{% endif %}
+
+Total {% money total_bytes %} bytes<br />
+Target {{ targets|length }}<br />
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Filename</th>
+        <th>Size</th>
+        <th>Container</th>
+    </tr>
+    {% if targets %}
+    {% for target, container in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.size }} bytes</td>
+        <td>{{ container.container }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+</table>
+
+
+{% endblock %}

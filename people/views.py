@@ -1,5 +1,8 @@
 from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
-        LiveCenter
+        LiveCenter, Container, Location
+from .models import People, Container as PeopleContainer
+from group.models import Group, Container as GroupContainer
+from attachment.models import Container as FileContainer
 from livecenter.utils import redirect, getLocationKey, default_location
 from attachment.utils import save_file_upload
 from transaction.models import Transaction
@@ -136,3 +139,47 @@ def group_save(request, pid):
     for item in request.POST['group'].getlist():
         person.livegroup.append(db.Key(item))
     person.save()
+
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
+    offset = len(People.objects.all())
+    sources = Person.all().order('__key__')
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = PeopleContainer.objects.filter(person=str(source.key()))
+        if target:
+            continue
+        target = People(
+            name=source.name,
+            livecenter=Container.objects.filter(livecenter=str(source.livecenter.key()))[0].livelihood,
+            email=source.email or '',
+            gender=source.gender=='Male',
+            birth_year=source.birth_year,
+            birth_place=source.birth_place or '',
+            address=source.address or '',
+            village=Location.objects.filter(lid=source.village.dl_id)[0],
+            sub_district=Location.objects.filter(lid=source.sub_district.dl_id)[0],
+            district=Location.objects.filter(lid=source.district.dl_id)[0],
+            education=source.education or '',
+            spouse_name=source.spouse_name or '',
+            monthly_income=source.monthly_income,
+            children_num=source.children_num,
+            member_type=source.member_type or '',
+            mobile=source.mobile or '',
+            info=source.info or '',
+            geo_pos=source.geo_pos or '')
+        if source.livegroup:
+            c = GroupContainer.objects.filter(livegroup=str(source.livegroup[0]))[:1]
+            if c:
+                target.group = c[0].group
+        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
+        if photo:
+            target.photo = photo[0].file
+        target.save()
+        c = PeopleContainer(people=target, person=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'people/migrate.html', {
+        'targets': targets, 
+        })
+

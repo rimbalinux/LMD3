@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi Person" }}{% endblock %}
+
+{% block content %}
+
+<ul>
+    {% for source, e in errors %}
+    <li>{{ source.name }} {{ e }}</li>
+    {% endfor %}
+</ul>
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Group</th>
+        <th>Livecenter</th>
+        <th>Village</th>
+        <th>Sub district</th>
+        <th>District</th>
+        <th>Geo Pos</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.gender }}</td>
+        <td>{{ target.group.name }}</td>
+        <td>{{ target.livecenter.name }}</td>
+        <td>{{ target.village.name }}</td>
+        <td>{{ target.sub_district.name }}</td>
+        <td>{{ target.district.name }}</td>
+        <td>{{ target.geo_pos }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

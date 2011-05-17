@@ -1,5 +1,5 @@
 application: livelihoodmembersdatabase 
-version: 3 
+version: 8 
 runtime: python
 api_version: 1
 
@@ -11,10 +11,6 @@ inbound_services:
 - warmup
 
 handlers:
-- url: /remote_api
-  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
-
 - url: /_ah/remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
@@ -26,8 +22,11 @@ handlers:
 - url: /stylesheets
   static_dir: stylesheets
 
-- url: /static
-  static_dir: static
+- url: /images
+  static_dir: images
+
+- url: /js
+  static_dir: js
 
 - url: /blank.html
   static_files: blank.html
@@ -40,9 +39,6 @@ handlers:
 - url: /media
   static_dir: _generated_media/
   expiration: '365d'
-
-- url: /images
-  static_dir: images/
 
 - url: /.*
   script: djangoappengine/main/main.py

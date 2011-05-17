@@ -1,22 +1,23 @@
 # Sumber: LMD/models.py
 
 from google.appengine.ext import db, search
-from attachment.models import Attachment
+from attachment.models import Attachment, File
+from django.db import models
+from djangotoolbox import fields
+from counter.tools import BaseModel
 
-
-"""
-GeoLocation storage
-"""
-class GeoPosition(db.Model):
-    containers  = db.ListProperty(db.Key,default=[])
-    geotype     = db.StringProperty(default='address')
-    geo_pos     = db.GeoPtProperty()
 
 """ Location data """
 class LivelihoodLocation(db.Model):
     dl_id = db.IntegerProperty()
     dl_name = db.StringProperty()
     dl_parent = db.IntegerProperty()
+
+class Location(models.Model):
+    lid = models.IntegerField(unique=True)
+    name = models.CharField(max_length=100)
+    parent = models.IntegerField() # references Location.lid 
+
 
 """ 
 Category and enterprises
@@ -44,6 +45,16 @@ class LiveCategory(search.SearchableModel):
         return MetaForm.gql("WHERE containers = :1", self.key())
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    ancestor = models.ForeignKey('Category', null=True)
+    updated = models.DateTimeField(auto_now=True)
+
+class CategoryContainer(models.Model): # migrasi
+    category = models.ForeignKey(Category)
+    livecategory = models.CharField(max_length=100) # references LiveCategory.__key__ 
+ 
 """ 
 LC Centers 
 1 LC has many categories
@@ -82,7 +93,25 @@ class LiveCenter(search.SearchableModel):
     @property
     def groups(self):
         return LiveGroup.gql("WHERE containers = :1", self.key())
-        
+
+
+class Livelihood(BaseModel): # was LiveCenter
+    name = models.CharField(max_length=100)
+    category = fields.ListField()
+    address = models.TextField(blank=True)
+    district = models.ForeignKey(Location, related_name='+')
+    sub_district = models.ForeignKey(Location, related_name='+')
+    village = models.ForeignKey(Location, related_name='+')
+    description = models.TextField(blank=True)
+    geo_pos = models.CharField(max_length=100)
+    photo = models.ForeignKey(File, null=True)
+    updated = models.DateTimeField(auto_now=True)
+
+class Container(models.Model): # peralihan, temporary
+    livelihood = models.ForeignKey(Livelihood)
+    livecenter = models.CharField(max_length=100) # references LiveCenter.__key__ 
+
+
 """
 Person Database
 person can have multiple groups, multiple category & clusters in one Livecenter
@@ -133,6 +162,17 @@ class LiveCluster(search.SearchableModel, db.Expando):
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
 
+class Cluster(BaseModel):
+    name = models.CharField(max_length=100)
+    category = models.ForeignKey(Category)
+    livecenter = models.ForeignKey(Livelihood)
+    info = models.TextField()
+    photo = models.ForeignKey(File, null=True)
+
+class ClusterContainer(models.Model): # migrasi, temporary
+    cluster = models.ForeignKey(Cluster, unique=True)
+    livecluster = models.CharField(max_length=100, unique=True) # references LiveCluster.__key__ 
+
 """
 LC Cluster Groups
 1 group has 1 cluster and has many members/person
@@ -149,7 +189,6 @@ class LiveGroup(search.SearchableModel, db.Expando):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
-
 
 """ Custom Field Storage """
 class MetaForm(db.Model):

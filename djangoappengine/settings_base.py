@@ -7,7 +7,7 @@ except ImportError:
 
 from djangoappengine.utils import on_production_server, have_appserver
 
-#DEBUG = not on_production_server
+DEBUG = not on_production_server
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

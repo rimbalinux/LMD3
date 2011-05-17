@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ "Migrasi user" }}{% endblock %}
+
+{% block content %}
+
+<table border="1">
+    <tr>
+        <th>Username</th>
+        <th colspan="2">Password</th>
+        <th>Email</th>
+        <th>Fullname</th>
+        <th>Address</th>
+        <th>Phone</th>
+        <th>Role</th>
+        <th>Livecenter</th>
+    </tr>
+    {% for source, target in users %}
+    <tr>
+        <td>{{ source.username }}</td>
+        <td>{{ source.passwd }}</td>
+        <td>{{ target.password }}</td>
+        <td>{{ source.email }}</td>
+        <td>{{ source.fullname }}</td>
+        <td>{{ source.address }}</td>
+        <td>{{ source.phone }}</td>
+        <td>{{ source.role }}</td>
+        <td>{{ source.livecenter }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

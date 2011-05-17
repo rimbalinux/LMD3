@@ -6,9 +6,9 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-<link rel="stylesheet" type="text/css" href="/static/jcarousel/skins/ie7/skin.css" />
-<script type="text/javascript" src="/static/jcarousel/lib/jquery-1.4.2.min.js"></script>
-<script type="text/javascript" src="/static/jcarousel/lib/jquery.jcarousel.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/js/jcarousel/skins/ie7/skin.css" />
+<script type="text/javascript" src="/js/jcarousel/lib/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/js/jcarousel/lib/jquery.jcarousel.min.js"></script>
 <script type="text/javascript">
     jQuery(document).ready(function() {
         jQuery('#mycarousel').jcarousel();
@@ -32,13 +32,14 @@
 <h2><i class="icon_small user"></i>{% t "Anggota" %}</h2>
 <ul id="mycarousel" class="jcarousel-skin-ie7">
   {% for item in people %}
-    <li><span class="cavatar"><img src="/img/{{item.key}}" alt="" title="{{ item.name }}" /></span></li>
+  <li><span class="cavatar"><img src="/img/fid/{{item.photo.id}}" title="{{ item.name }}" /></span></li>
   {% endfor %}
 </ul><br />
 {% include "livecenter/paging.html" %}
 
 <div id="about">
 {% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
+
 </div>
 
 {% endblock %}

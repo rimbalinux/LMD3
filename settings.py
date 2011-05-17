@@ -24,9 +24,9 @@ import os
 #}
 # -----------------
 
-SITE_NAME = 'Mata Pencaharian'
+SITE_NAME = 'My site'
 SITE_DESCRIPTION = ''
-SITE_COPYRIGHT = 'Livelihood Members Database'
+SITE_COPYRIGHT = ''
 DISQUS_SHORTNAME = ''
 GOOGLE_ANALYTICS_ID = ''
 # Get the ID from the CSE "Basics" control panel ("Search engine unique ID")
@@ -51,14 +51,13 @@ INSTALLED_APPS = (
     'blog',
     'disqus',
     'djangotoolbox',
-    #'mediagenerator',
+    'mediagenerator',
     'robots',
     'simplesocial',
     'redirects',
     'user',
     'translate',
     'easy_maps',
-    'migrasi',
     'livecenter',
     'attachment',
     'home',
@@ -68,6 +67,9 @@ INSTALLED_APPS = (
     'microfinance',
     'cluster',
     'transaction',
+    'permission_backend_nonrel',
+    'authority',
+    'counter',
 )
 
 if has_djangoappengine:
@@ -83,7 +85,7 @@ REST_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    #'mediagenerator.middleware.MediaMiddleware',
+    'mediagenerator.middleware.MediaMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djangotoolbox.middleware.RedirectMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -119,14 +121,15 @@ MEDIA_BUNDLES = (
 )
 
 ROOT_MEDIA_FILTERS = {
-    #'js': 'mediagenerator.filters.yuicompressor.YUICompressor',
-    #'css': 'mediagenerator.filters.yuicompressor.YUICompressor',
+    'js': 'mediagenerator.filters.yuicompressor.YUICompressor',
+    'css': 'mediagenerator.filters.yuicompressor.YUICompressor',
 }
 
 YUICOMPRESSOR_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                   'yuicompressor.jar')
 
-MEDIA_DEV_MODE = DEBUG
+#MEDIA_DEV_MODE = DEBUG
+MEDIA_DEV_MODE = False 
 DEV_MEDIA_URL = '/devmedia/'
 PRODUCTION_MEDIA_URL = '/media/'
 

@@ -5,10 +5,16 @@
 </head>
 
 <body>
-<h2>{% t "Tambah Pusat Mata Pencaharian" %}</h2>
+    <h2>
+        {% if livecenter %}
+            {% t "Ubah" %} {{livecenter.name}}
+        {% else %}
+            {% t "Tambah Pusat Mata Pencaharian" %}
+        {% endif %}
+    </h2>
 
 <div class="formsheet">
-    <form name="fgrid" id="fgrid" method="POST" class="validate" enctype="multipart/form-data">
+    <form name="fgrid" id="fgrid" method="POST" class="validate" enctype="multipart/form-data" action="{% if livecenter %}/livecenter/edit/{{livecenter.key}}{% else %}/livecenter/create{% endif %}">
         <p><label>{% t "Nama" %}</label><input type="text" name="name" value="{{ livecenter.name }}" class="xd" pattern="[a-zA-Z1-9 ]{3,}" required="required" /></p>
         <p><label>{% t "Alamat" %}</label><textarea cols="45" rows="3" name="address">{{ livecenter.address }}</textarea></p>
 

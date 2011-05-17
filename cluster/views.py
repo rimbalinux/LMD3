@@ -1,5 +1,7 @@
-from livecenter.models import LiveCluster, LiveCategory
+from livecenter.models import LiveCluster, LiveCategory, Cluster, Container, \
+        ClusterContainer, CategoryContainer
 from attachment.utils import save_file_upload
+from attachment.models import Container as FileContainer
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
@@ -27,3 +29,33 @@ def delete(request, pid):
     if item:
         item.delete()
     return HttpResponseRedirect(request.GET['destination'])
+
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20
+    if not Cluster.objects.all()[:1]:
+        Cluster.counter_reset()
+    offset = Cluster.counter_value()
+    sources = LiveCluster.all().order('__key__').\
+        filter('__key__ !=', db.Key('ahlsaXZlbGlob29kbWVtYmVyc2RhdGFiYXNlchILEgtMaXZlQ2x1c3RlchjlNww')).\
+        filter('__key__ !=', db.Key('ahlsaXZlbGlob29kbWVtYmVyc2RhdGFiYXNlchILEgtMaXZlQ2x1c3RlchjjTww'))
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = ClusterContainer.objects.filter(livecluster=str(source.key()))
+        if target:
+            continue
+        target = Cluster(name=source.name,
+            info=source.info or '',
+            category=CategoryContainer.objects.filter(livecategory=str(source.category.key()))[0].category,
+            livecenter=Container.objects.filter(livecenter=str(source.livecenter[0]))[0].livelihood)
+        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
+        if photo:
+            target.photo = photo[0].file
+        target.save()
+        c = ClusterContainer(cluster=target, livecluster=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'cluster/migrate.html', {
+        'targets': targets, 
+        })
+
+

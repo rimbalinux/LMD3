@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi LiveCategory" }}{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Ancestor</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.description }}</td>
+        <td>{{ target.ancestor }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

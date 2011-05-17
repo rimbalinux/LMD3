@@ -1,7 +1,9 @@
 from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
-        GroupTraining, LiveCluster
+        GroupTraining, LiveCluster, Container, ClusterContainer
+from .models import Group, Container as GroupContainer
 from livecenter.utils import redirect, default_location
 from attachment.utils import save_file_upload
+from attachment.models import Container as FileContainer
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
@@ -310,3 +312,41 @@ def delete(request, pid):
         item.delete()
         counter.update('site_group_count', -1)
     return redirect(request, '/group')
+
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20
+    if not Group.objects.all()[:1]:
+        Group.counter_reset()
+    offset = Group.counter_value()
+    sources = LiveGroup.all().order('__key__')
+    targets = []
+    errors = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = GroupContainer.objects.filter(livegroup=str(source.key()))
+        if target:
+            continue
+        try:
+            key = source.livecluster.key()
+        except db.ReferencePropertyResolveError, e:
+            errors.append([source, e])
+            continue
+        target = Group(name=source.name,
+            info=source.info or '',
+            geo_pos=source.geo_pos or '',
+            livecenter=Container.objects.filter(livecenter=str(source.containers[0]))[0].livelihood)
+        c = ClusterContainer.objects.filter(livecluster=str(key))[:1]
+        if c:
+            target.cluster = c[0].cluster
+        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
+        if photo:
+            target.photo = photo[0].file
+        target.save()
+        c = GroupContainer(group=target, livegroup=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'group/migrate.html', {
+        'targets': targets,
+        'errors': errors,
+        })
+
+

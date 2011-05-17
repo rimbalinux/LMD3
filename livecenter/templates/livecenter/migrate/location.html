@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi LivelihoodLocation" }}{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Parent</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.lid }}</td>
+        <td>{{ target.name }}</td>
+        <td>{{ target.parent }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

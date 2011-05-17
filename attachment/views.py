@@ -1,9 +1,10 @@
-from .models import Attachment 
+from .models import Attachment, File, Container
 from google.appengine.ext import db
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.simple import direct_to_template
 from livecenter.models import Person, LiveCluster
 from product.models import Product
+import counter
 
 
 def image(request, fid):
@@ -19,6 +20,15 @@ def imgid(request, fid):
     if image:
         response = HttpResponse(mimetype='image/png')
         response.write(image.file)
+        return response
+    return HttpResponseRedirect('/images/default.gif')
+
+def imgfid(request, fid):
+    image = File.objects.all().filter(id=fid)
+    if image:
+        image = image[0]
+        response = HttpResponse(mimetype=image.mime)
+        response.write(image.content)
         return response
     return HttpResponseRedirect('/images/default.gif')
 
@@ -80,3 +90,38 @@ def no_container(request):
         'total_bytes': total_bytes,
         'kinds': container_kinds,
         })
+
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
+    offset = counter.get('attachment_file')
+    sources = Attachment.all().order('filename')
+    kinds = {}
+    total_bytes = 0
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        if not source.containers:
+            continue
+        target = File.objects.filter(name=source.filename)
+        if target:
+            continue
+        byte = len(source.file)
+        total_bytes += byte
+        target = File(name=source.filename, content=source.file,
+            mime='image/png', size=byte, user=request.user)
+        target.save()
+        c = Container(file=target, container=source.containers[0])
+        c.save()
+        counter.update('attachment_file', 1)
+        targets.append([target, c])
+        kind = c.container.kind()
+        if kind in kinds:
+            kinds[kind] += 1
+        else:
+            kinds[kind] = 0
+    return direct_to_template(request, 'attachment/migrate.html', {
+        'targets': targets, 
+        'example': targets and targets[0][0],
+        'kinds': kinds,
+        'total_bytes': total_bytes,
+        })
+

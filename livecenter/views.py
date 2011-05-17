@@ -1,6 +1,7 @@
 from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
-        Attachment, LiveCluster, LiveCategory, MetaForm
-from attachment.models import Attachment
+        Attachment, LiveCluster, LiveCategory, MetaForm, \
+        CategoryContainer, Category, Livelihood, Container, Location
+from attachment.models import Attachment, Container as FileContainer
 from attachment.utils import save_file_upload
 from .utils import getLocation, default_location
 from django.views.generic.simple import direct_to_template
@@ -118,6 +119,40 @@ def district(request, pid):
             })
     return HttpResponse(json.encode(json_data))
 
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20
+    if not Livelihood.objects.all()[:1]:
+        Livelihood.counter_reset()
+    offset = Livelihood.counter_value()
+    sources = LiveCenter.all().order('__key__')
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = Container.objects.filter(livecenter=str(source.key()))
+        if target:
+            continue
+        target = Livelihood(name=source.name,
+            address=source.address or '',
+            description=source.description or '',
+            geo_pos=source.geo_pos,
+            updated=source.last_modified)
+        for sc in source.category:
+            c = CategoryContainer.objects.filter(livecategory=str(sc))[0].category
+            target.category.append(c.id)
+        target.district = Location.objects.filter(lid=source.district.dl_id)[0]
+        target.sub_district = Location.objects.filter(lid=source.sub_district.dl_id)[0]
+        target.village = Location.objects.filter(lid=source.village.dl_id)[0]
+        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
+        if photo:
+            target.photo = photo[0].file
+        target.save()
+        c = Container(livelihood=target, livecenter=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'livecenter/migrate/livecenter.html', {
+        'targets': targets, 
+        })
+
+
 ############
 # Category #
 ############
@@ -136,6 +171,38 @@ def category_save(request, pid):
     for cat in request.POST.getlist('category'):
         lc.category.append(db.Key(cat))
     lc.save()
+
+def category_migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
+    offset = len(Category.objects.all())
+    sources = LiveCategory.all().order('__key__')
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = CategoryContainer.objects.filter(livecategory=str(source.key()))
+        if target:
+            continue
+        target = Category(
+            name=source.name,
+            description=source.description,
+            updated=source.last_modified)
+        target.save()
+        container = CategoryContainer(category=target,
+            livecategory=str(source.key()))
+        container.save()
+        targets.append(target)
+    if 'ancestor' in request.GET:
+        for source in sources:
+            if not source.ancestor:
+                continue
+            c = CategoryContainer.objects.filter(livecategory=str(source.key()))
+            target = c[0].category
+            target.ancestor = CategoryContainer.objects.filter(livecategory=str(source.ancestor[0]))[0].category
+            target.save()
+            targets.append(target)
+    return direct_to_template(request, 'livecenter/migrate/category.html', {
+        'targets': targets, 
+        })
+
 
 ###########
 # Cluster #
@@ -157,3 +224,26 @@ def cluster_save(request, pid):
     item.livecenter.append(db.Key(pid))
     item.put()
     save_file_upload(request, 'photo', item)
+
+############
+# Location #
+############
+def location_migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
+    offset = len(Location.objects.all())
+    sources = LivelihoodLocation.all().order('dl_id')
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = Location.objects.filter(lid=source.dl_id)
+        if target:
+            continue
+        target = Location(lid=source.dl_id,
+            name=source.dl_name,
+            parent=source.dl_parent)
+        target.save()
+        targets.append(target)
+    return direct_to_template(request, 'livecenter/migrate/location.html', {
+        'targets': targets, 
+        })
+
+
