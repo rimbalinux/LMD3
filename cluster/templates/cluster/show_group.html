@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+{% load livecenter %}
+
+{% block title %}{% t "Gugusan" %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+{% include "tabber.html" %}
+{% include "facebox.html" %}
+{% endblock %}
+
+{% block content %}
+<h2>{% t "Gugusan" %} {{ cluster.name }}</h2>
+<p>&nbsp;</p>
+<p>
+
+<div class="tabber">
+    <div class="tabbertab {% tabdefault "group" %}">
+        <h2>{% t "Kelompok" %}</h2>
+        <ul class="uiListView icon-left"> 
+            {% for item in groups %}
+                    <li id="gr{{ item.key.id }}">
+                        <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                        <span class="block">
+                        <span class="title"><a href="/group/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
+                        <span class="body">{{ item.info }}</span>
+                        </span>
+                    </li>
+            {% empty %}
+                <li>{% t "Belum ada grup" %}</li>
+            {% endfor %}
+        </ul>
+        {% include "livecenter/paging.html" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="profile_pic">
+    <img src="/img/{{cluster.key}}" />
+</div>
+{% if cluster.info %}
+<div class="sidebox">
+    <h4><i class="icon_small contact"></i>{% t "Keterangan singkat" %}</h4>
+    <p>{{cluster.info}}</p>
+</div>
+{% endif %}
+{% if other_cluster %}
+<div class="sidebox">
+    <h4><i class="icon_small category"></i><strong>{% t "Gugusan Lain" %}</strong></h4>
+    <ul class="uiListView icon-left-small">
+        {% for item in other_cluster %}
+        <li><span class="icon"><img src="/img/{{item.key}}" class="small" /></span>
+            <span class="title"><a href="/cluster/show/{{item.key}}">{{ item.name }}</a></span>
+            <span class="body">{{item.info}}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div class="sidebox">
+    <h4><i class="icon_small contact"></i>{% t "Kode QR" %}
+    </h4>
+    <center>
+        <a href="http://qrcode.kaywa.com/img.php?s=4&amp;d=http://livelihoodmembersdatabase.appspot.com/cluster/show/{{cluster.key}}" >
+        <img alt="qrcode" src="http://qrcode.kaywa.com/img.php?s=2&amp;d=http://livelihoodmembersdatabase.appspot.com/cluster/show/{{cluster.key}}" >
+        </a>
+    </center>
+</div>
+{% endblock %}

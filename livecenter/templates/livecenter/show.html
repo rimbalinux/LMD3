@@ -71,7 +71,7 @@
                 <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
                 <span class="block">
                     {% if user.is_staff %}
-                    <span class="title"><a href="/group/show_cluster/{{ item.key }}" class="preview" >{{ item.name }}</a></span>
+                    <span class="title"><a href="/cluster/show/{{ item.key }}" class="preview" >{{ item.name }}</a></span>
                     <span class="body right">
                         <a href="/cluster/edit/{{ item.key }}?destination={{ request.path }}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
                         <a href="/group/create/{{ livecenter.key }}/{{ item.key }}?destination={{tab_group}}" rel="facebox" class="uiButton">{% t "Tambah kelompok" %}</a>

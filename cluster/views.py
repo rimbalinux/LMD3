@@ -1,10 +1,11 @@
-from livecenter.models import LiveCluster, LiveCategory, Cluster, Container, \
-        ClusterContainer, CategoryContainer
+from livecenter.models import LiveCluster, LiveGroup, LiveCategory, Cluster, Container, \
+        ClusterContainer, CategoryContainer, LiveCenter
 from attachment.utils import save_file_upload
 from attachment.models import Container as FileContainer
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
+from tipfy.pager import PagerQuery, SearchablePagerQuery
 
 def edit(request, pid):
     if request.POST:
@@ -23,6 +24,23 @@ def save(request, pid):
     item.category = db.Key(request.POST['category'])
     item.put()
     save_file_upload(request, 'photo', item)
+    
+def show(request, pid):
+    item = db.get(db.Key(pid))
+    q = 'q' in request.GET and request.GET['q']
+    page = 'page' in request.GET and request.GET['page']
+    prev, groups, next = SearchablePagerQuery(LiveGroup).\
+        filter('livecluster =',item.key()).order('__key__').fetch(15, page)
+    other_cluster = LiveCluster.all().order('__key__').\
+                  filter('livecenter =', item.livecenter[0]).\
+                  filter('__key__ !=', item.key()).fetch(5)
+    return direct_to_template(request, 'cluster/show_group.html', {
+        'groups': groups,
+        'other_cluster':other_cluster,
+        'cluster': item,
+        'prev': prev,
+        'next': next,
+        })
     
 def delete(request, pid):
     item = db.get(db.Key(pid))

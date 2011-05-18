@@ -4,4 +4,5 @@ urlpatterns = patterns('cluster.views',
     (r'^migrate$', 'migrate'),
     (r'^edit/(?P<pid>.*)$', 'edit'),
     (r'^delete/(?P<pid>.*)$', 'delete'),
+    (r'^show/(?P<pid>.*)$', 'show'),
 )
