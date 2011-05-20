@@ -29,49 +29,49 @@
             </span>
             <span class="c">
                 <label>{% t "Pendapatan bulanan" %}</label>
-                <input type="text" name="monthly_income" value="" />
+                <input type="text" name="monthly_income" value="{{person.montly_income}}" />
                 <strong>IDR</strong>
             </span>
             <span class="clear"></span>
             <span class="c">
                 <label>{% t "Telepon selular" %}</label>
-                <input type="text" name="mobile" value="" />
+                <input type="text" name="mobile" value="{% if person.mobile %}{{person.mobile}}{% endif %}" />
             </span>
             <span class="c">
                 <label>{% t "Email" %}</label>
-                <input type="email" name="email" value="" />
+                <input type="email" name="email" value="{{person.email}}" />
             </span>
             <span class="clear"></span>
             <span class="c">
                 <label>{% t "Tempat lahir" %}</label>
-                <input type="text" name="birth_place">
+                <input type="text" name="birth_place" value="{{person.birth_place}}">
             </span>
             <span class="c">
                 <label>{% t "Tahun lahir" %}</label>
-                <input type="text" name="birth_year">
+                <input type="text" name="birth_year" value="{{person.birth_year}}">
             </span>
             <span class="clear"></span>
             <span class="c">
                 <label>{% t "Pendidikan terakhir" %}</label>
-                <input type="text" name="education" value="" />
+                <input type="text" name="education" value="{{person.education}}" />
             </span>
             <span class="c">
                 <label>{% t "Nama pasangan" %}</label>
-                <input type="text" name="spouse_name" value="" />
+                <input type="text" name="spouse_name" value="{{person.spouse_name}}" />
             </span>
             <span class="c">
                 <label>{% t "Jumlah tanggungan" %}</label>
-                <input type="text" name="children_num" value="" />
+                <input type="text" name="children_num" value="{{person.children_num}}" />
             </span>
         </fieldset>
         <p>
         <label>{% t "Alamat" %}</label>
-        <textarea cols="45" rows="3" name="address"></textarea>
+        <textarea cols="45" rows="3" name="address">{{person.address}}</textarea>
         </p>
         {% include "livecenter/location_form.html" %}
         <p>
         <label>{% t "Catatan" %}</label>
-        <textarea cols="45" rows="3" name="description"></textarea>
+        <textarea cols="45" rows="3" name="description">{{person.info}}</textarea>
         </p>
         <p>
         <label>{% t "Foto" %}</label>

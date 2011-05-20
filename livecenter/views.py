@@ -23,6 +23,27 @@ def index(request):
 def destination(pid, tabname):
     return urllib.quote('/livecenter/show/%s?tab=%s' % (pid, tabname))
 
+def nomobile(request, pid=None):
+    lc = db.get( pid )
+    members = Person.all().filter('livecenter =', lc.key())
+    nomobile = []
+    mobile_list = []
+    error_mobile = []
+    for item in members:
+        if item.mobile == "0":
+            error_mobile.append(db.get(item.key()))
+        elif item.mobile:
+            mobile_list.append(db.get(item.key()))
+        else:
+            nomobile.append(db.get(item.key()))
+    return direct_to_template(request, 'livecenter/nomobile.html', {
+        'livecenter': lc,
+        'members':members,
+        'nomobile':nomobile,
+        'mobile_list':mobile_list,
+        'error_mobile':error_mobile,
+        })
+
 def show(request, pid):
     lc = db.get(pid)
     if not lc:

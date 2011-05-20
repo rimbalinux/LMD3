@@ -13,4 +13,5 @@ urlpatterns = patterns('livecenter.views',
     (r'^cluster/migrate$', 'cluster_migrate'),
     (r'^category/(?P<pid>.*)$', 'category'),
     (r'^cluster/(?P<pid>.*)$', 'cluster'),
+    (r'^nomobile/(?P<pid>.*)$', 'nomobile'),
 )

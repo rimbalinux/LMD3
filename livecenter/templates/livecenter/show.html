@@ -25,8 +25,7 @@
     <p>
     <br />
     <a href="/livecenter/nogroup/{{livecenter.key}}" class="uiButton uiTip" title="View Ungrouped Members"><span>{% t "Anggota tanpa kelompok" %}</span></a>
-    <a href="/livecenter/nomobile/{{livecenter.key}}" class="uiButton uiTip" title="View Members haven't Mobile"><span>{% t "Anggota tanpa telepon selular" %}</span></a> 
-    <a href="/livecenter/mobile_list/{{livecenter.key}}" class="uiButton uiTip" title="View List of Member's Mobile"><span>{% t "Daftar telepon selular" %}</span></a>
+    <a href="/livecenter/nomobile/{{livecenter.key}}" class="uiButton uiTip" title="View Members haven't Mobile"><span>{% t "Info telepon selular" %}</span></a> 
     <a href="/livecenter/lc_report/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="View Report Livecenter's Product"><span>{% t "Buat laporan" %}</span></a>
     <a href="/location" class="uiButton uiTip" title="View, Edit and Delete Location"><span>{% t "Lokasi" %}</span></a>
     </p>
@@ -149,7 +148,7 @@
     <p><label>{% t "Kabupaten" %}</label>{{ livecenter.district.dl_name }}</p>
     <p><label>{% t "Kecamatan" %}</label>{{ livecenter.sub_district.dl_name }}</p>
     <p><label>{% t "Desa" %}</label>{{ livecenter.village.dl_name }}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{ livecenter.geo_pos }}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat livecenter.geo_pos %}</span></p>
 </div>
 
 <div class="sidebox">
