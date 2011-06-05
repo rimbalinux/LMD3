@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ "Hitung anggota pada suatu group" }}{% endblock %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" /> 
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Group</th>
+        <th>Member Count</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.group.name }}</td>
+        <td>{{ target.group.member_count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

@@ -1,15 +1,8 @@
-from .models import Attachment
-from google.appengine.ext import db
+from .models import File 
 
-def save_file_upload(request, field, container):
-    if field not in request.FILES:
-        return
-    att = Attachment.all().filter('containers', container.key()).get()
-    if not att:
-        att = Attachment()
-    att.containers.append(container.key())
-    att.filename = '%s_%s' % (field, container.key().id())
-    att.filesize = 1024
-    att.file = db.Blob(request.FILES[field].read())
-    att.put()
-    return att
+def save_file_upload(request, form_name='photo_file'):
+    f = request.FILES[form_name]
+    file = File(name=f.name, size=f.size, mime=f.content_type, content=f.read(),
+            user=request.user)
+    file.save()
+    return file

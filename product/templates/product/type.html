@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Create Product Type" }}{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

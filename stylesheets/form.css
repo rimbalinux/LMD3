@@ -1,0 +1,52 @@
+.dialog-columns {
+    overflow: hidden;
+}
+
+.dialog-column {
+    float: left;
+}
+
+#location {
+    float: right;
+}
+
+.fieldset {
+    overflow: hidden;
+}
+
+.field-wrapper {
+    float: left;
+    padding-left: 2em;
+}
+
+.required {
+    color: red;
+}
+
+.errorlist {
+    color: red;
+}
+
+.description {
+    font-size: 0.85em;
+    color: #898989;
+    line-height: 150%;
+    margin-bottom: 0.75em;
+}
+
+.submit-wrapper {
+    float: right;
+    padding-right: 2em;
+}
+
+#dialog-content {
+    margin: 0 5px;
+}
+
+#content {
+    width: 100%;
+}
+
+#sidebar {
+    display: none;
+}

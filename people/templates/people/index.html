@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load pagination_tags %}
 
 {% block title %}{% t "Anggota" %}{% endblock %}
 
@@ -13,9 +14,9 @@
 
 <h2>{% t "Anggota" %}</h2>
 
-<span id="total">{% t "Jumlah" %}: {{ people_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
-{% easy_map lokasi 900 400 7 using "people/map/index.html" %}
+{% easy_map lokasi 900 400 8 using "people/map/index.html" %}
 
 {% if user.is_staff %}
 <p><a href="/people/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah anggota" %}</span></a></p>
@@ -26,23 +27,24 @@
     <div class="tabbertab">
         <h4>{% t "Anggota" %}</h4>
         <ul class="uiListView icon-left">
-            {% for item in people %}
-              <li id="gr{{ item.key.id }}">
+            {% autopaginate peoples %}
+            {% for people in peoples %}
+              <li>
                 {% if user.is_staff %}
-                  <span class="right"><a href="/people/delete/{{item.key}}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                  <span class="right"><a href="/people/delete/{{people.id}}" class="uiRemove" title="{% t "Hapus" %} {{people.name}}"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="avatar normal"><img src="/img/{{people.photo.id}}" /></span>
                 <span class="block">
-                <span class="title"><a href="/people/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
-                <span class="body">{{ item.district.dl_name }} / {{ item.member_type }}</span>
-                <span class="body"><span class="tag">LC</span><a href="/livecenter/show/{{ item.livecenter.key }}">{{ item.livecenter.name }}</a></span>
+                <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
+                <span class="body">{{ people.district.name }} / {{ people.member_type }}</span>
+                <span class="body"><span class="tag">LC</span> <a href="/livecenter/show/{{ people.livecenter.id }}">{{ people.livecenter.name }}</a></span>
                 </span>
               </li>
             {% empty %}
               <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}
         </ul>
-        {% include "livecenter/paging.html" %}
+        {% paginate %}
     </div>
 </div>
 

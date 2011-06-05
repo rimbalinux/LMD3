@@ -1,37 +1,31 @@
-from .models import Attachment, File, Container
-from google.appengine.ext import db
+from .models import File
+#from .models import Attachment, File, Container
+#from google.appengine.ext import db
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic.simple import direct_to_template
-from livecenter.models import Person, LiveCluster
-from product.models import Product
-import counter
+#from django.views.generic.simple import direct_to_template
+#from livecenter.models import Person, LiveCluster
+#from product.models import Product
+#import counter
 
+
+def default():
+    return HttpResponseRedirect('/images/default.gif')
 
 def image(request, fid):
-    response = HttpResponse(mimetype='image/png')
-    image = Attachment.all().filter('containers = ', db.Key(fid)).get()
-    if image:
-        response.write(image.file)
-        return response
-    return HttpResponseRedirect('/images/default.gif')
+    if not fid:
+        return default()
+    image = File.objects.get(pk=fid)
+    response = HttpResponse(mimetype=image.mime)
+    response.write(image.content)
+    return response
 
-def imgid(request, fid):
-    image = Attachment.all().filter('__key__ = ', db.Key(fid)).get()
-    if image:
-        response = HttpResponse(mimetype='image/png')
-        response.write(image.file)
-        return response
-    return HttpResponseRedirect('/images/default.gif')
+def delete(request, fid):
+    image = File.objects.get(pk=fid)
+    image.delete()
+    return default()
 
-def imgfid(request, fid):
-    image = File.objects.all().filter(id=fid)
-    if image:
-        image = image[0]
-        response = HttpResponse(mimetype=image.mime)
-        response.write(image.content)
-        return response
-    return HttpResponseRedirect('/images/default.gif')
 
+"""
 def _delete(fid):
     image = Attachment.all().filter('__key__ = ', db.Key(fid)).get()
     if image:
@@ -125,3 +119,19 @@ def migrate(request):
         'total_bytes': total_bytes,
         })
 
+def migrate_delete(request): # danger
+    limit = 20
+    targets = []
+    for target in File.objects.all()[:limit]:
+        targets.append(target)
+        target.delete()
+    temp = []
+    for c in Container.objects.all()[:limit]:
+        temp.append(c)
+        c.delete()
+    return direct_to_template(request, 'attachment/migrate.html', {
+        'targets': targets,
+        'temps': temp,
+        })
+
+"""

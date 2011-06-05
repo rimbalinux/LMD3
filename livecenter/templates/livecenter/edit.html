@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
+
+{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Mata pencaharian baru" %}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>
+{% if form.instance.id %}
+{{ form.instance.name }}
+{% else %}
+{% t "Mata pencaharian baru" %}
+{% endif %}
+</h2>
+{{ form.non_field_errors }}
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    <div class="dialog-columns">
+
+        <div class="dialog-column">
+            <div class="fieldset">
+                {% formfield form.name %}
+            </div>
+            <div class="fieldset">
+                {% formfield form.category %}
+            </div>
+            <div class="fieldset">
+                {% formfield form.address %}
+            </div>
+            <div class="fieldset">
+                {% formfield form.description %}
+            </div>
+            <div class="fieldset">
+                {% include "livecenter/photo_form.html" %}
+            </div>
+        </div>
+
+        <div id="location" class="dialog-column">
+        {% include "livecenter/location_form.html" %}
+        </div>
+
+    </div>
+
+    <div class="submit-wrapper">
+        <input type="submit" value="{% t "Simpan" %}" />
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+document.getElementById("id_name").focus();
+</script>
+{% endblock %}

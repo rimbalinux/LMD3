@@ -1,7 +1,7 @@
 {% extends 'livecenter/map/base.html' %}
 
 {% block set-positions %}
-{% for item in groups %}
-  {% if item.geo_pos %}positions.push(Array({{ item.geo_pos }}));{% endif %}
+{% for product in products %}
+  {% if product.geo_pos %}positions.push(Array({{ product.geo_pos }}));{% endif %}
 {% endfor %}
 {% endblock %}

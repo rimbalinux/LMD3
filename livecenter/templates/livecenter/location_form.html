@@ -1,112 +1,105 @@
 {% load lang %}
-<script type="text/javascript" src="/js/jquery-1.4.1.js"></script>
+{% load livecenter %}
+
+<!-- Facebox tidak tampil saat load satu baris di bawah ini -->
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
-{% if district_sel %}
-var district_sel = {{ district_sel }};
-var subdistrict_sel = {{ subdistrict_sel }};
-var village_sel = {{ village_sel }};
-{% endif %}
-
-$(function(){
-
-    {% if district_sel %}
-
-    if ($('#fdistrict').length){
-    	// dependen dropdown
-    	$('#district').bind('change',function(){
-    			var me = this[this.selectedIndex];
-    			if(me.value !=""){
-    				$.ajax({
-    					type: 'GET',
-    					url:'/livecenter/district/'+$(me).val(),
-    					success:function(json){
-    						var data = eval('(' + json + ')');
-    						$('#sub_district').empty()
-                            $('#sub_district').append($('<option />').val("").text('{% t "Pilih kecamatan" %}'));
-    						for(var i = 0;i< data.length;i++){
-    							$('#sub_district').append($('<option />').val(data[i].dl_id).text(data[i].dl_name));
-    						}
-    						if (subdistrict_sel){
-    							$('#sub_district').val('0');
-    							$('#sub_district').val(subdistrict_sel);
-    							$('#sub_district').change();
-    						}
-    					},
-    					error:function(){
-    						alert('error guys')
-    					}
-    				});	
-    			}
-    	});
-    	//var addBinding = function(){
-    		$('#sub_district').bind('change',function(){
-    			var me = this[this.selectedIndex];
-    			if(me.value !=""){
-    				$.ajax({
-    					type: 'GET',
-    					url:'/livecenter/district/'+$(me).val(),
-    					success:function(json){
-    						var data = eval('(' + json + ')');
-    						$('#village').empty()
-                            $('#village').append($('<option />').val("").text('{% t "Pilih desa" %}'));
-    						for(var i = 0;i< data.length;i++){
-    							$('#village').append($('<option />').val(data[i].dl_id).text(data[i].dl_name));	
-    						}
-    						if (village_sel){
-    							$('#village').val('0');
-    							$('#village').val(village_sel);
-    							$('#village').change();
-    						}
-    					},
-    					error:function(){
-    						alert('error guys')
-    					}
-    				});	
-    			}
-    		});
-    	//};
-    	
-    	if (district_sel) {
-    	   _ds = $('#district');
-    	   _ds.val(district_sel);
-    	   _ds.change();
-        }
-    }
-
-    {% endif %}
-
+var initialLocation = new google.maps.LatLng({{ form|geo_pos }});
+var map;
+var marker = new google.maps.Marker({
+        position: initialLocation,
+        icon: "/images/map_marker_segitiga.png"
 });
+  
+function initialize_map() {
+  var myOptions = {
+    zoom: 6,
+    mapTypeId: google.maps.MapTypeId.TERRAIN,
+    center: initialLocation
+  };
+  map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  {% if form.instance.geo_pos %}
+  marker.setMap(map);
+  {% endif %}
+  google.maps.event.addListener(map, 'click', function(event) {
+    placeMarker(event.latLng);
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize_map);
+//google.maps.event.addDomListener(document, 'afterReveal.facebox', initialize_map);
+
+function placeMarker(location) {
+    marker.setMap(map);
+    marker.setPosition(location);
+    map.setCenter(location);
+    document.getElementById("id_geo_pos").value = location.lat() + ',' + location.lng(); 
+    document.getElementById("id_geo_pos").focus();
+}
 </script>
 
-{% if districts %}
-<p>
-<fieldset id="fdistrict"><legend>{% t "Lokasi" %}</legend>
-    <span>
-        <label for="district">{% t "Kabupaten" %}</label>
-	<select name="district" id="district" required="required">
-        <option value="0">{% t "Pilih" %}</option>
-	{% for district in districts %}
-	<option value="{{district.dl_id}}" {%if district.dl_id == district_sel %}selected="selected"{%endif%}>{{district.dl_name}}</option>
-	{% endfor %}
-	</select>
-	</span>
-	<span>
-        <label>{% t "Kecamatan" %}</label>
-	<select id="sub_district" name="sub_district" required="required">
-        <option value="">{% t "Pilih" %}</option>
-	</select>
-	</span>
-	<span>
-        <label>{% t "Desa" %}</label>
-	<select id="village" name="village" required="required">
-        <option value="">{% t "Pilih" %}</option>
-	</select>
-	</span>
-</fieldset>
-</p>
+<style type="text/css">
+#map_canvas {
+    width: 400px;
+    height: 300px;
+    padding-right: 5em;
+}
+.field-wrapper {
+    padding-left: 0;
+    padding-right: 2em;
+}
+</style>
+
+<div id="map_canvas"></div>
+<div class="fieldset">
+<div class="location-field-wrapper">
+    {% formfield form.geo_pos %}
+</div>
+</div>
+
+{% if form.instance|has_attr:"district" %}
+<div class="fieldset">
+<div class="field-wrapper">
+    {% formfield form.district %}
+</div>
+<div class="field-wrapper">
+    {% formfield form.sub_district %}
+</div>
+</div>
+
+<div class="field-wrapper">
+    {% formfield form.village %}
+</div>
+
+<script type="text/javascript" src="/js/jquery-1.4.1.js"></script>
+<script type="text/javascript">
+$("#id_district").change(function() {
+    $.get(escape("/livecenter/district/" + $(this).attr("value")), function(json) {
+        var data = eval('(' + json + ')');
+        $("#id_sub_district").empty();
+        $("#id_sub_district").append($('<option />').val("").text(""));
+        for(var i = 0;i< data.length;i++){
+            $("#id_sub_district").append($("<option />").val(data[i].id).text(data[i].name));
+        }
+        $("#id_sub_district").val({{form.instance.sub_district.id}});
+        $("#id_sub_district").change();
+    });
+})
+.change();
+
+$("#id_sub_district").change(function() {
+    $.get(escape("/livecenter/district/" + $(this).attr("value")), function(json) {
+        var data = eval('(' + json + ')');
+        $("#id_village").empty();
+        $("#id_village").append($('<option />').val("").text(""));
+        for(var i = 0;i< data.length;i++){
+            $("#id_village").append($("<option />").val(data[i].id).text(data[i].name));
+        }
+        $("#id_village").val({{form.instance.village.id}});
+        $("#id_village").change();
+    });
+})
+.change();
+</script>
+
 {% endif %}
-<p>
-<fieldset id="fgeopos"><legend>{% t "Koordinat GPS" %}</legend>
-    <input name="geo_pos" id="geo_pos" value="{{ geo_pos}}" />
-</fieldset>
-</p>

@@ -1,30 +1,25 @@
-from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
-        GroupTraining, LiveCluster, Container, ClusterContainer
-from .models import Group, Container as GroupContainer
-from livecenter.utils import redirect, default_location
-from attachment.utils import save_file_upload
-from attachment.models import Container as FileContainer
+import urllib
+from datetime import date
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
-from tipfy.pager import PagerQuery, SearchablePagerQuery
-import counter
-import urllib
+from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
+        GroupTraining, LiveCluster, Container, ClusterContainer, Cluster, \
+        Metaform
+from livecenter.utils import redirect, default_location, migrate_photo
+from people.models import People
+from .models import Group, Container as GroupContainer, Report, ReportContainer, \
+        Training, TrainingContainer
+from .forms import GroupForm
 
 
 def destination(pid, tabname):
     return urllib.quote('/group/show/%s?tab=%s' % (pid, tabname))
 
 def index(request):
-    q = 'q' in request.GET and request.GET['q']
-    page = 'page' in request.GET and request.GET['page']
-    prev, group, next = SearchablePagerQuery(LiveGroup).\
-            search(q).fetch(8, page)
     return direct_to_template(request, 'group/index.html', {
-        'groups': group,
-        'groups_count': counter.get('site_group_count'),
-        'prev': prev,
-        'next': next,
+        'groups': Group.objects.all(), 
+        'count': Group.counter_value(),
         'lokasi': default_location(), 
         })
 
@@ -39,20 +34,17 @@ def map(request, pid):
         'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })
 
-def show(request, pid):
-    item = db.get(pid)
-    if not item:
-        return HttpResponseRedirect('/group')
-    category = item.livecluster.category
+def show(request, gid):
+    group = Group.objects.get(pk=gid)
     return direct_to_template(request, 'group/show.html', {
-        'group': item,
-        'member_count': item.members.count(),
-        'livecenter': LiveCenter.all().filter('__key__', item.livecluster.livecenter[0]).get(),
-        'other_groups': LiveGroup.all().filter('livecluster', item.livecluster ).filter('__key__ !=', item.key()),
-        'customfields': MetaForm.all().order('__key__').filter('container', category.key()).filter('meta_type', 'group'),
-        'report': Report_Group.all().filter('livecluster', item.livecluster ).filter('name_group', item.key()),
-        'training': GroupTraining.all().filter('group', item.key()),
-        'lokasi': str(item.geo_pos).strip('nan,nan') or default_location(),
+        'group': group,
+        'members': People.objects.filter(group=group),
+        'other_groups': Group.objects.filter(cluster=group.cluster).exclude(pk=group.id),
+        'customfields': Metaform.objects.filter(meta_type='group').\
+                filter(category__in=group.livecenter.category),
+        'reports': Report.objects.filter(group=group),
+        'trainings': Training.objects.filter(group=group),
+        'lokasi': group.geo_pos or default_location(),
         })
 
 def report_show(request, pid):
@@ -154,58 +146,26 @@ def edit_report(request, pid):
         'customfields': MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()),
         })
  
-def create(request, lid, cid):
-    lc = db.get(db.Key(lid))
-    cluster = db.get(db.Key(cid))
-    customfields = MetaForm.all().order('__key__').\
-            filter('meta_type', 'group').\
-            filter('container', cluster.category.key())
-    if request.POST:
-        save(request, lc, cluster, customfields)
-        return redirect(request, '/group')
-    category = cluster.category
-    return direct_to_template(request, 'group/create.html', {
-        'livecenter': lc,
-        'cluster': cluster,
-        'clusters': LiveCluster.all().filter('livecenter', lc.key()).\
-                filter('category', category.key()),
-        'customfields': customfields,
-        })
+def create(request, cid):
+    cluster = Cluster.objects.get(pk=cid)
+    group = Group(cluster=cluster, livecenter=cluster.livecenter)
+    return show_edit(request, group)
 
-def save(request, pid=None):
-    if pid:
-        group = db.get(pid)
-        if not group:
-            return
+def edit(request, gid):
+    group = Group.objects.get(pk=gid)
+    return show_edit(request, group)
+
+def show_edit(request, group):
+    if request.POST:
+        form = GroupForm(instance=group.id and group or None)
+        if form.is_valid():
+            form.save()
+            return redirect(request)
     else:
-        group = LiveGroup()
-    group = db.get(pid)
-    category = group.livecluster.category
-    customfields = MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()).fetch(100)
-    group.livecluster = db.Key(request.POST['cluster'])
-    group.name = request.POST['name']
-    group.info = request.POST['info']
-    if request.POST['geo_pos']:
-        group.geo_pos = request.POST['geo_pos']
-    group.put()
-    for meta in customfields:
-        if request.POST[meta.slug]:
-            try:
-                if meta.form_type == 'file':
-                    if not request.POST[meta.slug]:
-                        continue
-                    val = db.Blob(request.POST[meta.slug])
-                    setattr(group, meta.slug, val)
-                else:
-                    setattr(group, meta.slug, request.POST[meta.slug])
-            except: pass
-    group.put()
-    if not pid:
-        counter.update('site_group_count', 1)
-    if 'photo' not in request.FILES:
-        return group
-    save_file_upload(request, 'photo', lc)
-    return group
+        form = GroupForm(instance=group)
+    return direct_to_template(request, 'group/edit.html', {
+        'form': form,
+        })
 
 def save_report(request, pid=None):
     item = db.get(pid)
@@ -315,8 +275,8 @@ def delete(request, pid):
 
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20
-    if not Group.objects.all()[:1]:
-        Group.counter_reset()
+    #if not Group.objects.all()[:1]:
+    #    Group.counter_reset()
     offset = Group.counter_value()
     sources = LiveGroup.all().order('__key__')
     targets = []
@@ -326,25 +286,154 @@ def migrate(request):
         if target:
             continue
         try:
-            key = source.livecluster.key()
+            cluster_key = source.livecluster.key()
         except db.ReferencePropertyResolveError, e:
             errors.append([source, e])
             continue
+        livecenter_key = str(source.containers[0])
+        c = Container.objects.get(livecenter=livecenter_key)
+        if c:
+            livecenter = c.livelihood
+        else:
+            errors.append([source, 'Livecenter %s tidak ada' % livecenter_key])
+            continue
         target = Group(name=source.name,
             info=source.info or '',
-            geo_pos=source.geo_pos or '',
-            livecenter=Container.objects.filter(livecenter=str(source.containers[0]))[0].livelihood)
-        c = ClusterContainer.objects.filter(livecluster=str(key))[:1]
+            geo_pos=str(source.geo_pos) != 'nan,nan' and source.geo_pos or '',
+            livecenter=livecenter)
+        c = ClusterContainer.objects.filter(livecluster=str(cluster_key))[:1]
         if c:
             target.cluster = c[0].cluster
-        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
-        if photo:
-            target.photo = photo[0].file
+        target.photo = migrate_photo(request, source)
         target.save()
         c = GroupContainer(group=target, livegroup=str(source.key()))
         c.save()
         targets.append(target)
     return direct_to_template(request, 'group/migrate.html', {
+        'targets': targets,
+        'errors': errors,
+        })
+
+def migrate_delete(request): # danger
+    limit = 20
+    targets = []
+    for target in Group.objects.all()[:limit]:
+        targets.append(target)
+        target.delete()
+    for c in GroupContainer.objects.all()[:limit]:
+        c.delete()
+    return direct_to_template(request, 'group/migrate.html', {
+        'targets': targets,
+        })
+
+
+# Hitung ulang jumlah group pada suatu livecenter. Sebelum fungsi ini
+# dipanggil, pastikan seluruh field group_count = 0 pada tabel
+# livecenter_livelihood.
+def livecenter_group_count(request):
+    counter_name = '__livecenter_group_count_offset'
+    offset = counter.get(counter_name)
+    targets = []
+    for g in Group.objects.order_by('id')[offset:20]:
+        g.livecenter.group_count += 1
+        g.livecenter.save()
+        counter.increment(counter_name)
+        targets.append(g)
+    return direct_to_template(request, 'group/livecenter_group_count.html', {
+        'targets': targets,
+        })
+
+##################
+# Migrate Report #
+##################
+# s = 05-MAY-2010
+def migrate_date(s):
+    months = ['','JAN','FEB','MAR','APR','MAY','JUN','JUL','AGT','SEP','OKT','NOP','DES']
+    t = s.split('-')
+    return date(int(t[2]), months.index(t[1]), int(t[0])) 
+
+  
+def migrate_report(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20
+    offset = Report.counter_value()
+    sources = Report_Group.all().order('__key__')
+    targets = []
+    errors = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = ReportContainer.objects.filter(old=str(source.key()))
+        if target:
+            continue
+        try:
+            group_key = source.name_group.key()
+        except db.ReferencePropertyResolveError, e:
+            errors.append(e)
+            continue
+        group = GroupContainer.objects.get(livegroup=group_key)
+        target = Report(name=source.name,
+            group=group.group,
+            date=migrate_date(source.year),
+            info=source.info or '')
+        target.save()
+        c = ReportContainer(new=target, old=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'group/migrate_report.html', {
+        'targets': targets,
+        'errors': errors,
+        })
+
+def migrate_report_delete(request): # danger
+    limit = 20
+    targets = []
+    for target in Report.objects.all()[:limit]:
+        targets.append(target)
+        target.delete()
+    for c in ReportContainer.objects.all()[:limit]:
+        c.delete()
+    return direct_to_template(request, 'group/migrate_report.html', {
+        'targets': targets,
+        })
+
+####################
+# Migrate Training #
+####################
+def migrate_training(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20
+    offset = Training.counter_value()
+    sources = GroupTraining.all().order('__key__')
+    targets = []
+    errors = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = TrainingContainer.objects.filter(old=str(source.key()))
+        if target:
+            continue
+        try:
+            group_key = source.group.key()
+        except db.ReferencePropertyResolveError, e:
+            errors.append(e)
+            continue
+        group = GroupContainer.objects.get(livegroup=group_key)
+        target = Training(
+            group=group.group,
+            manajemen_usaha=source.manajemen_usaha,
+            pembukuan=source.pembukuan,
+            produksi=source.produksi,
+            pemanfaatan_limbah=source.pemanfaatan_limbah,
+            pengemasan=source.pengemasan,
+            akses_pasar=source.akses_pasar,
+            keuangan_mikro=source.keuangan_mikro,
+            hitung_hpp_harga_jual=source.hitung_hpp_harga_jual,
+            navigasi=source.navigasi,
+            keselamatan_laut=source.keselamatan_laut,
+            penanganan_atas_kapal=source.penanganan_atas_kapal,
+            kontrol_kualitas=source.kontrol_kualitas,
+            rawat_mesin=source.rawat_mesin,
+            rescue=source.rescue)
+        target.save()
+        c = TrainingContainer(new=target, old=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'group/migrate_training.html', {
         'targets': targets,
         'errors': errors,
         })

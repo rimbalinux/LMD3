@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load pagination_tags %}
 
 {% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
 
@@ -14,9 +15,9 @@
 
 <h2>{% t "Pusat Mata Pencaharian" %}</h2>
 
-<span id="total">{% t "Jumlah" %}: {{ livecenters.count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
-{% easy_map lokasi 900 400 7 using "livecenter/map/index.html" %}
+{% easy_map lokasi 900 400 9 using "livecenter/map/index.html" %}
 
 
 <div class="tabber">
@@ -26,20 +27,22 @@
         <p><a href="/livecenter/create" class="uiButton" rel="facebox"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
         {% endif %}
         <ul class="uiListView icon-left">
-          {% for item in livecenters %}
-            <li id="gr{{item.key.id}}">
+          {% autopaginate livecenters %}
+          {% for lc in livecenters %}
+            <li>
               {% if user.is_staff %}
-              <span class="right"><a href="/livecenter/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+              <span class="right"><a href="/livecenter/delete/{{lc.id}}" class="uiRemove" title="{% t "Hapus" %} {{lc.name}}"></a></span>
               {% endif %}
-              <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+              <span class="avatar normal"><img src="/img/{{ lc.photo.id }}" /></span>
               <span class="block">
-              <span class="title"><a href="/livecenter/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span> 
-              <span class="body">{% t item.description %}</span>
-              <span class="body">{{ item.district.dl_name }}</span>
+              <span class="title"><a href="/livecenter/show/{{ lc.id }}" class="preview">{{ lc.name }}</a></span> 
+              <span class="body">{% t lc.description %}</span>
+              <span class="body">{{ lc.district.name }}</span>
               </span>
             </li>
           {% endfor %}
         </ul>
+        {% paginate %}
     </div>
 </div>
 

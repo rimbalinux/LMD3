@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load pagination_tags %}
 
 {% block title %}{% t "Kelompok" %}{% endblock %}
 
@@ -13,7 +14,7 @@
 
 <h2>{% t "Kelompok" %}</h2>
 
-<span id="total">{% t "Jumlah" %}: {{ groups_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
 {% easy_map lokasi 900 400 7 using "group/map/index.html" %}
 
@@ -21,22 +22,23 @@
     <div class="tabbertab">
         <h4>{% t "Kelompok" %}</h4>
         <ul class="uiListView icon-left">
-            {% for item in groups %}
-                <li id="gr{{ item.key.id }}">
+            {% autopaginate groups %}
+            {% for group in groups %}
+                <li>
                   {% if user.is_staff %}
-                  <span class="right"><a href="/group/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                  <span class="right"><a href="/group/delete/{{group.id}}" class="uiRemove" title="{% t "Hapus" %} {{group.name}}"></a></span>
                   {% endif %}
-                  <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
+                  <span class="avatar normal"><img src="/img/{{group.photo.id}}" /></span>
                   <span class="block">
-                      <span class="title"><a href="/group/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span> 
-                      <span class="body">{{ item.livecluster.category.name }}</span>
-                      <span class="body">{{ item.info }}</span>
+                      <span class="title"><a href="/group/show/{{ group.id }}" class="preview">{{ group.name }}</a></span> 
+                      <span class="body">{{ group.cluster.category.name }}</span>
+                      <span class="body">{{ group.info }}</span>
               </li>
             {% empty %}
               <li>{% t "Belum ada kelompok" %}</li>
             {% endfor %}
         </ul>
-        {% include "livecenter/paging.html" %}
+        {% paginate %}
     </div>
 </div>
 

@@ -1,1 +1,1 @@
-DEFAULT_LOCATION = [4.0287, 96.7181]
+from home.settings import DEFAULT_LOCATION

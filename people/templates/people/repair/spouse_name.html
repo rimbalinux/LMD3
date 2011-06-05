@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ "Ganti spouse_name 0 menjadi string hampa" }}{% endblock %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" /> 
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

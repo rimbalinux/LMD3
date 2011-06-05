@@ -150,10 +150,6 @@ input[type="button"], input[type="submit"], input[type="reset"], input[type="ima
   width: 48px;
 }
 
-.cavatar img {
-  width: 80px;
-}                         
-
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -182,4 +178,19 @@ ul.metapick li {
   clear: both;
   padding: 4px;
   border-bottom: 1px solid #ccc;
+}
+
+fieldset {
+    border:1px solid #bdc7c8;
+}
+
+fieldset.grid {
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+fieldset.grid span.c {
+    float: left;
+    margin-right: 15px;
 }

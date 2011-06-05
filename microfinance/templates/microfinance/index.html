@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
+{% load pagination_tags %}
 
 {% block title %}{% t "Keuangan Mikro" %}{% endblock %}
 
@@ -13,7 +14,7 @@
 
 <h2>{% t "Keuangan Mikro" %}</h2>
 
-<span id="total">{% t "Jumlah" %}: {{ items_count }}</span>
+<span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
 {% easy_map lokasi 900 400 7 using "microfinance/map/index.html" %}
 
@@ -26,23 +27,23 @@
     <div class="tabbertab">
         <h4>{% t "Keuangan Mikro" %}</h4>
         <ul class="uiListView icon-left">
-            {% for item in items %}
-              <li id="gr{{ item.key.id }}">
+            {% autopaginate finances %}
+            {% for finance in finances %}
+              <li>
                 {% if user.is_staff %}
-                <span class="right"><a href="/microfinance/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{item.name}}"></a></span>
+                <span class="right"><a href="/microfinance/delete/{{finance.id}}" class="uiRemove" title="{% t "Hapus" %} {{finance.name_org}}"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="avatar normal"><img src="/img/{{finance.id}}" /></span>
                 <span class="block">
-                <span class="title"><a href="/microfinance/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
-                <span class="body">{{ item.district.dl_name }}</span>
+                <span class="title"><a href="/microfinance/show/{{finance.id}}" class="preview">{{ finance.name_org }}</a></span> 
+                <span class="body">{{ finance.district.name }}</span>
                 </span>
               </li>
             {% empty %}
               <li>{% t "Belum ada data" %}</li>
             {% endfor %}
         </ul>
-
-        {% include "livecenter/paging.html" %}
+        {% paginate %}
     </div>
 </div>
 

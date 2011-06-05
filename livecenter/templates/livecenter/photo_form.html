@@ -1,0 +1,11 @@
+{% load lang %}
+{% load livecenter %}
+
+<label>{% t "Foto" %}:</label>
+<input type="file" name="photo_file" />
+{{ form.photo.errors }}
+{% if form.instance.photo %}
+{{ form.photo }}
+<br />
+<img src="/img/{{form.instance.photo.id}}" width="50" height="50" />
+{% endif %}

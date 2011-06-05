@@ -1,88 +1,86 @@
+{% extends 'base.html' %}
 {% load lang %}
-<h2><i class="icon_small home"></i>
-{% if person %}
-  {% t "Ubah" %} {{person.name}} {% t "di" %} {{livecenter.name}}
-{% else %}
-  {% t "Anggota baru di" %} {{livecenter.name}}
-{% endif %}
-</h2>
+{% load livecenter %}
 
-<div class="formsheet">
-    <form name="fgrid" id="fgrid" action="/people/create/{{livecenter.key}}" method="POST" class="validate" enctype="multipart/form-data">
-        <p>
-            <label>{% t "Nama lengkap" %}</label>
-            <input type="text" name="name" value="{{person.name}}" class="xd" pattern="[a-zA-Z1-9 ]{3,}" required="required" />
-        </p>
-        <fieldset class="grid">
-            <span class="c">
-                <label>{% t "Tipe anggota" %}</label>
-                <input type="text" name="member_type" value="{{person.member_type}}" pattern="[a-zA-Z0-9 ]{3,}" />
-            </span>
-            <span class="clear"></span>
-            <span class="c">
-                <label>{% t "Jenis kelamin" %}</label>
-                <select name="gender">
-                    {% for gender in genders %}
-                      <option value="{{gender}}" {% if person.gender == gender %}selected{% endif %}>{{gender}}</option>
-                    {% endfor %}
-                </select>
-            </span>
-            <span class="c">
-                <label>{% t "Pendapatan bulanan" %}</label>
-                <input type="text" name="monthly_income" value="{{person.montly_income}}" />
-                <strong>IDR</strong>
-            </span>
-            <span class="clear"></span>
-            <span class="c">
-                <label>{% t "Telepon selular" %}</label>
-                <input type="text" name="mobile" value="{% if person.mobile %}{{person.mobile}}{% endif %}" />
-            </span>
-            <span class="c">
-                <label>{% t "Email" %}</label>
-                <input type="email" name="email" value="{{person.email}}" />
-            </span>
-            <span class="clear"></span>
-            <span class="c">
-                <label>{% t "Tempat lahir" %}</label>
-                <input type="text" name="birth_place" value="{{person.birth_place}}">
-            </span>
-            <span class="c">
-                <label>{% t "Tahun lahir" %}</label>
-                <input type="text" name="birth_year" value="{{person.birth_year}}">
-            </span>
-            <span class="clear"></span>
-            <span class="c">
-                <label>{% t "Pendidikan terakhir" %}</label>
-                <input type="text" name="education" value="{{person.education}}" />
-            </span>
-            <span class="c">
-                <label>{% t "Nama pasangan" %}</label>
-                <input type="text" name="spouse_name" value="{{person.spouse_name}}" />
-            </span>
-            <span class="c">
-                <label>{% t "Jumlah tanggungan" %}</label>
-                <input type="text" name="children_num" value="{{person.children_num}}" />
-            </span>
-        </fieldset>
-        <p>
-        <label>{% t "Alamat" %}</label>
-        <textarea cols="45" rows="3" name="address">{{person.address}}</textarea>
-        </p>
-        {% include "livecenter/location_form.html" %}
-        <p>
-        <label>{% t "Catatan" %}</label>
-        <textarea cols="45" rows="3" name="description">{{person.info}}</textarea>
-        </p>
-        <p>
-        <label>{% t "Foto" %}</label>
-        <input type="file" name="photo" />
-        </p>
-        <p class="formsetaction">
-        <input type="submit" value=" {% t "Simpan" %} " class="uiButton_blue" />
-        </p>
-    </form>
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
+
+{% block title %}{{ form.instance.name }}{% endblock %}
+
+
+{% block content %}
+
+<h2>{% t "Anggota" %}</h2>
+<form action="/people/edit/{{form.instance.id}}" method="post" enctype="multipart/form-data">
+
+<div class="dialog-columns">
+
+<div class="dialog-column">
+
+<div class="fieldset">
+    {% formfield form.name %}
+    <div class="field-wrapper">
+        <label>{% t "Mata pencaharian" %}:</label>
+        {{ form.instance.livecenter.name }}
+    </div>
 </div>
 
+<div class="fieldset">
+    {% formfield form.group %}
+    {% formfield form.monthly_income %}
+</div>
+
+<div class="fieldset">
+    {% formfield form.address %}
+    {% formfield form.gender %}
+</div>
+
+<div class="fieldset">
+    {% formfield form.birth_year %}
+    {% formfield form.birth_place %}
+</div>
+
+<div class="fieldset">
+    {% formfield form.spouse_name %}
+    {% formfield form.children_num %}
+</div>
+    
+<div class="fieldset">
+    {% formfield form.education %}
+    {% formfield form.member_type %}
+</div>
+
+<div class="fieldset">
+    {% formfield form.mobile %}
+    {% formfield form.email %}
+</div>
+
+<div class="fieldset">
+    {% formfield form.info %}
+    {% include "livecenter/photo_form.html" %}
+</div>
+</div>
+
+</div><!-- dialog-column -->
+
+<div id="location" class="dialog-column">
+{% include "livecenter/location_form.html" %}
+</div>
+
+</div><!-- dialog-columns -->
+
+<div class="submit-wrapper">
+    <input type="submit" value="{% t "Simpan" %}" />
+</div>
+
+</form>
+
+{% endblock %}
+
+
+{% block js %}
 <script type="text/javascript">
-    document.fgrid.name.focus();
+    document.getElementById("id_name").focus();
 </script>
+{% endblock %}

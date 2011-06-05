@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Hitung anggota pada suatu livecenter" }}{% endblock %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" /> 
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Livecenter</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.livecenter.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

@@ -1,10 +1,12 @@
 # Sumber: LMD/models.py
 
 from google.appengine.ext import db, search
-from attachment.models import Attachment, File
 from django.db import models
 from djangotoolbox import fields
+from attachment.models import Attachment
+from attachment.tools import PhotoModel
 from counter.tools import BaseModel
+from .tools import GeoModel
 
 
 """ Location data """
@@ -13,10 +15,25 @@ class LivelihoodLocation(db.Model):
     dl_name = db.StringProperty()
     dl_parent = db.IntegerProperty()
 
-class Location(models.Model):
+class Location(BaseModel):
     lid = models.IntegerField(unique=True)
     name = models.CharField(max_length=100)
-    parent = models.IntegerField() # references Location.lid 
+    parent = models.IntegerField() # references Location.lid
+
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+
+class DistrictModel(GeoModel):
+    district = models.ForeignKey(Location, related_name='+', null=True)
+    sub_district = models.ForeignKey(Location, related_name='+', null=True)
+    village = models.ForeignKey(Location, related_name='+', null=True)
+
+    class Meta:
+        abstract = True
 
 
 """ 
@@ -45,11 +62,13 @@ class LiveCategory(search.SearchableModel):
         return MetaForm.gql("WHERE containers = :1", self.key())
 
 
-class Category(models.Model):
+class Category(PhotoModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
     ancestor = models.ForeignKey('Category', null=True)
-    updated = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
 
 class CategoryContainer(models.Model): # migrasi
     category = models.ForeignKey(Category)
@@ -95,17 +114,25 @@ class LiveCenter(search.SearchableModel):
         return LiveGroup.gql("WHERE containers = :1", self.key())
 
 
-class Livelihood(BaseModel): # was LiveCenter
+class Livelihood(DistrictModel): # was LiveCenter
     name = models.CharField(max_length=100)
-    category = fields.ListField()
-    address = models.TextField(blank=True)
-    district = models.ForeignKey(Location, related_name='+')
-    sub_district = models.ForeignKey(Location, related_name='+')
-    village = models.ForeignKey(Location, related_name='+')
-    description = models.TextField(blank=True)
-    geo_pos = models.CharField(max_length=100)
-    photo = models.ForeignKey(File, null=True)
-    updated = models.DateTimeField(auto_now=True)
+    category = fields.ListField(verbose_name='kategori', null=True)
+    address = models.TextField('alamat')
+    description = models.TextField('keterangan')
+    member_count = models.IntegerField(default=0, blank=True)
+    cluster_count = models.IntegerField(default=0, blank=True)
+    group_count = models.IntegerField(default=0, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    @property
+    def categories(self):
+        cs = []
+        for c in self.category:
+            cs.append(Category.objects.get(pk=c))
+        return cs
+
 
 class Container(models.Model): # peralihan, temporary
     livelihood = models.ForeignKey(Livelihood)
@@ -141,6 +168,7 @@ class Person(search.SearchableModel):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
+
     @property
     def groups(self):
         if self.livegroup:
@@ -162,12 +190,28 @@ class LiveCluster(search.SearchableModel, db.Expando):
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
 
-class Cluster(BaseModel):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(Category)
-    livecenter = models.ForeignKey(Livelihood)
-    info = models.TextField()
-    photo = models.ForeignKey(File, null=True)
+class Cluster(PhotoModel):
+    name = models.CharField('nama gugusan', max_length=100)
+    category = models.ForeignKey(Category, verbose_name='kategori')
+    livecenter = models.ForeignKey(Livelihood, verbose_name='mata pencaharian')
+    info = models.TextField('keterangan', blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def after_save(self, *args, **kwargs):
+        super(Cluster, self).after_save(*args, **kwargs)
+        if self.is_insert:
+            self.livecenter_counter()
+
+    def delete(self, *args, **kwargs):
+        super(Cluster, self).delete(*args, **kwargs)
+        self.livecenter_counter(-1)
+
+    def livecenter_counter(self, add=1):
+        self.livecenter.cluster_count += add 
+        self.livecenter.save()
+
 
 class ClusterContainer(models.Model): # migrasi, temporary
     cluster = models.ForeignKey(Cluster, unique=True)
@@ -207,7 +251,24 @@ class MetaForm(db.Model):
     @property
     def livecenters(self):
         LiveCenter.gql("WHERE __key__ IN :1", self.container)
-     
+
+class Metaform(BaseModel):
+    title = models.CharField(max_length=100) 
+    meta_type = models.CharField(max_length=100, choices=('product', 'group'),
+            default='product')
+    category = models.ForeignKey(Category)
+    slug = models.CharField(max_length=100)
+    form_type = models.CharField(choices=('text', 'select', 'photo', 'document', 'textarea', 'geopt'))
+    attribute = models.TextField()
+    description = models.TextField()
+
+    class Meta:
+        ordering = ['title']
+
+class MetaformContainer(models.Model):
+    new = models.ForeignKey(Metaform)
+    old = models.CharField(max_length=100, unique=True)
+
 
 """
 Micro Finance
@@ -293,4 +354,20 @@ class GroupTraining(search.SearchableModel):
     rawat_mesin = db.IntegerProperty(default=0)
     rescue = db.IntegerProperty(default=0)
 
-
+""" Member Products """
+class Product(search.SearchableModel, db.Expando):
+    person = db.ReferenceProperty(Person, collection_name='products')
+    livecenter = db.ReferenceProperty(LiveCenter, collection_name='products')
+    category = db.ReferenceProperty(LiveCategory, collection_name='products')
+    cluster = db.ReferenceProperty(LiveCluster, collection_name='products')
+    containers = db.ListProperty(db.Key,default=[])
+    name  = db.StringProperty()
+    geo_pos = db.GeoPtProperty()
+    info = db.TextProperty()
+    #added by Jufri Wahyudi
+    year = db.StringProperty()
+    #end of added
+    @property
+    def photo(self):
+        return Attachment.gql("WHERE containers = :1", self.key())
+ 

@@ -1,40 +1,68 @@
+{% extends 'base.html' %}
 {% load lang %}
-{% load easy_maps_tags %}
 {% load livecenter %}
 
-<h2>{% t "Kelompok" %} {{ group.name }}</h2>
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
 
-<form name="fcategory" action="/group/edit/{{ group.key }}" class="validate" method="POST" enctype="multipart/form-data">
-<table border="0" cellpadding="0" cellspacing="4" width="600">
-<tr><td class="xc">{% t "Gugusan" %}</td><td>
-    <select name="cluster">
-        {% for item in cluster %}
-            <option value="{{item.key}}" {% if item.key == group.livecluster.key %} selected="selected" {%endif%}>{{item.name}}</option>
-        {% endfor %}
-    </select>
-</td></tr>
-<tr><td><span>{% t "Nama Kelompok" %}</span></td><td>
-	<input type="text" name="name" class="xe" value="{{group.name}}" required="required" />
-</td></tr>
-{% for x in customfields %}
-<tr><td><span>{{ x.title }}<br/><i>{% t x.description %}</i></span></td><td>
-    {{group|metaform:x}}</td></tr>
-{% endfor %}
+{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Kelompok baru" %}{% endif %}{% endblock %}
 
-<tr><td colspan="2">
-{% include "livecenter/location_form.html" %}
-</td></tr>
-<tr><td><span>{% t "Info tentang kelompok ini" %}</span></td><td>
-<textarea class="xe" rows="4" name="info">{{group.info}}</textarea></td></tr>
+{% block content %}
 
-<tr>
-    <td>{% t "Foto" %}<br />
-    <div class="profile_pic"><img src="/img/{{ group.key }}" width="100" height="100" /></div>
-    </td>
-    <td><input type="file" name="photo" /></td>
-</tr>
-</table>
-<p class="formsetaction">
-<input type="submit" value={% t "Simpan" %} class="uiButton_blue" />
-</p>
+<h2>
+{% if form.instance.id %} %}
+{% t "Kelompok" %} {{ form.instance.name }}
+{% else %}
+{% t "Kelompok baru" %}
+{% endif %}
+</h2>
+{{ form.non_field_errors }}
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    {{ form.livecenter }}
+    {{ form.cluster }}
+    <div class="dialog-columns">
+        <div class="dialog-column">
+            <div class="fieldset">
+                <div class="field-wrapper">
+                    <label>{% t "Mata pencaharian" %}</label>
+                    {{ form.instance.livecenter }}
+                    {{ form.livecenter.errors }}
+                </div>
+            </div>
+            <div class="fieldset">
+                <div class="field-wrapper">
+                    <label>{% t "Gugusan" %}</label>
+                    {{ form.instance.cluster }}
+                    {{ form.cluster.errors }}
+                </div>
+            </div>
+            <div class="fieldset">
+                {% formfield form.name %}
+            </div>
+            <div class="fieldset">
+                {% formfield form.info %}
+            </div>
+            <div class="fieldset">
+                {% include "livecenter/photo_form.html" %}
+            </div>
+        </div>
+
+        <div id="location" class="dialog-column">
+            {% include "livecenter/location_form.html" %}
+        </div>
+
+    </div><!-- dialog-columns -->
+
+    <div class="submit-wrapper">
+        <input type="submit" value="{% t "Simpan" %}" />
+    </div>
 </form>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    document.getElementById("id_name").focus();
+</script>
+{% endblock %}

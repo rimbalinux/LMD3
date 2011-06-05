@@ -1,0 +1,113 @@
+{% extends 'livecenter/dialog_form.html' %}
+{% load lang %}
+
+{% block action %}/people/edit/{{form.instance.id}}{% endblock %}
+
+{% block header %}
+<h2>{% t "Anggota" %}</h2>
+{% endblock %}
+
+{% block content %}
+{{ form.non_field_errors }}
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Nama" %}:</label>
+    {{ form.name }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Mata pencaharian" %}:</label>
+    {{ form.instance.livecenter.name }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Kelompok" %}:</label>
+    {{ form.group }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Alamat" %}:</label>
+    {{ form.address }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Jenis kelamin" %}:</label>
+    {{ form.gender }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Tahun lahir" %}:</label>
+    {{ form.birth_year }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Tempat lahir" %}:</label>
+    {{ form.birth_place }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Nama pasangan" %}:</label>
+    {{ form.spouse_name }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Jumlah tanggungan" %}:</label>
+    {{ form.children_num }}
+</div>
+</div>
+    
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Pendidikan" %}:</label>
+    {{ form.education }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Tipe anggota" %}:</label>
+    {{ form.member_type }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Telepon selular" %}:</label>
+    {{ form.mobile }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Email" %}:</label>
+    {{ form.email }}
+</div>
+</div>
+
+<div class="fieldset">
+<div class="field-wrapper">
+    <label for="">{% t "Catatan" %}:</label>
+    {{ form.info }}
+</div>
+<div class="field-wrapper">
+    <label for="">{% t "Foto" %}:</label>
+    {{ form.photo }}
+    {% if form.instance.photo %}
+    <div>
+        <img src="/img/{{form.instance.photo.id}}" width="50" height="50" />
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="submit-wrapper">
+    <input type="submit" value="{% t "Simpan" %}" />
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    document.getElementById("id_name").focus();
+</script>
+{% endblock %}

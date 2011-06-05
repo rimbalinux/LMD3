@@ -16,8 +16,10 @@ class TranslateNode(Node):
         self.text = template.Variable(text)
 
     def render(self, context):
-        request = context['request']
         text = self.text.resolve(context)
+        if 'request' not in context:
+            return text
+        request = context['request']
         try:
             return translate(text, to=request.session.get('lang','id'))
         except template.VariableDoesNotExist:

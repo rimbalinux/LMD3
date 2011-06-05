@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load lang %}
 
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" />
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ "Migrasi LiveCenter" }}{% endblock %}
 
 {% block content %}

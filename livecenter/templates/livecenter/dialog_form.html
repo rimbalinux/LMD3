@@ -1,0 +1,54 @@
+<style type="text/css">
+.dialog-columns {
+    overflow: hidden;
+}
+
+.dialog-column {
+    float: left;
+}
+
+.fieldset {
+    overflow: hidden;
+}
+
+.field-wrapper {
+    float: left;
+    padding-left: 2em;
+}
+
+.description {
+    font-size: 0.85em;
+    color: #898989;
+    line-height: 150%;
+    margin-bottom: 0.75em;
+}
+
+.submit-wrapper {
+    float: right;
+}
+
+#dialog-content {
+    margin: 0 5px;
+}
+
+</style>
+
+<form action="{% block action %}{% endblock %}" method="post" enctype="multipart/form-data">
+<div>
+    {% block header %}{% endblock %}
+</div>
+<div class="columns">
+    <div id="dialog-content" class="dialog-column">
+        {% block content %}{% endblock %}
+    </div>
+    <div id="dialog-sidebar" class="dialog-column">
+        {% include "livecenter/location_form.html" %}
+        {% block sidebar %}{% endblock %}
+    </div>
+</div>
+<div>
+    {% block footer %}{% endblock %}
+</div>
+</form>
+
+{% block js %}{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi MetaForm" }}{% endblock %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" />
+{% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>Category</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.title }}</td>
+        <td>{{ target.category.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

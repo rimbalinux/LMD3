@@ -24,9 +24,9 @@ import os
 #}
 # -----------------
 
-SITE_NAME = 'My site'
+SITE_NAME = 'Mata Pencaharian'
 SITE_DESCRIPTION = ''
-SITE_COPYRIGHT = ''
+SITE_COPYRIGHT = 'Livelihood Members Database'
 DISQUS_SHORTNAME = ''
 GOOGLE_ANALYTICS_ID = ''
 # Get the ID from the CSE "Basics" control panel ("Search engine unique ID")
@@ -70,6 +70,8 @@ INSTALLED_APPS = (
     'permission_backend_nonrel',
     'authority',
     'counter',
+    'pagination',
+    'globalrequest',
 )
 
 if has_djangoappengine:
@@ -91,6 +93,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'urlrouter.middleware.URLRouterFallbackMiddleware',
+    'pagination.middleware.PaginationMiddleware',
+    'globalrequest.middleware.GlobalRequestMiddleware',
 )
 
 URL_ROUTE_HANDLERS = (

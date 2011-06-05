@@ -2,8 +2,9 @@
 {% load lang %}
 {% load easy_maps_tags %}
 {% load livecenter %}
+{% load pagination_tags %}
 
-{% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
+{% block title %}{{ livecenter.name }}{% endblock %}
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
@@ -15,70 +16,69 @@
 {% block content %}
 <h2>{{ livecenter.name }}</h2>
 
-{% easy_map lokasi 600 300 7 using "livecenter/map/show.html" %} 
+{% easy_map lokasi 600 300 8 using "livecenter/map/show.html" %} 
 
 {% if user.is_staff %}
     <p>
-    <a href="/livecenter/member/{{livecenter.key}}" class="uiButton uiTip" title="View Members Map"><span>{% t "Peta anggota" %}</span></a>
-    <a href="/livecenter/map/{{livecenter.key}}" class="uiButton uiTip" title="View Groups Map"><span>{% t "Peta kelompok" %}</span></a><br />
+    <a href="/livecenter/member/{{livecenter.id}}" class="uiButton" title="View Members Map">{% t "Peta anggota" %}</a>
+    <a href="/livecenter/map/{{livecenter.id}}" class="uiButton" title="View Groups Map">{% t "Peta kelompok" %}</a><br />
     </p>
     <p>
     <br />
-    <a href="/livecenter/nogroup/{{livecenter.key}}" class="uiButton uiTip" title="View Ungrouped Members"><span>{% t "Anggota tanpa kelompok" %}</span></a>
-    <a href="/livecenter/nomobile/{{livecenter.key}}" class="uiButton uiTip" title="View Members haven't Mobile"><span>{% t "Info telepon selular" %}</span></a> 
-    <a href="/livecenter/lc_report/{{livecenter.key}}" rel="facebox" class="uiButton uiTip" title="View Report Livecenter's Product"><span>{% t "Buat laporan" %}</span></a>
-    <a href="/location" class="uiButton uiTip" title="View, Edit and Delete Location"><span>{% t "Lokasi" %}</span></a>
+    <a href="/livecenter/nogroup/{{livecenter.id}}" class="uiButton" title="View Ungrouped Members">{% t "Anggota tanpa kelompok" %}</a>
+    <a href="/livecenter/nomobile/{{livecenter.id}}" class="uiButton" title="View Members haven't Mobile">{% t "Anggota tanpa telepon selular" %}</a> 
+    <a href="/livecenter/mobile_list/{{livecenter.id}}" class="uiButton" title="View List of Member's Mobile">{% t "Daftar telepon selular" %}</a>
+    <a href="/livecenter/lc_report/{{livecenter.id}}" rel="facebox" class="uiButton" title="View Report Livecenter's Product">{% t "Buat laporan" %}</a>
+    <a href="/location" class="uiButton" title="View, Edit and Delete Location">{% t "Lokasi" %}</a>
     </p>
     <p>&nbsp;</p>
 {% endif %}
-
 
 <div class="tabber">
     <div class="tabbertab {% tabdefault "member" %}">
         <h2>{% t "Anggota" %}</h2>
         {% if user.is_staff %}
-        <a href="/people/create/{{livecenter.key}}?destination={{tab_member}}" class="uiButton right" rel="facebox">{% t "Tambah" %}</a>
+        <a href="/people/create/{{livecenter.id}}?destination={{tab_member}}" class="uiButton right">{% t "Tambah" %}</a>
         {% endif %}
-        <ul class="uiListView icon-left"> 
-            {% for item in members %}
-                    <li id="gr{{ item.key.id }}">
-                        <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+        <ul class="uiListView icon-left">
+            {% for people in peoples %}
+                    <li>
+                        <span class="avatar normal"><img src="/img/{{ people.photo.id }}" /></span>
                         <span class="block">
-                        <span class="title"><a href="/people/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span> 
-                        <span class="body">{{ item.member_type }}</span>
-                        <span class="body">{{ item.district.dl_name }}</span>
+                        <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
+                        <span class="body">{{ people.member_type }}</span>
+                        <span class="body">{{ people.district.name }}</span>
                         </span>
                     </li>
             {% empty %}
                 <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}
         </ul>
-        {% include "livecenter/paging.html" %}
     </div>
 
     <div class="tabbertab {% tabdefault "cluster" %}">
         <h2>{% t "Gugusan" %}</h2>
         {% if user.is_staff %}
-            <a href="/livecenter/cluster/{{livecenter.key}}" rel="facebox" class="uiButton right">{% t "Tambah gugusan" %}</a>
+        <a href="/cluster/create/{{livecenter.id}}?destination={{tab_cluster}}" rel="facebox" class="uiButton right">{% t "Tambah gugusan" %}</a>
         {% endif %}
         <ul class="uiListView icon-left">
-            {% for item in livecenter.clusters %}
-              <li id="cr{{ item.key.id }}">
+            {% for cluster in clusters %}
+              <li>
                 {% if user.is_staff %}
-                <span class="right"><a href="/cluster/delete/{{item.key}}?destination={{request.path}}" class="uiRemove" title=" {% t "Hapus" %} {{item.name}}"></a></span>
+                <span class="right"><a href="/cluster/delete/{{cluster.id}}?destination={{tab_cluster}}" class="uiRemove" title=" {% t "Hapus" %} {{cluster.name}}"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="avatar normal"><img src="/img/{{ cluster.photo.id }}" /></span>
                 <span class="block">
                     {% if user.is_staff %}
-                    <span class="title"><a href="/cluster/show/{{ item.key }}" class="preview" >{{ item.name }}</a></span>
+                    <span class="title"><a href="/group/show_cluster/{{ cluster.id }}" class="preview" >{{ cluster.name }}</a></span>
                     <span class="body right">
-                        <a href="/cluster/edit/{{ item.key }}?destination={{ request.path }}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
-                        <a href="/group/create/{{ livecenter.key }}/{{ item.key }}?destination={{tab_group}}" rel="facebox" class="uiButton">{% t "Tambah kelompok" %}</a>
+                        <a href="/cluster/edit/{{ cluster.id }}?destination={{tab_cluster}}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
+                        <a href="/group/create/{{ cluster.id }}?destination={{tab_group}}" class="uiButton">{% t "Tambah kelompok" %}</a>
                     </span>
                     {% else %}
-                      <span class="title"> {{ item.name }}</span>
+                      <span class="title"> {{ cluster.name }}</span>
                     {% endif %}
-                    <span class="body">{{ item.info }}</span>
+                    <span class="body">{{ cluster.info }}</span>
                 </span>
               </li>
             {% empty %}
@@ -90,17 +90,17 @@
     <div class="tabbertab {% tabdefault "group" %}">
         <h2>{% t "Kelompok" %}</h2>
         <ul class="uiListView icon-left">
-            {% for item in livecenter.groups %}
-              <li id="gr{{ item.key.id }}">
+            {% for group in groups %}
+              <li>
                 {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/delete/{{item.key}}?destination={{ tab_group }}" class="uiRemove" title="{% t "Hapus" %} {{item.name}}"></a>
+                    <a href="/group/delete/{{group.id}}?destination={{ tab_group }}" class="uiRemove" title="{% t "Hapus" %} {{group.name}}"></a>
                 </span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{item.key}}" /></span>
+                <span class="avatar normal"><img src="/img/{{group.photo.id}}" /></span>
                 <span class="block">
-                  <span class="title"><a href="/group/show/{{ item.key }}" class="preview">{{ item.name }}</a></span> 
-                  <span class="body">{{ item.info }}</span>
+                  <span class="title"><a href="/group/show/{{ group.id }}" class="preview">{{ group.name }}</a></span> 
+                  <span class="body">{{ group.info }}</span>
                 </span>
               </li>
             {% empty %}
@@ -112,19 +112,19 @@
     <div class="tabbertab {% tabdefault "microfinance" %}">
         <h2>{% t "Keuangan mikro" %}</h2>
             <ul class="uiListView icon-left">
-                {% for item in microfinance %}
-                  <li id="gr{{item.key.id}}">
-                    <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                {% for finance in finances %}
+                  <li>
+                    <span class="avatar normal"><img src="/img/{{ finance.photo.id }}" /></span>
                     <span class="block">
-                      <span class="title"><a href="/microfinance/show/{{ item.key }}" class="preview">{{ item.name_org }}</a></span> 
-                      <span class="body">{{ item.district.dl_name }} / {{ item.sub_district.dl_name}}</span>
+                      <span class="title"><a href="/microfinance/show/{{ finance.id }}" class="preview">{{ finance.name_org }}</a></span> 
+                      <span class="body">{{ finance.district.name }} / {{ finance.sub_district.name}}</span>
                     </span>
                   </li>
                 {% empty %}
                   <li>{% t "Belum ada data" %}</li>
                 {% endfor %}
                 {% if microfinance %}
-                <li><a href="/livecenter/show_microfinance/{{livecenter.key}}" style="float:right;" title="{% t "Tampilkan yang ada di " %} {{livecenter.district.dl_name}}" >{% t "Tampilkan semua" %}</a></li>
+                <li><a href="/livecenter/show_microfinance/{{livecenter.id}}" style="float:right;" title="{% t "Tampilkan yang ada di " %} {{livecenter.district.name}}" >{% t "Tampilkan semua" %}</a></li>
                 {% endif %}
             </ul>
     </div>
@@ -135,57 +135,52 @@
 {% block sidebar %}
 
 <div class="profile_pic">
-    <img src="/img/{{ livecenter.key }}" />
+    <img src="/img/{{ livecenter.photo.id }}" />
 </div>
 
 <div class="sidebox">
     <h4><i class="icon_small contact"></i>{% t "Info kontak" %}
     {% if user.is_staff %} 
-    <a href="/livecenter/edit/{{livecenter.key}}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
+    <a href="/livecenter/edit/{{livecenter.id}}" class="uiButton">{% t "Ubah" %}</a>
     {% endif %}
     </h4>
     <p><label>{% t "Alamat" %}</label>{{ livecenter.address }}</p>
-    <p><label>{% t "Kabupaten" %}</label>{{ livecenter.district.dl_name }}</p>
-    <p><label>{% t "Kecamatan" %}</label>{{ livecenter.sub_district.dl_name }}</p>
-    <p><label>{% t "Desa" %}</label>{{ livecenter.village.dl_name }}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat livecenter.geo_pos %}</span></p>
+    <p><label>{% t "Kabupaten" %}</label>{{ livecenter.district.name }}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{ livecenter.sub_district.name }}</p>
+    <p><label>{% t "Desa" %}</label>{{ livecenter.village.name }}</p>
+    <p><label>{% t "Koordinat GPS" %}</label>{{ livecenter.geo_pos }}</p>
 </div>
 
 <div class="sidebox">
-    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ members_count }}</h4>
-    <h4><i class="icon_small category"></i><strong>{% t "Jumlah gugusan" %}</strong>: {{ livecenter.clusters.count }}</h4>
-    <h4><i class="icon_small group"></i><strong>{% t "Jumlah kelompok" %}</strong>: {{ livecenter.groups.count }}</h4>
+    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ livecenter.member_count }}</h4>
+    <h4><i class="icon_small category"></i><strong>{% t "Jumlah gugusan" %}</strong>: {{ livecenter.cluster_count }}</h4>
+    <h4><i class="icon_small group"></i><strong>{% t "Jumlah kelompok" %}</strong>: {{ livecenter.group_count }}</h4>
 </div>
 
 <div class="sidebox">
     <h4><i class="icon_small category"></i>{% t "Kategori" %}
-    {% if user.is_staff %} 
-    <a href="/livecenter/category/{{livecenter.key}}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
-    {% endif %}
     </h4>
-    {% if livecenter.category %}
       <ul class="uiListView icon-left-small">
-        {% for item in livecenter.categories %}
+        {% for cat in livecenter.categories %}
           <li>
-            <span class="icon"><img src="/img/{{ item.key }}" class="small" /></span>
-            <span class="title">{{ item.name }}</span>
-            <span class="body">{{ item.description }}</span>
+            <span class="icon"><img src="/img/{{ cat.photo.id }}" class="small" /></span>
+            <span class="title">{{ cat.name }}</span>
+            <span class="body">{{ cat.description }}</span>
           </li>
         {% empty %}
           <li>{% t "Belum ada kategori" %}</li>
         {% endfor %}
       </ul>
-    {% endif %}
 </div>
 
 <div class="sidebox">
     <h4><i class="icon_small home"></i><strong>{% t "Pusat mata pencaharian yang terkait" %}</strong></h4>
     <ul class="uiListView icon-left-small">
-        {% for item in related_livecenter %}
+        {% for rlc in related_livecenter %}
             <li>
-              <span class="icon"><img src="/img/{{ item.key }}" class="small" /></span>
-              <span class="title"><a href="/livecenter/show/{{ item.key }}">{{ item.name }}</a></span>
-              <span class="body">{{ item.district.dl_name }}</span>
+              <span class="icon"><img src="/img/{{ rlc.photo.id }}" class="small" /></span>
+              <span class="title"><a href="/livecenter/show/{{ rlc.id }}">{{ rlc.name }}</a></span>
+              <span class="body">{{ rlc.district.name }}</span>
             </li>
         {% empty %}
             <li>{% t "Belum ada" %}</li>
@@ -193,5 +188,7 @@
 </ul>
 </div>
 
+{{ debug }}
 
 {% endblock %}
+

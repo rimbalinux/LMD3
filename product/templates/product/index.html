@@ -14,22 +14,25 @@
 <h2>{% t "Produk" %}</h2>
 
 <div id="livecenters">
-    <span id="total">{% t "Jumlah" %}: {{ product_count }}</span>
+    <span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
-{% easy_map lokasi 900 400 7 using "product/map/index.html" %}
+{% easy_map lokasi 900 400 8 using "product/map/index.html" %}
 
 <div class="tabber">
     <div class="tabbertab">
         <h4>{% t "Produk" %}</h4>
-        <ul class="uiListView">
-            {% for nama, jml in product_list %}
-              <li>
-              <span class="title"><a href="/product/name/{{ nama|urlencode }}" class="preview">{{ nama }} ({{ jml }})</a></span>
-              </li>
-            {% empty %}
-              <li>{% t "Belum ada produk" %}</li>
+        <table>
+            <tr>
+                <th>{% t "Jenis" %}</th>
+                <th>{% t "Jumlah anggota" %}</th>
+            </tr>
+            {% for type in types %}
+            <tr>
+                <td><a href="/product/type/{{ type.id }}" class="preview">{{ type.name }}</a></td>
+                <td align="right">{{ type.count }}</td>
+            </tr>
             {% endfor %}
-        </ul>
+        </table>
     </div>
 </div>
 

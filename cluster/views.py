@@ -1,52 +1,37 @@
-from livecenter.models import LiveCluster, LiveGroup, LiveCategory, Cluster, Container, \
-        ClusterContainer, CategoryContainer, LiveCenter
+from livecenter.models import LiveCluster, Cluster, Container, \
+        ClusterContainer, CategoryContainer, Livelihood
+from livecenter.utils import redirect, migrate_photo
+from .forms import ClusterForm
 from attachment.utils import save_file_upload
-from attachment.models import Container as FileContainer
 from django.views.generic.simple import direct_to_template
-from django.http import HttpResponseRedirect
 from google.appengine.ext import db
-from tipfy.pager import PagerQuery, SearchablePagerQuery
 
-def edit(request, pid):
+
+def create(request, lid): # add cluster
+    lc = Livelihood.objects.get(pk=lid)
+    cl = Cluster(livecenter=lc)
+    return show(request, cl)
+
+def edit(request, cid):
+    cl = Cluster.objects.get(pk=cid)
+    return show(request, cl)
+ 
+def show(request, cl):
     if request.POST:
-        save(request, pid)
-        return HttpResponseRedirect(request.POST['destination'])
+        form = ClusterForm(instance=cl.id and cl or None)
+        if form.is_valid():
+            form.save()
+            return redirect(request)
+    else:
+        form = ClusterForm(instance=cl)
     return direct_to_template(request, 'cluster/edit.html', {
-        'cluster': db.get(db.Key(pid)),
-        'categories': LiveCategory.all(),
-        'destination': 'destination' in request.GET and request.GET['destination'] or '/',
+        'form': form,
         })
-    
-def save(request, pid):    
-    item = db.get(db.Key(pid))
-    item.name = request.POST['name']
-    item.info = request.POST['info']
-    item.category = db.Key(request.POST['category'])
-    item.put()
-    save_file_upload(request, 'photo', item)
-    
-def show(request, pid):
-    item = db.get(db.Key(pid))
-    q = 'q' in request.GET and request.GET['q']
-    page = 'page' in request.GET and request.GET['page']
-    prev, groups, next = SearchablePagerQuery(LiveGroup).\
-        filter('livecluster =',item.key()).order('__key__').fetch(15, page)
-    other_cluster = LiveCluster.all().order('__key__').\
-                  filter('livecenter =', item.livecenter[0]).\
-                  filter('__key__ !=', item.key()).fetch(5)
-    return direct_to_template(request, 'cluster/show_group.html', {
-        'groups': groups,
-        'other_cluster':other_cluster,
-        'cluster': item,
-        'prev': prev,
-        'next': next,
-        })
-    
-def delete(request, pid):
-    item = db.get(db.Key(pid))
-    if item:
-        item.delete()
-    return HttpResponseRedirect(request.GET['destination'])
+
+def delete(request, cid):
+    cl = Cluster.objects.get(pk=cid)
+    cl.delete()
+    return redirect(request) 
 
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20
@@ -64,14 +49,24 @@ def migrate(request):
         target = Cluster(name=source.name,
             info=source.info or '',
             category=CategoryContainer.objects.filter(livecategory=str(source.category.key()))[0].category,
-            livecenter=Container.objects.filter(livecenter=str(source.livecenter[0]))[0].livelihood)
-        photo = FileContainer.objects.filter(container=str(source.key()))[:1]
-        if photo:
-            target.photo = photo[0].file
+            livecenter=Container.objects.filter(livecenter=str(source.livecenter[0]))[0].livelihood,
+            photo=migrate_photo(request, source))
         target.save()
         c = ClusterContainer(cluster=target, livecluster=str(source.key()))
         c.save()
         targets.append(target)
+    return direct_to_template(request, 'cluster/migrate.html', {
+        'targets': targets, 
+        })
+
+def migrate_delete(request): # danger
+    limit = 20
+    targets = []
+    for target in Cluster.objects.all()[:limit]:
+        targets.append(target)
+        target.delete()
+    for c in ClusterContainer.objects.all()[:limit]:
+        c.delete()
     return direct_to_template(request, 'cluster/migrate.html', {
         'targets': targets, 
         })

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" />
+{% endif %}
+{% endblock %}
+
+{% block title %}{{ "Migrasi Training Group" }}{% endblock %}
+
+{% block content %}
+
+<ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</ul>
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Group</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.group.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

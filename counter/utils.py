@@ -5,12 +5,14 @@
 #
 
 from .models import Counter
+from django.core.exceptions import ObjectDoesNotExist
 
 def get(name):
-    c = Counter.objects.filter(name=name)
-    if c:
-        return c.get().count
-    return 0
+    try:
+        c = Counter.objects.get(name=name)
+        return c.count
+    except ObjectDoesNotExist:
+        return 0
 
 def update(name, value):
     c = Counter.objects.filter(name=name)

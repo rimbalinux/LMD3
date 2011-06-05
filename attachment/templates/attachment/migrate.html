@@ -1,42 +1,52 @@
 {% extends 'base.html' %}
 {% load lang %}
 
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" />
+{% else %}
+  {% if temps %}
+  <meta http-equiv="refresh" content="5" />
+  {% endif %}
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ "Migrasi files" }}{% endblock %}
 
 {% block content %}
 
-{% if example %}
-    <img src="/img/fid/{{example.id}}" width="50" height="50"/>
-    <br />
-{% endif %}
-
-{% if kinds %}
-{% for kind, count in kinds.items %}
-    {{kind}} {{count}}
-    <br />
-{% endfor %}
-{% endif %}
-
-Total {% money total_bytes %} bytes<br />
-Target {{ targets|length }}<br />
+{% if targets %}
 
 <b>Target</b>
 <table border="1">
     <tr>
         <th>Filename</th>
         <th>Size</th>
-        <th>Container</th>
     </tr>
-    {% if targets %}
-    {% for target, container in targets %}
+    {% for target in targets %}
     <tr>
         <td>{{ target.name }}</td>
         <td>{{ target.size }} bytes</td>
-        <td>{{ container.container }}</td>
     </tr>
     {% endfor %}
-    {% endif %}
 </table>
+
+{% else %}
+
+<b>Temporary</b>
+<table border="1">
+    <tr>
+        <th>Container</th>
+    </tr>
+    {% for temp in temps %}
+    <tr>
+        <td>{{ temp.container }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endif %}
+
 
 
 {% endblock %}

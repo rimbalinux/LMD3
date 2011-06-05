@@ -21,7 +21,7 @@
 {% block content %}
 <h2>{% t "Selamat datang" %}</h2>
 
-{% easy_map lokasi 600 400 7 using "map.html" %}
+{% easy_map lokasi 600 400 8 using "map.html" %}
 
 {% endblock %}
 
@@ -31,11 +31,10 @@
 {% endif %}
 <h2><i class="icon_small user"></i>{% t "Anggota" %}</h2>
 <ul id="mycarousel" class="jcarousel-skin-ie7">
-  {% for item in people %}
-  <li><span class="cavatar"><img src="/img/fid/{{item.photo.id}}" title="{{ item.name }}" /></span></li>
+  {% for people in peoples %}
+  <li><img src="/img/{{people.photo.id}}" title="{{ people.name }}" width="75" height="75"/></li>
   {% endfor %}
 </ul><br />
-{% include "livecenter/paging.html" %}
 
 <div id="about">
 {% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}

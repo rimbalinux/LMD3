@@ -1,22 +1,18 @@
-from livecenter.models import *
-from livecenter.utils import getLocation, default_location
+from livecenter.models import MicroFinance, LivelihoodLocation, Location
+from livecenter.utils import getLocation, default_location, migrate_photo
 from attachment.utils import save_file_upload
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
 from tipfy.pager import PagerQuery, SearchablePagerQuery
 import counter
+from .models import Finance, Container
 
 
 def index(request):
-    q = 'q' in request.GET and request.GET['q']
-    page = 'page' in request.GET and request.GET['page']
-    prev, items, next = SearchablePagerQuery(MicroFinance).search(q).fetch(12, page)
     return direct_to_template(request, 'microfinance/index.html', {
-        'items': items,
-        'items_count': counter.get('site_micro_count'),
-        'prev': prev,
-        'next': next,
+        'finances': Finance.objects.all(),
+        'count': Finance.counter_value(),
         'lokasi': default_location(), 
         })
 
@@ -62,7 +58,7 @@ def show(request, pid):
         'microfinance': item,
         'kontak': kontak,
         'keuangan': keuangan,
-        'lokasi': ', '.join(map(lambda x: str(x), DEFAULT_LOCATION)),
+        'lokasi': default_location(),
         })
 
 def create(request):
@@ -155,3 +151,62 @@ def delete(request, pid=None):
     counter.update('site_micro_count', -1)
     item.delete()
     return HttpResponseRedirect('/microfinance')
+
+def migrate(request):
+    limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
+    offset = len(Finance.objects.all())
+    sources = MicroFinance.all().order('__key__')
+    targets = []
+    for source in sources.fetch(limit=limit, offset=offset):
+        target = Container.objects.filter(microfinance=str(source.key()))
+        if target:
+            continue
+        target = Finance(
+            name_org=source.name_org,
+            contact_name=source.contact_name,
+            address=source.address,
+            geo_pos=str(source.geo_pos) != 'nan,nan' and source.geo_pos or '',
+            sub_district=source.sub_district and Location.objects.filter(lid=source.sub_district.dl_id)[0] or None,
+            district=source.district and Location.objects.filter(lid=source.district.dl_id)[0] or None,
+            mobile=source.mobile,
+            kind_lkm=source.kind_lkm,
+            total_asset=source.total_asset,
+            total_sedia_dana_pinjaman=source.total_sedia_dana_pinjaman,
+            total_penyaluran=source.total_penyaluran,
+            sektor_usaha=source.sektor_usaha,
+            persyaratan_pinjaman=source.persyaratan_pinjaman,
+            persyaratan_agunan=source.persyaratan_agunan,
+            jangkauan_wilayah_usaha=source.jangkauan_wilayah_usaha,
+            nilai_maks_pinjaman=source.nilai_maks_pinjaman,
+            jangka_wkt_pinjaman=source.jangka_wkt_pinjaman,
+            margin_bunga=source.margin_bunga,
+            bantuan_penerima_manfaat_jfpr=source.bantuan_penerima_mamfaat_jfpr,
+            manajemen_usaha=source.manajemen_usaha,
+            pembukuan=source.pembukuan,
+            akses_pasar=source.akses_pasar,
+            keuangan_mikro=source.keuangan_mikro,
+            ao=source.ao,
+            cs=source.cs,
+            tl=source.tl,
+            kelayakan_usaha=source.kelayakan_usaha,
+            photo=migrate_photo(request, source))
+        target.save()
+        c = Container(finance=target, microfinance=str(source.key()))
+        c.save()
+        targets.append(target)
+    return direct_to_template(request, 'microfinance/migrate.html', {
+        'targets': targets, 
+        })
+
+def migrate_delete(request): # danger
+    limit = 20
+    targets = []
+    for target in Finance.objects.all()[:limit]:
+        targets.append(target)
+        target.delete()
+    for c in Container.objects.all()[:limit]:
+        c.delete()
+    return direct_to_template(request, 'microfinance/migrate.html', {
+        'targets': targets, 
+        })
+

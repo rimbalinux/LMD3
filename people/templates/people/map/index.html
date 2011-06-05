@@ -1,7 +1,9 @@
 {% extends 'livecenter/map/base.html' %}
+{% load pagination_tags %}
 
 {% block set-positions %}
-{% for item in people %}
-  {% if item.geo_pos|stringformat:"s" != "nan,nan" %}positions.push(Array({{ item.geo_pos }}));{% endif %}
+{% autopaginate peoples %}
+{% for people in peoples %}
+{% if people.geo_pos %}positions.push(Array({{ people.geo_pos }}));{% endif %}
 {% endfor %}
 {% endblock %}

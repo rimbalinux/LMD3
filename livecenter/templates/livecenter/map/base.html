@@ -17,14 +17,14 @@
     <!-- Map creation script -->
     <script type="text/javascript">
         function initialize_map_{{ map.pk }}() {
-            var latlng = new google.maps.LatLng({{ map.latitude|stringformat:"f" }}, {{ map.longitude|stringformat:"f" }});
+            var latlng = new google.maps.LatLng({{ lokasi }});
             var mapElem = document.getElementById("map-canvas-{{ map.pk }}");
 
             {% block map_options_js %}
             var mapOptions = {
                 zoom: {{ zoom }},
                 center: latlng,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                mapTypeId: google.maps.MapTypeId.TERRAIN
             };
             {% endblock %}
 
@@ -38,8 +38,15 @@
             for (var i = 0; i < positions.length; i++) {
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(positions[i][0], positions[i][1]),
-                    map: map
+                    map: map,
+                    icon: '/images/map_marker_segitiga.png'
                 });
+
+                if (positions[i][2]) {
+                    google.maps.event.addListener(marker, 'click', function() {
+                        window.location = positions[i][2]; 
+                        });
+                }
             }
 
             {% endblock %}

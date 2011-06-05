@@ -1,7 +1,7 @@
 {% extends 'livecenter/map/base.html' %}
 
 {% block set-positions %}
-{% for item in items %}
-  {% if item.geo_pos|stringformat:"s" != "nan,nan" %}positions.push(Array({{ item.geo_pos }}));{% endif %}
+{% for finance in finances %}
+  {% if finance.geo_pos %}positions.push(Array({{ finance.geo_pos }}));{% endif %}
 {% endfor %}
 {% endblock %}

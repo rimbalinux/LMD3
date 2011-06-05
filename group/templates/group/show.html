@@ -3,7 +3,7 @@
 {% load easy_maps_tags %}
 {% load livecenter %}
 
-{% block title %}{% t "Kelompok" %}{% endblock %}
+{% block title %}{% t "Kelompok" %} {{group.name}}{% endblock %}
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
@@ -12,34 +12,33 @@
 {% endblock %}
 
 {% block content %}
-<h2><a href="/group">{% t "Kelompok" %}</a> / {{ group.name }}</h2>
+<h2>{% t "Kelompok" %} {{ group.name }}</h2>
 
 {% easy_map lokasi 600 300 7 using "group/map/show.html" %}
-<p>&nbsp;</p>
-<p>
+<br />
 
 <div class="tabber">
 
     <div class="tabbertab">
         <h4>{% t "Anggota" %}</h4>
         {% if user.is_staff %}
-        <a href="/group/map/{{group.key}}" class="uiButton uiTip">{% t "Lihat peta" %}</a>
+        <a href="/group/map/{{group.id}}" class="uiButton uiTip">{% t "Lihat peta" %}</a>
         {% endif %}
         <ul class="uiListView icon-left">
-          {% for item in group.members %}
-            <li id="gr{{item.key.id}}">
+          {% for member in members %}
+            <li>
               {% if user.is_staff %}
-                <span class="right"><a href="/people/delete/{{item.key}}" class="uiRemove acRemove uiTip" title="Delete {{item.name}}"></a></span>
+                <span class="right"><a href="/people/delete/{{member.id}}" class="uiRemove acRemove uiTip" title="Delete {{member.name}}"></a></span>
               {% endif %}
-              <span class="avatar normal"><img src="/img?id={{item.key}}" /></span>
+              <span class="avatar normal"><img src="/img/{{member.photo.id}}" /></span>
               <span class="block">
-                <span class="title"><a href="/people/show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span>
-                <span class="body">{{ item.member_type }}</span>
-                <span class="body">{{ item.district.dl_name }}</span>
+                <span class="title"><a href="/people/show/{{ member.id }}" class="preview">{{ member.name }}</a></span>
+                <span class="body">{{ member.member_type }}</span>
+                <span class="body">{{ member.district.name }}</span>
               </span>
             </li>
           {% empty %}
-            <li class="trans">{% t "Belum ada anggota" %}</li>
+            <li>{% t "Belum ada anggota" %}</li>
           {% endfor %}
         </ul>
     </div>
@@ -47,12 +46,12 @@
     <div class="tabbertab {% tabdefault "keterangan" %}">
         <h4>{% t "Keterangan" %}</h4>
         {% if user.is_staff %}
-        <a href="/group/edit/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a>
+        <a href="/group/edit/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a>
         {% endif %}
         <table class="uiListView">
             {% for x in customfields %}
-            <tr><td class="trans">{{ x.description|t:request }}</td>
-                <td><span class="trans">: {{group|metaview:x}}</span></td>
+            <tr><td>{{ x.description|t:request }}</td>
+                <td><span>: {{group|metaview:x}}</span></td>
             </tr>
             {% endfor %}
         </table>
@@ -61,24 +60,24 @@
     <div class="tabbertab {% tabdefault "laporan" %}">
         <h4>{% t "Laporan" %}</h4>
         {% if user.is_staff %}
-        <a href="/group/add_report/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+        <a href="/group/add_report/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
         {% endif %}
         <ul class="uiListView">
-          {% for item in report %}
-            <li id="gr{{item.key.id}}">
+          {% for report in reports %}
+            <li>
               {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/report_delete/{{item.key}}" class="uiRemove acRemove uiTip" title="Delete {{item.name}}"></a>
+                    <a href="/group/report_delete/{{report.id}}" class="uiRemove acRemove uiTip" title="Delete {{report.name}}"></a>
                 </span>
               {% endif %}
               <span class="block">
-                <span class="title"><a href="/group/report_show/{{ item.key }}" gid="{{item.key}}" class="preview">{{ item.name }}</a></span>
-                <span class="body">{% t "Kelompok" %} {{item.name_group.name}}</span>
-                <span class="body">{% t "Periode" %} {{ item.year }}</span>
+                <span class="title"><a href="/group/report_show/{{ report.id }}" class="preview">{{ report.name }}</a></span>
+                <span class="body">{% t "Kelompok" %} {{report.group.name}}</span>
+                <span class="body">{% t "Periode" %} {{ report.date }}</span>
               </span>
             </li>
           {% empty %}
-          <li class="trans">{% t "Belum ada laporan" %}</li>
+          <li>{% t "Belum ada laporan" %}</li>
           {% endfor %}
         </ul>
     </div>
@@ -86,29 +85,29 @@
     <div class="tabbertab {% tabdefault "pelatihan" %}">
         <h4>{% t "Pelatihan" %}</h4>
         {% if user.is_staff %}
-          {% if training.0.key %}
-            <p><a href="/group/edit_training/{{training.0.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a></p>
+          {% if trainings.0.key %}
+            <p><a href="/group/edit_training/{{trainings.0.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a></p>
           {% else %}
-          <a href="/group/add_training/{{group.key}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+          <a href="/group/add_training/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
           {% endif %}
         {% endif %}
 
         <table class="uiListView">
-          {% for item in training %}
-            <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{item.manajemen_usaha}} {% t "kali" %}</td></tr>
-            <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{item.pembukuan}} {% t "kali" %}</td></tr>
-            <tr><td>3.</td><td>{% t "Produksi" %}</td><td>: {{item.produksi}} {% t "kali" %}</td></tr>
-            <tr><td>4.</td><td>{% t "Pemanfaatan Limbah" %}</td><td>: {{item.pemanfaatan_limbah}} {% t "kali" %}</td></tr>
-            <tr><td>5.</td><td>{% t "Pengemasan" %}</td><td>: {{item.pengemasan}} {% t "kali" %}</td></tr>
-            <tr><td>6.</td><td>{% t "Akses Pasar" %}</td><td>: {{item.akses_pasar}} {% t "kali" %}</td></tr>
-            <tr><td>7.</td><td>{% t "Keuangan Mikro" %}</td><td>: {{item.keuangan_mikro}} {% t "kali" %}</td></tr>
-            <tr><td>8.</td><td>{% t "Perhitungan Harga Pokok Produksi" %}<br />{% t "dan Harga Jual" %}</td><td>: {{item.hitung_hpp_harga_jual}} {% t "kali" %}</td></tr>
-            <tr><td>9.</td><td>{% t "Navigasi" %}</td><td>: {{item.navigasi}} {% t "kali" %}</td></tr>
-            <tr><td>10.</td><td>{% t "Keselamatan di Laut" %}</td><td>: {{item.keselamatan_laut}} {% t "kali" %}</td></tr>
-            <tr><td>11.</td><td>{% t "Penanganan di atas Kapal" %}</td><td>: {{item.penanganan_atas_kapal}} {% t "kali" %}</td></tr>
-            <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{item.kontrol_kualitas}} {% t "kali" %}</td></tr>
-            <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{item.rawat_mesin }} {% t "kali" %}</td></tr>
-            <tr><td>14.</td><td>{% t "Penyelamatan" %}</td><td>: {{item.rescue}} {% t "kali" %}</td></tr>
+          {% for training in trainings %}
+            <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{training.manajemen_usaha}} {% t "kali" %}</td></tr>
+            <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{training.pembukuan}} {% t "kali" %}</td></tr>
+            <tr><td>3.</td><td>{% t "Produksi" %}</td><td>: {{training.produksi}} {% t "kali" %}</td></tr>
+            <tr><td>4.</td><td>{% t "Pemanfaatan Limbah" %}</td><td>: {{training.pemanfaatan_limbah}} {% t "kali" %}</td></tr>
+            <tr><td>5.</td><td>{% t "Pengemasan" %}</td><td>: {{training.pengemasan}} {% t "kali" %}</td></tr>
+            <tr><td>6.</td><td>{% t "Akses Pasar" %}</td><td>: {{training.akses_pasar}} {% t "kali" %}</td></tr>
+            <tr><td>7.</td><td>{% t "Keuangan Mikro" %}</td><td>: {{training.keuangan_mikro}} {% t "kali" %}</td></tr>
+            <tr><td>8.</td><td>{% t "Perhitungan Harga Pokok Produksi" %}<br />{% t "dan Harga Jual" %}</td><td>: {{training.hitung_hpp_harga_jual}} {% t "kali" %}</td></tr>
+            <tr><td>9.</td><td>{% t "Navigasi" %}</td><td>: {{training.navigasi}} {% t "kali" %}</td></tr>
+            <tr><td>10.</td><td>{% t "Keselamatan di Laut" %}</td><td>: {{training.keselamatan_laut}} {% t "kali" %}</td></tr>
+            <tr><td>11.</td><td>{% t "Penanganan di atas Kapal" %}</td><td>: {{training.penanganan_atas_kapal}} {% t "kali" %}</td></tr>
+            <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{training.kontrol_kualitas}} {% t "kali" %}</td></tr>
+            <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{training.rawat_mesin }} {% t "kali" %}</td></tr>
+            <tr><td>14.</td><td>{% t "Penyelamatan" %}</td><td>: {{training.rescue}} {% t "kali" %}</td></tr>
           {% empty %}
             <tr><td>{% t "Belum ada pelatihan" %}</td></tr>
           {% endfor %}
@@ -122,48 +121,46 @@
 {% block sidebar %}
 
 <div class="profile_pic">
-    <img src="/img/{{group.key}}" />
+    <img src="/img/{{group.photo.id}}" />
 </div>
 <div class="sidebox">
     <h4><i class="icon_small contact"></i>{% t "Keterangan singkat" %}</h4>
     <p>{{group.info}}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat group.geo_pos %}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label>{{ group.geo_pos }}</p>
 </div>
 
 <div class="sidebox">
-    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ member_count }}</h4>
+    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ group.member_count }}</h4>
 </div>
 
 <div class="sidebox">
     <h4><i class="icon_small contact"></i>{% t "Kode QR" %}
     </h4>
     <center>
-        <a href="http://qrcode.kaywa.com/img.php?s=4&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.key}}" >
-        <img alt="qrcode" src="http://qrcode.kaywa.com/img.php?s=2&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.key}}" >
+        <a href="http://qrcode.kaywa.com/img.php?s=4&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.id}}" >
+        <img alt="qrcode" src="http://qrcode.kaywa.com/img.php?s=2&amp;d=http://livelihoodmembersdatabase.appspot.com/group/show/{{group.id}}" >
         </a>
     </center>
 </div>
 
-{% if group.livecluster %}
 <div class="sidebox">
-    <h4><i class="icon_small category"></i><strong>{% t "Pusat Mata Pencaharian" %}</strong></h4>
+    <h4><i class="icon_small category"></i><strong>Livecenter</strong></h4>
     <ul class="uiListView icon-left-small">
-        <li><span class="icon"><img src="/img/{{livecenter.key}}" class="small" /></span>
-            <span class="title"><a href="/livecenter/show/{{livecenter.key}}">{{ livecenter.name }}</a></span>
-            <span class="body">{{livecenter.district.dl_name}}</span>
+        <li><span class="icon"><img src="/img/{{group.livecenter.photo.id}}" class="small" /></span>
+            <span class="title"><a href="/livecenter/show/{{group.livecenter.id}}">{{ livecenter.name }}</a></span>
+            <span class="body">{{group.livecenter.district.name}}</span>
         </li>
     </ul>
 </div>
-{% endif %}
 
 <div class="sidebox">
     <h4><i class="icon_small group"></i><strong>{% t "Kelompok serupa lain" %}</strong></h4>
     <ul class="uiListView icon-left-small">
-      {% for item in other_groups %}
+      {% for og in other_groups %}
         <li>
-          <span class="icon"><img src="/img/{{item.key}}" class="small" /></span>
-          <span class="title"><a href="/group/show/{{item.key}}">{{ item.name }}</a></span>
-          <span class="body">{{item.info}}</span>
+          <span class="icon"><img src="/img/{{og.photo.id}}" class="small" /></span>
+          <span class="title"><a href="/group/show/{{og.id}}">{{ og.name }}</a></span>
+          <span class="body">{{og.info}}</span>
         </li>
       {% empty %}
         <li>{% t "Belum ada kelompok yang serupa" %}</li>

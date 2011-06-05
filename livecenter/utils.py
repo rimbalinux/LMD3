@@ -7,9 +7,10 @@
 # changed by: sugiana@gmail.com, 2011-04-25
 #
 
-from .models import LivelihoodLocation
 from django.http import HttpResponseRedirect
 import urllib
+from attachment.models import File
+from .models import LivelihoodLocation
 from .settings import DEFAULT_LOCATION
 
 
@@ -28,5 +29,17 @@ def getLocationKey(id):
     return location and location.key() or None
 
 def redirect(request, default_url='/'):
-    return HttpResponseRedirect('destination' in request.GET and \
+    return HttpResponseRedirect(getattr(request, 'GET') and \
+            'destination' in request.GET and \
             urllib.unquote(request.GET['destination']) or default_url)
+
+def migrate_photo(request, source):
+    photo = source.photo[:1]
+    if photo:
+        photo = photo[0]
+        photo = File(name=photo.filename, content=photo.file,
+            mime='image/png', size=len(photo.file), user=request.user)
+        photo.save()
+        return photo
+
+

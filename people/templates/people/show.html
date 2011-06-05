@@ -3,7 +3,7 @@
 {% load easy_maps_tags %}
 {% load livecenter %}
 
-{% block title %}{{ person.name }} | {% t "Anggota" %}{% endblock %}
+{% block title %}{{ person.name }}, {% t "Anggota" %}{% endblock %}
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
@@ -16,22 +16,22 @@
 <h2>{{ person.name }}
 </h2>
 
-{% easy_map lokasi 600 300 7 using "people/map/show.html" %} 
+{% easy_map lokasi 600 300 8 using "people/map/show.html" %} 
 
 <div class="tabber">
     <div class="tabbertab {% tabdefault "produk" %} ">
         <h2>{% t "Produk" %}</h2>
         <ul class="uiListView icon-left"> 
-            {% for item in person.products %}
-                <li id="gr{{item.key.id}}">
+            {% for product in products %}
+                <li>
                 {% if user.is_staff %}
-                    <span class="right"><a href="/product/delete/{{item.key}}" class="uiRemove"></a></span>
+                    <span class="right"><a href="/product/delete/{{product.id}}" class="uiRemove"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{ item.key }}" /></span>
+                <span class="avatar normal"><img src="/img/{{product.photo.id}}" /></span>
                 <span class="block">
-                    <span class="title"><a href="/product/show/{{ item.key }}" gid="{{ item.key }}" class="preview">{{ item.name }}</a></span>
-                    <span class="body">{{ item.category.name }}</span>
-                    <span class="year">{% t "Laporan" %} &#64;{{ item.year }}</span>
+                    <span class="title"><a href="/product/show/{{product.id}}" class="preview">{{product.name}}</a></span>
+                    <span class="body">{{ product.category.name }}</span>
+                    <span class="year">{% t "Laporan" %} &#64;{{ product.year }}</span>
                 </span>
             {% empty %}
                 <li>{% t "Belum ada produk" %}</li>
@@ -42,22 +42,22 @@
     <div class="tabbertab {% tabdefault "pelatihan" %} ">
         <h2>{% t "Pelatihan" %}</h2>
         <table class="uiListView">
-            {% for item in training %}
-                <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{item.manajemen_usaha}} {% t "kali" %}</td></tr>
-                <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{item.pembukuan}} {% t "kali" %}</td></tr>
-                <tr><td>3.</td><td>{% t "Produksi" %} </td><td>: {{item.produksi}} {% t "kali" %}</td></tr>
-                <tr><td>4.</td><td>{% t "Pemanfaatan Limbah" %}</td><td>: {{item.pemanfaatan_limbah}} {% t "kali" %}</td></tr>
-                <tr><td>5.</td><td>{% t "Pengemasan" %}</td><td>: {{item.pengemasan}} {% t "kali" %}</td></tr>
-                <tr><td>6.</td><td>{% t "Akses Pasar" %}</td><td>: {{item.akses_pasar}} {% t "kali" %}</td></tr>
-                <tr><td>7.</td><td>{% t "Keuangan Mikro" %}</td><td>: {{item.keuangan_mikro}} {% t "kali" %}</td></tr>
-                <tr><td>8.</td><td>{% t "Perhitungan Harga Pokok Produksi" %}</br>{% t "dan Harga Jual" %}</td><td>: {{item.hitung_hpp_harga_jual}} {% t "kali" %}</td></tr>
+            {% for training in trainings %}
+                <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{training.manajemen_usaha}} {% t "kali" %}</td></tr>
+                <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{training.pembukuan}} {% t "kali" %}</td></tr>
+                <tr><td>3.</td><td>{% t "Produksi" %} </td><td>: {{training.produksi}} {% t "kali" %}</td></tr>
+                <tr><td>4.</td><td>{% t "Pemanfaatan Limbah" %}</td><td>: {{training.pemanfaatan_limbah}} {% t "kali" %}</td></tr>
+                <tr><td>5.</td><td>{% t "Pengemasan" %}</td><td>: {{training.pengemasan}} {% t "kali" %}</td></tr>
+                <tr><td>6.</td><td>{% t "Akses Pasar" %}</td><td>: {{training.akses_pasar}} {% t "kali" %}</td></tr>
+                <tr><td>7.</td><td>{% t "Keuangan Mikro" %}</td><td>: {{training.keuangan_mikro}} {% t "kali" %}</td></tr>
+                <tr><td>8.</td><td>{% t "Perhitungan Harga Pokok Produksi" %}</br>{% t "dan Harga Jual" %}</td><td>: {{training.hitung_hpp_harga_jual}} {% t "kali" %}</td></tr>
                 {% if boat %}
-                  <tr><td>9.</td><td>{% t "Navigasi" %}</td><td>: {{item.navigasi}} {% t "kali" %}</td></tr>
-                  <tr><td>10.</td><td>{% t "Keselamatan di Laut" %}</td><td>: {{item.keselamatan_laut}} {% t "kali" %}</td></tr>
-                  <tr><td>11.</td><td>{% t "Penanganan di atas Kapal" %}</td><td>: {{item.penanganan_atas_kapal}} {% t "kali" %}</td></tr>
-                  <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{item.kontrol_kualitas}} {% t "kali" %}</td></tr>
-                  <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{item.rawat_mesin }} {% t "kali" %}</td></tr>
-                  <tr><td>14.</td><td>{% t "Penyelamatan" %} </td><td>: {{item.rescue}} {% t "kali" %}</td></tr>
+                  <tr><td>9.</td><td>{% t "Navigasi" %}</td><td>: {{training.navigasi}} {% t "kali" %}</td></tr>
+                  <tr><td>10.</td><td>{% t "Keselamatan di Laut" %}</td><td>: {{training.keselamatan_laut}} {% t "kali" %}</td></tr>
+                  <tr><td>11.</td><td>{% t "Penanganan di atas Kapal" %}</td><td>: {{training.penanganan_atas_kapal}} {% t "kali" %}</td></tr>
+                  <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{training.kontrol_kualitas}} {% t "kali" %}</td></tr>
+                  <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{training.rawat_mesin }} {% t "kali" %}</td></tr>
+                  <tr><td>14.</td><td>{% t "Penyelamatan" %} </td><td>: {{training.rescue}} {% t "kali" %}</td></tr>
                 {% endif %}
             {% empty %}
                 <tr><td>{% t "Belum ada data" %}</td></tr>
@@ -73,13 +73,11 @@
             <tr>
                 <td class="label">{% t "Jenis kelamin" %}</td>
                 <td>
-                    <span class="trans">
-                        {% if person.gender == "Male" %}
+                        {% if person.gender %}
                             {% t "Laki-laki" %}
                         {% else %}
                             {% t "Perempuan" %}
                         {% endif %}
-                    </span>
                 </td>
             </tr>
             <tr><td class="label">{% t "Tempat dan tahun lahir" %}</td><td>{{person.birth_place}} {{person.birth_year|s}}</td></tr>
@@ -128,7 +126,7 @@
 {% block sidebar %}
 
 <div class="profile_pic">
-    <img src="/img/{{ person.key }}" />
+    <img src="/img/{{ person.photo.id }}" />
 </div>
 
 <div class="sidebox">
@@ -136,15 +134,15 @@
       <i class="icon_small contact"></i>
       {% t "Info kontak" %}
       {% if user.is_staff %}
-          <a href="/people/edit/{{person.key}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
+          <a href="/people/edit/{{person.id}}" class="uiButton">{% t "Ubah" %}</a>
       {% endif %}
     </h4>
     <p><label>{% t "Alamat" %}</label>{{ person.address|s }}</p>
-    <p><label>{% t "Kabupaten" %}</label>{{ person.district.dl_name }}</p>
-    <p><label>{% t "Kecamatan" %}</label>{{ person.sub_district.dl_name }}</p>
-    <p><label>{% t "Desa" %}</label>{{ person.village.dl_name }}</p>
+    <p><label>{% t "Kabupaten" %}</label>{{ person.district.name }}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{ person.sub_district.name }}</p>
+    <p><label>{% t "Desa" %}</label>{{ person.village.name }}</p>
     <p><label>{% t "Telepon selular" %}</label>{{ person.mobile|s }}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{% posformat person.geo_pos %}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label>{{ person.geo_pos }}</p>
 </div>
 
 <div class="sidebox">
@@ -152,9 +150,9 @@
     <ul class="uiListView icon-left-small">
       {% if person.livecenter %}
         <li>
-          <span class="icon"><img src="/img/{{person.livecenter.key}}" class="small" /></span>
-          <span class="title"><a href="/livecenter/show/{{person.livecenter.key}}">{{ person.livecenter.name }}</a></span>
-          <span class="body">{{person.livecenter.district.dl_name}}</span>
+          <span class="icon"><img src="/img/{{person.livecenter.photo.id}}" class="small" /></span>
+          <span class="title"><a href="/livecenter/show/{{person.livecenter.id}}">{{ person.livecenter.name }}</a></span>
+          <span class="body">{{person.livecenter.district.name}}</span>
         </li>
       {% else %}
         <li>{% t "Belum bergabung ke Pusat Mata Pencaharian" %}</li>
@@ -165,15 +163,11 @@
 <div class="sidebox">
     <h4><i class="icon_small home"></i><strong>{% t "Gugusan" %}</strong></h4>
     <ul class="uiListView icon-left-small">
-      {% for item in person.groups %}
         <li>
-          <span class="icon"><img src="/img/{{item.livecluster.key}}" class="small" /></span>
-          <span class="title"><a href="/livecenter/show/{{person.livecenter.key}}">{{ item.livecluster.name }}</a></span>
-          <span class="body">{{person.livecenter.info}}</span>
+          <span class="icon"><img src="/img/{{person.group.cluster.photo.id}}" class="small" /></span>
+          <span class="title"><a href="/livecenter/show/{{person.livecenter.id}}?tab=cluster">{{ person.group.cluster.name }}</a></span>
+          <span class="body">{{person.group.cluster.info}}</span>
         </li>
-      {% empty %}
-        <li>{% t "Belum bergabung ke gugusan manapun" %}</li>
-      {% endfor %}
     </ul>
 </div>
 
@@ -182,26 +176,22 @@
       <i class="icon_small group"></i>
       {% t "Kelompok" %}
       {% if user.is_staff %}
-          <a href="/people/group/{{person.key}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
+          <a href="/people/group/{{person.id}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
       {% endif %}
     </h4>
     <ul class="uiListView icon-left-small">
-        {% for item in person.groups %}
           <li>
-            <span class="icon"><img src="/img/{{item.key}}" class="small" /></span>
-            <span class="title"><a href="/group/show/{{item.key}}">{{ item.name }}</a></span>
-            <span class="body">{{item.info}}</span>
+            <span class="icon"><img src="/img/{{person.group.photo.id}}" class="small" /></span>
+            <span class="title"><a href="/group/show/{{person.group.id}}">{{person.group.name}}</a></span>
+            <span class="body">{{person.group.info}}</span>
           </li>
-        {% empty %}
-          <li>{% t "Belum bergabung di kelompok manapun" %}</li>
-        {% endfor %}
     </ul>
 </div>
 
 {% if user.is_staff %}
 <div class="sidebox">
     <h4>{%t "Hati-hati" %}</h4>
-    <a href="/people/delete/{{person.key}}" class="uiButton">{% t "Hapus" %} {{person.name}}</a>
+    <a href="/people/delete/{{person.id}}" class="uiButton">{% t "Hapus" %} {{person.name}}</a>
 </div>
 {% endif %}
 

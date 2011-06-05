@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Migrasi Product" }}{% endblock %}
+
+{% block extra-head %}
+{% if errors %}
+{% else %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" /> 
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</ul>
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Person</th>
+        <th>Livecenter</th>
+        <th>Cluster</th>
+        <th>Geo Pos</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.category.name }}</td>
+        <td>{{ target.person.name }}</td>
+        <td>{{ target.livecenter.name }}</td>
+        <td>{{ target.cluster.name }}</td>
+        <td>{{ target.geo_pos }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

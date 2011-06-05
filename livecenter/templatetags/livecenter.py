@@ -1,10 +1,13 @@
 # http://docs.djangoproject.com/en/1.3/howto/custom-template-tags/#passing-template-variables-to-the-tag
 
+import re
+import urllib
 from django import template
 from django.utils.safestring import mark_safe
 from django.template.base import Node, TemplateSyntaxError
-import re
-import urllib
+from translate.lang import translate
+from home.settings import DEFAULT_LOCATION
+from globalrequest.middleware import get_request
 
 register = template.Library()
 
@@ -88,3 +91,57 @@ def tabdefault(parser, token):
 def positions(coordinat):
     return coordinat and 'positions.push(Array(%s));' % coordinat or ''
 register.filter(positions)
+
+def geo_pos(form):
+    request = get_request()
+    return hasattr(form.instance, 'geo_pos') and form.instance.geo_pos or \
+        (hasattr(request, 'POST') and 'geo_pos' in request.POST and \
+        request.POST['geo_pos']) or \
+        ', '.join(map(lambda x: str(x), DEFAULT_LOCATION))
+register.filter(geo_pos)
+
+
+##############
+# Form field #
+##############
+class FormFieldNode(template.Node):
+    def __init__(self, text):
+        self.text = template.Variable(text) 
+
+    def render(self, context):
+        bf = self.text.resolve(context)
+        request = context.get('request', None)
+        if request is None:
+            label = bf.label
+        else:
+            language = request.session.get('lang','id')
+            label = translate(bf.label, to=language)
+        req = _required(bf.field.required)
+        label = '<label>%s:%s</label>' % (label, req)
+        errors = bf.errors and '\n' + str(bf.errors) or ''
+        return "\n" + '<div class="field-wrapper">' + \
+            "\n" + label + \
+            "\n" + bf.as_widget() + \
+            errors + \
+            "\n</div>"
+
+@register.tag
+def formfield(parser, token):
+    try:
+        tag, text = token.split_contents()
+    except ValueError:
+        raise TemplateSyntaxError('Contoh penggunaan tag formfield: {% formfield form.name %}')
+    return FormFieldNode(text)
+
+def required(bf, autoescape=None):
+    return mark_safe(_required(bf.field.required))
+required.needs_autoescape = True
+register.filter(required)
+
+def _required(yes):
+    return yes and ' <span class="required">*</span>' or ''
+
+def has_attr(obj, attrname):
+    return hasattr(obj, attrname)
+register.filter(has_attr)
+

@@ -1,15 +1,24 @@
 {% extends 'base.html' %}
 {% load lang %}
 
+{% block extra-head %}
+{% if errors %}
+{% else %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" />
+{% endif %}
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ "Migrasi Person" }}{% endblock %}
 
 {% block content %}
 
 <ul>
-    {% for source, e in errors %}
-    <li>{{ source.name }} {{ e }}</li>
-    {% endfor %}
-</ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</li>
 
 <b>Target</b>
 <table border="1">
