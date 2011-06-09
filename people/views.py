@@ -1,17 +1,18 @@
-from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
-        LiveCenter, Container, Location, Metaform, Livelihood
-from .models import People, Container as PeopleContainer, Training
-from product.models import Product
-from group.models import Group, Container as GroupContainer
-from livecenter.utils import redirect, default_location, migrate_photo
-from attachment.utils import save_file_upload
-from transaction.models import Transaction
-from .settings import GENDERS
+import urllib
+from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
-from google.appengine.ext import db
-import counter
 from django.core.exceptions import ObjectDoesNotExist
+import counter
+from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
+        LiveCenter, Container, Location, Metaform, Livelihood
+from livecenter.utils import redirect, default_location, migrate_photo
+from product.models import Product
+from group.models import Group, Container as GroupContainer
+from attachment.utils import save_file_upload
+from transaction.models import Transaction
+from .models import People, Container as PeopleContainer, Training
+from .settings import GENDERS
 from .forms import PeopleForm
 
 
@@ -23,6 +24,9 @@ def index(request):
         'lokasi': default_location(),
         })
 
+def destination(pid, tabname):
+    return urllib.quote('/people/show/%s?tab=%s' % (pid, tabname))
+
 def show(request, pid):
     try:
         people = People.objects.get(id=pid)
@@ -30,10 +34,10 @@ def show(request, pid):
         return HttpResponseRedirect('/people')
     customfields = boat = None 
     if people.group and people.group.cluster.category.name.upper() == 'CAPTURE FISHERIES':
-        customfields = Metaform.objects.order('id').\
-            filter(category=group.cluster.category).\
+        customfields = Metaform.objects.order_by('id').\
+            filter(category=people.group.cluster.category).\
             filter(meta_type='group')
-        boat = group
+        boat = people.group
     return direct_to_template(request, 'people/show.html', {
         'person': people,
         'boat': boat,
@@ -41,25 +45,26 @@ def show(request, pid):
         'trainings': Training.objects.filter(person=people),
         'transactions': Transaction.objects.filter(person=people),
         'products': Product.objects.filter(person=people),
-        'tab_transaction': '/people/show/%d?tab=transaction' % people.id,
+        'tab_product': destination(people.id, 'product'),
+        'tab_transaction': destination(people.id, 'transaction'),
         'lokasi': default_location(people.geo_pos),
         })
 
 def create(request, lid): # lid = livecenter id 
     lc = Livelihood.objects.get(pk=lid)
-    form = PeopleForm(lc)
-    return show_edit(request, form)
+    person = People(livecenter=lc)
+    return show_edit(request, person)
 
 def edit(request, pid): # pid = people id
     person = People.objects.get(pk=pid)
-    form = PeopleForm(instance=person)
-    return show_edit(request, form)
+    return show_edit(request, person)
  
-def show_edit(request, form):
+def show_edit(request, person):
+    form = PeopleForm(instance=person)
     if request.POST:
         if form.is_valid():
             form.save()
-            return redirect(request)
+            return redirect(request, '/people/show/%d' % person.id)
     return direct_to_template(request, 'people/edit.html', {
         'form': form, 
         })

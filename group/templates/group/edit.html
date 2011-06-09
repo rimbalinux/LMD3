@@ -11,7 +11,7 @@
 {% block content %}
 
 <h2>
-{% if form.instance.id %} %}
+{% if form.instance.id %}
 {% t "Kelompok" %} {{ form.instance.name }}
 {% else %}
 {% t "Kelompok baru" %}
@@ -46,6 +46,13 @@
             <div class="fieldset">
                 {% include "livecenter/photo_form.html" %}
             </div>
+            {% for x in customfields %}
+            <div class="fieldset">
+                <label>{{ x.title }}</label>
+                <div class="field-wrapper">{{group|metaform:x}}</div>
+                <div class="description">{{ x.description }}</div>
+            </div>
+            {% endfor %}
         </div>
 
         <div id="location" class="dialog-column">

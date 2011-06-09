@@ -3,3 +3,17 @@
 {% block set-positions %}
 {% if group.geo_pos %}positions.push(Array({{ group.geo_pos }}));{% endif %}
 {% endblock %}
+
+{% block extra-marker %}
+var member_pos = new Array();
+{% for member in members %}
+    {% if member.geo_pos %}member_pos.push(Array({{ member.geo_pos }}));{% endif %}
+{% endfor %}
+for (var i = 0; i < member_pos.length; i++) {
+    var marker = new google.maps.Marker({
+                 position: new google.maps.LatLng(member_pos[i][0], member_pos[i][1]),
+                 map: map,
+                 icon: '/images/map_marker1.png'
+                 });
+}
+{% endblock %}

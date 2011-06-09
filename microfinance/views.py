@@ -1,12 +1,13 @@
-from livecenter.models import MicroFinance, LivelihoodLocation, Location
-from livecenter.utils import getLocation, default_location, migrate_photo
-from attachment.utils import save_file_upload
+from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
-from google.appengine.ext import db
-from tipfy.pager import PagerQuery, SearchablePagerQuery
+from livecenter.utils import default_location, redirect
 import counter
-from .models import Finance, Container
+from .models import Finance
+from .forms import FinanceForm
+#from livecenter.models import MicroFinance, LivelihoodLocation, Location
+#from livecenter.utils import migrate_photo
+#from .models import Container
 
 
 def index(request):
@@ -16,140 +17,72 @@ def index(request):
         'lokasi': default_location(), 
         })
 
-def show(request, pid):
-    item = db.get(pid)
-    if not item:
-        return HttpResponseRedirect('/microfinance')
+def show(request, mid):
+    mf = Finance.objects.get(pk=mid)
 
     kontak = [
-        ['Nama', item.contact_name],
-        ['Telepon selular', item.mobile],
-        ['Alamat', item.address],
-        ['Kabupaten', item.district.dl_name],
-        ['Kecamatan', item.sub_district.dl_name],
+        ['Nama', mf.contact_name],
+        ['Telepon selular', mf.mobile],
+        ['Alamat', mf.address],
+        ['Kabupaten', mf.district.name],
+        ['Kecamatan', mf.sub_district.name],
         ]
 
     keuangan = [
-        ['Tipe LKM', item.kind_lkm],
-        ['Total aset', '%d Rupiah' % item.total_asset],
-        ['Total penyediaan dana pinjaman', '%d Rupiah' % item.total_sedia_dana_pinjaman],
-        ['Total pencairan', '%d Rupiah' % item.total_penyaluran],
-        ['Sektor usaha', item.sektor_usaha],
-        ['Persyaratan pinjaman', item.persyaratan_pinjaman],
-        ['Persyaratan agunan', item.persyaratan_agunan],
-        ['Jangkauan wilayah usaha', item.jangkauan_wilayah_usaha],
-        ['Nilai pinjaman maksimum', item.nilai_maks_pinjaman],
-        ['Jangka waktu pinjaman', item.jangka_wkt_pinjaman],
-        ['Bunga pinjaman', '%s %%' % item.margin_bunga],
-        ['Bantuan untuk penerima manfaat JFPR', item.bantuan_penerima_mamfaat_jfpr],
+        ['Tipe LKM', mf.kind_lkm],
+        ['Total aset', '%d Rupiah' % mf.total_asset],
+        ['Total penyediaan dana pinjaman', '%d Rupiah' % mf.total_sedia_dana_pinjaman],
+        ['Total pencairan', '%d Rupiah' % mf.total_penyaluran],
+        ['Sektor usaha', mf.sektor_usaha],
+        ['Persyaratan pinjaman', mf.persyaratan_pinjaman],
+        ['Persyaratan agunan', mf.persyaratan_agunan],
+        ['Jangkauan wilayah usaha', mf.jangkauan_wilayah_usaha],
+        ['Nilai pinjaman maksimum', mf.nilai_maks_pinjaman],
+        ['Jangka waktu pinjaman', mf.jangka_wkt_pinjaman],
+        ['Bunga pinjaman', '%s %%' % mf.margin_bunga],
+        ['Bantuan untuk penerima manfaat JFPR', mf.bantuan_penerima_manfaat_jfpr],
         ['Pelatihan', '<none>'],
-        ['Pengelolaan usaha', '%d kali' % item.manajemen_usaha],
-        ['Pembukuan', '%d kali' % item.pembukuan],
-        ['Akses pasar', '%d kali' % item.akses_pasar],
-        ['Keuangan mikro', '%d kali' % item.keuangan_mikro],
+        ['Pengelolaan usaha', '%d kali' % mf.manajemen_usaha],
+        ['Pembukuan', '%d kali' % mf.pembukuan],
+        ['Akses pasar', '%d kali' % mf.akses_pasar],
+        ['Keuangan mikro', '%d kali' % mf.keuangan_mikro],
         ['Penguatan pelayanan', '<none>'],
-        ['Petugas akun', '%d kali' % item.ao],
-        ['Layanan pelanggan', '%d kali' % item.cs],
-        ['Kasir', '%d kali' % item.tl],
-        ['Kelayakan usaha', '%d kali' % item.kelayakan_usaha],
+        ['Petugas akun', '%d kali' % mf.ao],
+        ['Layanan pelanggan', '%d kali' % mf.cs],
+        ['Kasir', '%d kali' % mf.tl],
+        ['Kelayakan usaha', '%d kali' % mf.kelayakan_usaha],
         ]
 
     return direct_to_template(request, 'microfinance/show.html', {
-        'microfinance': item,
+        'microfinance': mf,
         'kontak': kontak,
         'keuangan': keuangan,
-        'lokasi': default_location(),
+        'lokasi': default_location(mf.geo_pos),
         })
 
 def create(request):
-    if request.POST: 
-        micro = save(request)
-        return HttpResponseRedirect('/microfinance/show/%s' % micro.key())
-    return direct_to_template(request, 'microfinance/create.html', {
-        'pagetitle': 'Tambah Keuangan Mikro',
-        'district_sel': 0,
-        'subdistrict_sel': 0,
-        'village_sel': 0,
-        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
-        })
+    mf = Finance()
+    return show_edit(request, mf)
 
-def edit(request, pid):
+def edit(request, mid):
+    mf = Finance.objects.get(pk=mid)
+    return show_edit(request, mf)
+
+def show_edit(request, mf):
     if request.POST:
-        micro = save(request, pid)
-        if micro:
-            return HttpResponseRedirect('/microfinance/show/%s' % micro.key())
-        return HttpResponseRedirect('/microfinance')
-    micro = db.get(pid)
+        form = FinanceForm(instance=mf.id and mf or None)
+        if form.is_valid():
+            form.save()
+            return redirect(request, '/microfinance/show/%d' % mf.id)
+    else:
+        form = FinanceForm(instance=mf)
     return direct_to_template(request, 'microfinance/edit.html', {
-        'pagetitle': 'Ubah ' + micro.name_org,
-        'micro': micro,
-        'geo_pos': micro.geo_pos,
-        'districts': LivelihoodLocation().all().filter('dl_parent = ',0),
-        'district_sel': micro.district.dl_id,
-        'subdistrict_sel': micro.sub_district.dl_id,
+        'form': form
         })
 
-def save(request, pid=None):
-    if pid:
-        micro = db.get(pid)
-        if not micro:
-            return
-    else:
-        micro = MicroFinance()
-    micro.name_org = request.POST['name_org']
-    micro.contact_name = request.POST['contact_name']
-    micro.geo_pos = request.POST['geo_pos'] or default_location() 
-    micro.district = getLocation(request.POST['district']).key()
-    micro.sub_district = getLocation(request.POST['sub_district']).key()
-    micro.kind_lkm = request.POST['kind_lkm']
-    if request.POST['total_asset']:
-        micro.total_asset = int(request.POST['total_asset'])
-    if request.POST['total_sedia_dana_pinjaman']:
-        micro.total_sedia_dana_pinjaman  = int(request.POST['total_sedia_dana_pinjaman'])
-    if request.POST['total_penyaluran']:
-        micro.penyaluran  = int(request.POST['total_penyaluran'])
-    micro.sektor_usaha = request.POST['sektor_usaha']
-    micro.persyaratan_pinjaman = request.POST['persyaratan_pinjaman']
-    micro.persyaratan_agunan = request.POST['persyaratan_agunan']
-    micro.jangkauan_wilayah_usaha = request.POST['jangkauan_wilayah_usaha']
-    micro.nilai_maks_pinjaman = request.POST['nilai_maks_pinjaman']
-    micro.jangka_wkt_pinjaman = request.POST['jangka_wkt_pinjaman']
-    micro.margin_bunga = request.POST['margin_bunga']
-    micro.bantuan_penerima_mamfaat_jfpr = request.POST['bantuan_penerima_mamfaat_jfpr']
-    if request.POST['manajemen_usaha']:
-        micro.manajemen_usaha  = int(request.POST['manajemen_usaha'])
-    if request.POST['pembukuan']:
-        micro.pembukuan  = int(request.POST['pembukuan'])
-    if request.POST['akses_pasar']:
-        micro.akses_pasar  = int(request.POST['akses_pasar'])
-    if request.POST['keuangan_mikro']:
-        micro.keuangan_mikro  = int(request.POST['keuangan_mikro'])
-    if request.POST['ao']:
-        micro.ao  = int(request.POST['ao'])
-    if request.POST['cs']:
-        micro.cs  = int(request.POST['cs'])
-    if request.POST['tl']:
-        micro.tl  = int(request.POST['tl'])
-    if request.POST['kelayakan_usaha']:
-        micro.kelayakan_usaha  = int(request.POST['kelayakan_usaha'])
-    if request.POST['address']:
-        micro.address  = request.POST['address']
-    if request.POST['mobile']:
-        micro.mobile   = request.POST['mobile']
-    micro.put()
-    if not pid:
-        counter.update('site_micro_count', 1)
-    save_file_upload(request, 'photo', micro)
-    return micro
-
-def delete(request, pid=None):
-    if not pid:
-        return HttpResponseRedirect('/microfinance')
-    item = db.get( pid )
-    if not item:
-        return HttpResponseRedirect('/microfinance')
-    counter.update('site_micro_count', -1)
-    item.delete()
+def delete(request, mid):
+    mf = Finance.objects.get(pk=mid)
+    mf.delete()
     return HttpResponseRedirect('/microfinance')
 
 def migrate(request):

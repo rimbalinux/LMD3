@@ -194,3 +194,17 @@ fieldset.grid span.c {
     float: left;
     margin-right: 15px;
 }
+
+.small-pic {
+    max-width: 100px;
+    max-height: 100px;
+    width: expression(this.width > 100 ? "100px" : true);
+    height: expression(this.height > 100 ? "100px" : true);
+}
+
+.big-pic {
+    max-width: 200px;
+    max-height: 200px;
+    width: expression(this.width > 200 ? "200px" : true);
+    height: expression(this.height > 200 ? "200px" : true);
+}

@@ -21,14 +21,11 @@
 
     <div class="tabbertab">
         <h4>{% t "Anggota" %}</h4>
-        {% if user.is_staff %}
-        <a href="/group/map/{{group.id}}" class="uiButton uiTip">{% t "Lihat peta" %}</a>
-        {% endif %}
         <ul class="uiListView icon-left">
           {% for member in members %}
             <li>
               {% if user.is_staff %}
-                <span class="right"><a href="/people/delete/{{member.id}}" class="uiRemove acRemove uiTip" title="Delete {{member.name}}"></a></span>
+              <span class="right"><a href="/people/delete/{{member.id}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{member.name}}"></a></span>
               {% endif %}
               <span class="avatar normal"><img src="/img/{{member.photo.id}}" /></span>
               <span class="block">
@@ -46,7 +43,7 @@
     <div class="tabbertab {% tabdefault "keterangan" %}">
         <h4>{% t "Keterangan" %}</h4>
         {% if user.is_staff %}
-        <a href="/group/edit/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a>
+        <a href="/group/edit/{{group.id}}" class="uiButton">{% t "Ubah" %}</a>
         {% endif %}
         <table class="uiListView">
             {% for x in customfields %}
@@ -67,7 +64,7 @@
             <li>
               {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/report_delete/{{report.id}}" class="uiRemove acRemove uiTip" title="Delete {{report.name}}"></a>
+                    <a href="/group/report_delete/{{report.id}}" class="uiRemove" title="Delete {{report.name}}"></a>
                 </span>
               {% endif %}
               <span class="block">

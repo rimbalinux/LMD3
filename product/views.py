@@ -1,13 +1,13 @@
-from .models import Product
-from livecenter.models import LiveGroup, MetaForm, Product as OldProduct, \
-        CategoryContainer, ClusterContainer
-from livecenter.utils import default_location, migrate_photo
+import re
+from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
-from google.appengine.ext import db
+from livecenter.models import LiveGroup, Metaform, Product as OldProduct, \
+        CategoryContainer, ClusterContainer
+from livecenter.utils import default_location, migrate_photo, redirect
+from people.models import People, Container as PersonContainer
 from .models import Product, Container, Type
-from people.models import Container as PersonContainer
-import re
+from .forms import ProductForm
 
 # migrasi
 pola = [
@@ -43,15 +43,41 @@ def index(request):
         })
 
 def show(request, pid):
-    item = db.get(pid)
-    if not item:
-        return HttpResponseRedirect('/product')
+    product = Product.objects.get(pk=pid)
     return direct_to_template(request, 'product/show.html', {
-        'customfields': MetaForm.all().order('__key__').filter('meta_type', 'product').filter('container', item.category.key()),
-        'product': item,
-        'person': item.person,
-        'lokasi': default_location(), 
+        'customfields': Metaform.objects.filter(meta_type='product').\
+                filter(category=product.category),
+        'product': product, 
+        'person': product.person,
+        'lokasi': default_location(product.geo_pos), 
         })
+
+def create(request, pid): # person id
+    person = People.objects.get(pk=pid)
+    product = Product(person=person,
+        livecenter=person.livecenter,
+        cluster=person.group.cluster)
+    return show_edit(request, product)
+
+def edit(request, pid): # product id
+    product = Product.objects.get(pk=pid)
+    return show_edit(request, product)
+ 
+def show_edit(request, product):
+    form = ProductForm(instance=product)
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(request, '/product/show/%d' % product.id)
+    return direct_to_template(request, 'product/edit.html', {
+        'form': form, 
+        })
+
+def delete(request, pid):
+    p = Product.objects.get(pk=pid)
+    p.delete()
+    return redirect(request, '/product')
+
 
 def migrate(request):
     def intval(n):

@@ -13,7 +13,7 @@ class People(DistrictModel): # was livecenter.Person
     livecenter = models.ForeignKey(Livelihood)
     group = models.ForeignKey(Group, null=True, verbose_name='kelompok', related_name='+')
     email = models.EmailField('email', blank=True)
-    gender = models.BooleanField('jenis kelamin', choices=GENDERS)
+    gender = models.BooleanField('jenis kelamin', choices=GENDERS, default=True)
     birth_year = models.IntegerField('tahun lahir', null=True, blank=True)
     birth_place = models.CharField('tempat lahir', max_length=100, blank=True)
     address = models.TextField('alamat', blank=True)

@@ -6,16 +6,16 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
 {% endblock %}
 
-{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Anggota baru" %}{% endif %}{% endblock %}
+{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Produk baru" %}{% endif %}{% endblock %}
 
 
 {% block content %}
 
 <h2>
 {% if form.instance.id %}
-{% t "Anggota" %}
+{% t "Produk" %}
 {% else %}
-{% t "Anggota baru" %}
+{% t "Produk baru" %}
 {% endif %}
 </h2>
 
@@ -26,38 +26,34 @@
     <div class="dialog-column">
         <div class="fieldset">
             {% formfield form.name %}
+        </div>
+        <div class="fieldset">
+            {% formfield form.type %}
+            {% formfield form.year %}
+        </div>
+        <div class="fieldset">
             <div class="field-wrapper">
-                <label>{% t "Mata pencaharian" %}:</label>
-                {{ form.instance.livecenter.name }}
-                {{ form.livecenter }}
+                <label>{% t "Anggota" %}</label>
+                {{ form.instance.person.name }}
             </div>
         </div>
         <div class="fieldset">
-            {% formfield form.group %}
-            {% formfield form.monthly_income %}
+            <div class="field-wrapper">
+                <label>{% t "Mata pencaharian" %}:</label>
+                {{ form.instance.livecenter.name }}
+            </div>
+            <div class="field-wrapper">
+                <label>{% t "Gugusan" %}:</label>
+                {{ form.instance.cluster.name }}
+            </div>
         </div>
         <div class="fieldset">
-            {% formfield form.address %}
-            {% formfield form.gender %}
-        </div>
-        <div class="fieldset">
-            {% formfield form.birth_year %}
-            {% formfield form.birth_place %}
-        </div>
-        <div class="fieldset">
-            {% formfield form.spouse_name %}
-            {% formfield form.children_num %}
-        </div>
-        <div class="fieldset">
-            {% formfield form.education %}
-            {% formfield form.member_type %}
-        </div>
-        <div class="fieldset">
-            {% formfield form.mobile %}
-            {% formfield form.email %}
+            {% formfield form.category %}
         </div>
         <div class="fieldset">
             {% formfield form.info %}
+        </div>
+        <div class="fieldset">
             {% include "livecenter/photo_form.html" %}
         </div>
     </div><!-- dialog-column -->

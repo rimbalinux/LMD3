@@ -2,9 +2,10 @@
 
 from django import template
 from django.template.base import Node, TemplateSyntaxError
-from translate.lang import translate, tr, money as _money
 from django.template.defaultfilters import stringfilter
 from html2text import html2text
+from globalrequest.middleware import get_request
+from translate.lang import translate, tr, money as _money
 
 register = template.Library()
 
@@ -33,7 +34,8 @@ def t(parser, token):
         raise TemplateSyntaxError('Penggunaan tag t: {% t "pesan" %}')
     return TranslateNode(text)
 
-def t_(text, request):
+def t_(text, request=None):
+    request = request or get_request()
     return html2text(translate(text, to=request.session.get('lang','id')))
 t_.is_safe = True
 t_ = stringfilter(t_)

@@ -45,7 +45,7 @@
                     <li>
                         <span class="avatar normal"><img src="/img/{{ people.photo.id }}" /></span>
                         <span class="block">
-                        <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
+                            <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
                         <span class="body">{{ people.member_type }}</span>
                         <span class="body">{{ people.district.name }}</span>
                         </span>
@@ -67,10 +67,10 @@
                 {% if user.is_staff %}
                 <span class="right"><a href="/cluster/delete/{{cluster.id}}?destination={{tab_cluster}}" class="uiRemove" title=" {% t "Hapus" %} {{cluster.name}}"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{ cluster.photo.id }}" /></span>
+                <span class="avatar normal"><img src="/img/{{ cluster.photo.id }}" class="small-pic" /></span>
                 <span class="block">
                     {% if user.is_staff %}
-                    <span class="title"><a href="/group/show_cluster/{{ cluster.id }}" class="preview" >{{ cluster.name }}</a></span>
+                    <span class="title">{{ cluster.name }}</span>
                     <span class="body right">
                         <a href="/cluster/edit/{{ cluster.id }}?destination={{tab_cluster}}" rel="facebox" class="uiButton">{% t "Ubah" %}</a>
                         <a href="/group/create/{{ cluster.id }}?destination={{tab_group}}" class="uiButton">{% t "Tambah kelompok" %}</a>

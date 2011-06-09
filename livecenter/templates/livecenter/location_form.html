@@ -66,10 +66,11 @@ function placeMarker(location) {
     {% formfield form.sub_district %}
 </div>
 </div>
-
+{% if form.instance|has_attr:"village" %}
 <div class="field-wrapper">
     {% formfield form.village %}
 </div>
+{% endif %}
 
 <script type="text/javascript" src="/js/jquery-1.4.1.js"></script>
 <script type="text/javascript">
@@ -82,11 +83,14 @@ $("#id_district").change(function() {
             $("#id_sub_district").append($("<option />").val(data[i].id).text(data[i].name));
         }
         $("#id_sub_district").val({{form.instance.sub_district.id}});
+        {% if form.instance|has_attr:"village" %}
         $("#id_sub_district").change();
+        {% endif %}
     });
 })
 .change();
 
+{% if form.instance|has_attr:"village" %}
 $("#id_sub_district").change(function() {
     $.get(escape("/livecenter/district/" + $(this).attr("value")), function(json) {
         var data = eval('(' + json + ')');
@@ -100,6 +104,8 @@ $("#id_sub_district").change(function() {
     });
 })
 .change();
+{% endif %}
+
 </script>
 
 {% endif %}

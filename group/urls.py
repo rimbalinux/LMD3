@@ -18,5 +18,5 @@ urlpatterns = patterns('group.views',
     (r'^edit_report/(?P<pid>.*)$', 'edit_report'),
     (r'^add_training/(?P<pid>.*)$', 'add_training'),
     (r'^edit_training/(?P<pid>.*)$', 'edit_training'),
-    (r'^map/(?P<pid>.*)$', 'map'),
+    #(r'^map/(?P<pid>.*)$', 'map'),
 )

@@ -3,14 +3,14 @@ from datetime import date
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from google.appengine.ext import db
-from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
-        GroupTraining, LiveCluster, Container, ClusterContainer, Cluster, \
-        Metaform
+from livecenter.models import Metaform
 from livecenter.utils import redirect, default_location, migrate_photo
 from people.models import People
-from .models import Group, Container as GroupContainer, Report, ReportContainer, \
-        Training, TrainingContainer
+from .models import Group, Report, Training
 from .forms import GroupForm
+#from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
+#        GroupTraining, LiveCluster, Container, ClusterContainer, Cluster
+#from .models import Container as GroupContainer, ReportContainer, TrainingContainer
 
 
 def destination(pid, tabname):
@@ -21,17 +21,6 @@ def index(request):
         'groups': Group.objects.all(), 
         'count': Group.counter_value(),
         'lokasi': default_location(), 
-        })
-
-def map(request, pid):
-    item = db.get(pid)
-    if not item:
-        return HttpResponseRedirect('/group')
-    category = item.livecluster.category
-    return direct_to_template(request, 'group/map_member.html', {
-        'groups': item.members,
-        'member_count': item.members.count(),
-        'lokasi': str(item.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
         })
 
 def show(request, gid):
@@ -67,24 +56,6 @@ def report_delete(request, pid):
         return redirect(request, '/group/show/%s?tab=laporan' % group)
     return redirect(request, '/group')
  
-def edit(request, pid):
-    if request.POST:
-        group = save(request, pid)
-        if group:
-            return redirect(request, '/group/show/%s?tab=keterangan' % group.key())
-        return HttpResponseRedirect('/group')
-    group = db.get(pid)
-    category = group.livecluster.category
-    clusters = LiveCluster.all().filter('livecenter', group.livecluster.livecenter[0]).filter('category', category.key()).fetch(100)
-    customfields = MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()).fetch(100)
-    return direct_to_template(request, 'group/edit.html', {
-        'group': group,
-        'geo_pos': group.geo_pos,
-        'category': category,
-        'cluster': clusters,
-        'customfields': customfields,
-        })
-
 def add_report(request, pid):
     if request.POST:
         group = save_report(request, pid)
@@ -165,6 +136,8 @@ def show_edit(request, group):
         form = GroupForm(instance=group)
     return direct_to_template(request, 'group/edit.html', {
         'form': form,
+        'customfields': Metaform.objects.filter(meta_type='group').\
+                filter(category__in=group.livecenter.category),
         })
 
 def save_report(request, pid=None):

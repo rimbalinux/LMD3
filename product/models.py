@@ -17,14 +17,14 @@ class Type(BaseModel):
 
 
 class Product(GeoModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField('nama produk', max_length=100)
     livecenter = models.ForeignKey(Livelihood)
-    category = models.ForeignKey(Category)
-    person = models.ForeignKey(People)
-    cluster = models.ForeignKey(Cluster, null=True)
-    info = models.TextField()
-    year = models.IntegerField(null=True)
-    type = models.ForeignKey(Type)
+    category = models.ForeignKey(Category, verbose_name='kategori')
+    person = models.ForeignKey(People, verbose_name='nama anggota')
+    cluster = models.ForeignKey(Cluster, null=True, verbose_name='gugusan')
+    info = models.TextField('keterangan')
+    year = models.IntegerField('tahun', null=True)
+    type = models.ForeignKey(Type, verbose_name='tipe')
 
     def before_save(self, *args, **kwargs):
         super(Product, self).before_save(*args, **kwargs)

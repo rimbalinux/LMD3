@@ -2,32 +2,22 @@ from django import forms
 from .models import People
 from group.models import Group
 from livecenter.models import Location, Livelihood
-from livecenter.tools import GeoForm
+from livecenter.forms import DistrictForm
 
 
-class PeopleForm(GeoForm):
-    district = forms.ModelChoiceField(queryset=Location.objects.\
-            filter(parent=0).order_by('name'))
-    sub_district = forms.ModelChoiceField(queryset=Location.objects.\
-            filter(parent=-1))
-    village = forms.ModelChoiceField(queryset=Location.objects.\
-            filter(parent=-1))
-    photo = forms.FileField()
 
+class PeopleForm(DistrictForm):
     class Meta:
         model = People
         widgets = {
             'livecenter': forms.HiddenInput(),
-            'cluster': forms.HiddenInput(),
             'address': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
             'info': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
             }
 
-    def __init__(self, livecenter=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(PeopleForm, self).__init__(*args, **kwargs)
-        if livecenter:
-            lc = livecenter
-        else:
-            lc = self.instance.livecenter
+        self.fields['gender'].initial = True # default male
         self.fields['group'] = forms.ModelChoiceField(queryset=Group.objects.\
-            filter(livecenter=lc))
+            filter(livecenter=self.instance.livecenter),
+            label='Kelompok')

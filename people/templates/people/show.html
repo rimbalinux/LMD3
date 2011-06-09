@@ -21,13 +21,16 @@
 <div class="tabber">
     <div class="tabbertab {% tabdefault "produk" %} ">
         <h2>{% t "Produk" %}</h2>
+        {% if user.is_staff %}
+        <a href="/product/create/{{person.id}}?destination=/people/show/{{person.id}}?tab=product" class="uiButton right">{% t "Tambah" %}</a>
+        {% endif %}
         <ul class="uiListView icon-left"> 
             {% for product in products %}
                 <li>
                 {% if user.is_staff %}
-                    <span class="right"><a href="/product/delete/{{product.id}}" class="uiRemove"></a></span>
+                <span class="right"><a href="/product/delete/{{product.id}}?destination={{tab_product}}" class="uiRemove"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{product.photo.id}}" /></span>
+                <span class="avatar normal"><img src="/img/{{product.photo.id}}" class="small-pic" /></span>
                 <span class="block">
                     <span class="title"><a href="/product/show/{{product.id}}" class="preview">{{product.name}}</a></span>
                     <span class="body">{{ product.category.name }}</span>
@@ -134,7 +137,7 @@
       <i class="icon_small contact"></i>
       {% t "Info kontak" %}
       {% if user.is_staff %}
-          <a href="/people/edit/{{person.id}}" class="uiButton">{% t "Ubah" %}</a>
+      <a href="/people/edit/{{person.id}}?destination=/people/show/{{person.id}}" class="uiButton">{% t "Ubah" %}</a>
       {% endif %}
     </h4>
     <p><label>{% t "Alamat" %}</label>{{ person.address|s }}</p>
@@ -175,9 +178,6 @@
     <h4>
       <i class="icon_small group"></i>
       {% t "Kelompok" %}
-      {% if user.is_staff %}
-          <a href="/people/group/{{person.id}}" class="uiButton" rel="facebox">{% t "Ubah" %}</a>
-      {% endif %}
     </h4>
     <ul class="uiListView icon-left-small">
           <li>

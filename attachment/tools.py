@@ -22,7 +22,7 @@ class PhotoModel(BaseModel):
             photo = old.photo
         except ObjectDoesNotExist:
             return
-        if not old.photo:
+        if not old.photo or not self.photo:
             return
         if old.photo.id != self.photo.id:
             old.photo.delete()
@@ -41,7 +41,8 @@ class PhotoForm(forms.ModelForm):
             super(PhotoForm, self).__init__(self.request.POST, *args, **kwargs)
         else:
             super(PhotoForm, self).__init__(*args, **kwargs)
-        self.fields['photo'].widget = forms.HiddenInput()
+        if 'photo' in self.fields:
+            del self.fields['photo']
 
     def save(self, *args, **kwargs):
         super(PhotoForm, self).save(*args, **kwargs)

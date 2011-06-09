@@ -1,6 +1,7 @@
 import re, urllib
 import simplejson as json
 from django.utils.encoding import force_unicode
+from globalrequest.middleware import get_request
 
 
 
@@ -19,7 +20,8 @@ def translate(phrase, src="id", to="en"):
     except:
         return ""
 
-def tr(kalimat, request):
+def tr(kalimat, request=None):
+    request = request or get_request()
     to = request.session.get('lang','id')
     return translate(kalimat, to=to)
 

@@ -16,7 +16,7 @@
 
 <span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
-{% easy_map lokasi 900 400 7 using "microfinance/map/index.html" %}
+{% easy_map lokasi 900 400 8 using "microfinance/map/index.html" %}
 
 {% if user.is_staff %}
 <p><a href="/microfinance/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah Keuangan Mikro" %}</span></a></p>
@@ -33,7 +33,7 @@
                 {% if user.is_staff %}
                 <span class="right"><a href="/microfinance/delete/{{finance.id}}" class="uiRemove" title="{% t "Hapus" %} {{finance.name_org}}"></a></span>
                 {% endif %}
-                <span class="avatar normal"><img src="/img/{{finance.id}}" /></span>
+                <span class="avatar normal"><img src="/img/{{finance.photo.id}}" /></span>
                 <span class="block">
                 <span class="title"><a href="/microfinance/show/{{finance.id}}" class="preview">{{ finance.name_org }}</a></span> 
                 <span class="body">{{ finance.district.name }}</span>

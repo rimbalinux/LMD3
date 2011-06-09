@@ -11,12 +11,12 @@
 
 {% block content %}
 
-<h2><a href="/microfinance">{% t "Keuangan Mikro" %}</a> / {{ microfinance.name_org }}</h2>
+<h2>{{ microfinance.name_org }}</h2>
 
-{% easy_map lokasi 600 300 7 using "livecenter/map/base.html" %}
+{% easy_map lokasi 600 300 8 using "livecenter/map/base.html" %}
 
 {% if user.is_staff %}
-<p><a href="/microfinance/edit/{{microfinance.key}}" class="uiButton"><span class="iconAdd"></span><span>{% t "Ubah" %} {{microfinance.name_org}}</span></a></p>
+<p><a href="/microfinance/edit/{{microfinance.id}}" class="uiButton"><span class="iconAdd"></span><span>{% t "Ubah" %} {{microfinance.name_org}}</span></a></p>
     <p>&nbsp;</p>
 {% endif %}
 
@@ -25,18 +25,18 @@
         <h4>{% t "Keterangan" %}</h4>
         <table class="uiListView">
             {% for judul, nilai in kontak %}
-                <tr><td class="label">{{ judul|t:request }}</td>
+                <tr><td class="label">{% t judul %}</td>
                     <td>:</td>
-                    <td>{{ nilai|t:request }}</td>
+                    <td>{% t nilai %}</td>
                 </tr>
             {% endfor %}
 
             {% if user.is_staff %}
                 {% for judul, nilai in keuangan %}
-                    <tr><td class="label">{{ judul|t:request }}</td>
+                    <tr><td class="label">{% t judul %}</td>
                         {% if nilai != "<none>" %}
                           <td>:</td>
-                          <td>{{ nilai|t:request }}</td>
+                          <td>{% t nilai %}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
@@ -50,7 +50,7 @@
 
 {% block sidebar %}
 <div class="profile_pic">
-    <img src="/img/{{microfinance.key}}" />
+    <img src="/img/{{microfinance.photo.id}}" class="big-pic" />
 </div>
 {% endblock %}
 

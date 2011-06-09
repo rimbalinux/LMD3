@@ -3,7 +3,7 @@
 {% load easy_maps_tags %}
 {% load livecenter %}
 
-{% block title %}{% t "Produk" %}{% endblock %}
+{% block title %}{% t "Produk" %} {% t product.name %}{% endblock %}
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
@@ -11,9 +11,9 @@
 {% endblock %}
 
 {% block content %}
-<h2><a href="/product">{% t "Produk" %}</a> / {{ product.name|t:request }}</h2>
+<h2>{{ product.name|t:request }}</h2>
 
-{% easy_map lokasi 600 300 7 using "product/map/show.html" %}
+{% easy_map lokasi 600 300 8 using "product/map/show.html" %}
 
 <div class="tabber">
     <div class="tabbertab">
@@ -22,11 +22,11 @@
             <tr><td class="label">{% t "Siklus laporan" %}</td><td>{{product.year}}</td></tr>
             <tr><td class="label">{% t "Nama produk" %}</td><td>{{product.name}}</td></tr>
             {% for i in customfields %}
-              <tr><td class="label"><span class="trans">{{i.title}}</span></td>
-                  <td><span class="trans">{{product|metaview:i}}</span></td>
+              <tr><td class="label">{{i.title}}</td>
+                  <td>{{product|metaview:i}}</td>
               </tr>
             {% endfor %}
-            <tr><td class="label"><span class="trans">{% t "Catatan" %}</span></td><td><span class="trans">{{product.info}}</span></td></tr>
+            <tr><td class="label">{% t "Catatan" %}</td><td>{{product.info}}</td></tr>
         </table>
     </div>
 </div>
@@ -35,17 +35,17 @@
 {% block sidebar %}
 
 <div class="profile_pic">
-  <img src="/img/{{product.key}}" />
+  <img src="/img/{{product.photo.id}}" class="big-pic" />
 </div>
 
 <ul class="uiListView icon-left">
     <li>
-      <span class="avatar normal"><img src="/img/{{person.key}}" /></span>
-      <span class="title"><a href="/people/show/{{person.key}}">{{ person.name }}</a></span>
-      <span class="body">{{person.member_type}} / {{person.district.dl_name}}</span>
+      <span class="avatar normal"><img src="/img/{{person.photo.id}}" /></span>
+      <span class="title"><a href="/people/show/{{person.id}}">{{ person.name }}</a></span>
+      <span class="body">{{person.member_type}} / {{person.district.name}}</span>
       <span class="body">
         <span class="tag">LC</span>
-        <a href="/livecenter/show/{{person.livecenter.key}}">{{ person.livecenter.name }}</a>
+        <a href="/livecenter/show/{{person.livecenter.id}}">{{ person.livecenter.name }}</a>
       </span>
    </li>
 </ul>
@@ -53,30 +53,24 @@
 <div class="sidebox">
     <h4><i class="icon_small contact"></i><strong>{% t "Kontak" %}</strong></h4>
     <p><label>{% t "Alamat" %}</label>{{person.address}}</p>
-    <p><label>{% t "Kabupaten" %}</label>{{person.district.dl_name}}</p>
-    <p><label>{% t "Kecamatan" %}</label>{{person.sub_district.dl_name}}</p>
-    <p><label>{% t "Desa" %}</label>{{person.village.dl_name}}</p>
+    <p><label>{% t "Kabupaten" %}</label>{{person.district.name}}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{person.sub_district.name}}</p>
+    <p><label>{% t "Desa" %}</label>{{person.village.name}}</p>
     <p><label>{% t "Telepon selular" %}</label>{{person.mobile}}</p>
-    <p><label>{% t "Koordinat GPS" %}</label><span class="gps">{{person.geo_pos}}</span></p>
+    <p><label>{% t "Koordinat GPS" %}</label>{{person.geo_pos}}</p>
 </div>
 
-{% if person.livegroup %}
+{% if person.group %}
 <div class="sidebox">
     <h4><i class="icon_small category"></i><strong>{% t "Kategori / Gugusan" %}</strong></h4>
     <ul class="uiListView icon-left-small">
-        {% for item in person.groups %}
-          <li>
-            <span class="icon"><img src="/img/{{item.livecluster.key}}" class="small" /></span>
-            <span class="title"><a href="/livecenter/show/{{person.livecenter.key}}">{{ item.livecluster.name }}</a></span>
-            <span class="body">{{person.livecenter.info}}</span>
-          </li>
-        {% empty %}
-          <li>{% t "Belum bergabung ke gugusan manapun" %}</li>
-        {% endfor %}
+      <li>
+        <span class="icon"><img src="/img/{{person.group.cluster.photo.id}}" class="small" /></span>
+        <span class="title"><a href="/livecenter/show/{{person.livecenter.id}}">{{ person.livecluster.name }}</a></span>
+        <span class="body">{{person.livecenter.info}}</span>
+      </li>
     </ul>
 </div>
 {% endif %}
-
-
 
 {% endblock %}
