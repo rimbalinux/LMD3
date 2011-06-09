@@ -2,11 +2,12 @@ from django.db import models
 from counter.tools import BaseModel
 from livecenter.models import Livelihood, Cluster, Category
 from livecenter.tools import GeoModel
+from attachment.tools import PhotoModel
 from people.models import People
 
 
-class Type(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
+class Type(PhotoModel):
+    name = models.CharField('jenis produk', max_length=100, unique=True)
     count = models.IntegerField(default=0)
 
     class Meta:

@@ -9,4 +9,7 @@ urlpatterns = patterns('product.views',
     (r'^create/(?P<pid>.*)$', 'create'),
     (r'^edit/(?P<pid>.*)$', 'edit'),
     (r'^delete/(?P<pid>.*)$', 'delete'),
+    (r'^type/create$', 'type_create'),
+    (r'^type/edit/(?P<tid>.*)$', 'type_edit'),
+    (r'^type/show/(?P<tid>.*)$', 'type_show'),
 )

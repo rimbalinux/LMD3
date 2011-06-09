@@ -72,7 +72,11 @@ INSTALLED_APPS = (
     'counter',
     'pagination',
     'globalrequest',
+    'registration',
 )
+
+# registration
+ACCOUNT_ACTIVATION_DAYS = 7 # days
 
 if has_djangoappengine:
     # djangoappengine should come last, so it can override a few manage.py commands

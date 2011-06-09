@@ -7,7 +7,7 @@ from livecenter.models import LiveGroup, Metaform, Product as OldProduct, \
 from livecenter.utils import default_location, migrate_photo, redirect
 from people.models import People, Container as PersonContainer
 from .models import Product, Container, Type
-from .forms import ProductForm
+from .forms import ProductForm, TypeForm
 
 # migrasi
 pola = [
@@ -78,6 +78,30 @@ def delete(request, pid):
     p.delete()
     return redirect(request, '/product')
 
+def type_show(request, tid):
+    return direct_to_template(request, 'product/type/show.html', {
+        'product_type': Type.objects.get(pk=tid),
+        'products': Product.objects.filter(type=tid),
+        'lokasi': default_location(), 
+        })
+
+def type_create(request):
+    return type_show_edit(request, Type())
+
+def type_edit(request, tid):
+    type_ = Type.objects.get(pk=tid)
+    return type_show_edit(request, type_)
+
+def type_show_edit(request, type_):
+    form = TypeForm(instance=type_.id and type_ or None)
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(request, '/product/type/%d' % type_.id)
+    return direct_to_template(request, 'product/type/edit.html', {
+        'form': form,
+        })
+
 
 def migrate(request):
     def intval(n):
@@ -147,6 +171,6 @@ def types(request):
         for regex, name in pola:
             t = Type(name=name, user=request.user)
             t.save()
-    return direct_to_template(request, 'product/type.html', {
+    return direct_to_template(request, 'product/type/created.html', {
         'targets': Type.objects.all(),
         })

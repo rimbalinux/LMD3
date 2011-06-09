@@ -6,36 +6,32 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
 {% endblock %}
 
 {% block content %}
 
 <h2>{% t "Produk" %}</h2>
 
-<div id="livecenters">
     <span id="total">{% t "Jumlah" %}: {{ count }}</span>
 
 {% easy_map lokasi 900 400 8 using "product/map/index.html" %}
 
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Produk" %}</h4>
-        <table>
-            <tr>
-                <th>{% t "Jenis" %}</th>
-                <th>{% t "Jumlah anggota" %}</th>
-            </tr>
+        <ul class="uiListView icon-left">
             {% for type in types %}
-            <tr>
-                <td><a href="/product/type/{{ type.id }}" class="preview">{{ type.name }}</a></td>
-                <td align="right">{{ type.count }}</td>
-            </tr>
+            <li>
+                <span class="avatar">
+                    <a href="/product/type/show/{{type.id}}"><img src="/img/{{type.photo.id}}" /></a>
+                </span>
+                <span class="block">
+                    <span class="body">
+                        <a href="/product/type/show/{{ type.id }}">{{ type.name }}</a>
+                    </span>
+                    <span class="body">
+                        {{ type.count }} {% t "anggota" %}
+                    </span>
+                </span>
+            </li>
             {% endfor %}
-        </table>
-    </div>
-</div>
 
-</div>
 
 {% endblock %}

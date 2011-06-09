@@ -11,7 +11,7 @@
 {% wide_social_buttons request post.title post.get_absolute_url %}
 
 {% if browse_posts %}
-{{ post.content|truncatewords:150|t:request }}
+{{ post.content|truncatewords:150|t }}
 {% else %}
 {% t post.content %}
 {% endif %}

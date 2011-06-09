@@ -32,7 +32,7 @@ class DistrictForm(GeoForm):
 
 
 class LivelihoodForm(DistrictForm):
-    category = forms.fields.MultipleChoiceField(choices=categories())
+    category = forms.fields.MultipleChoiceField()
 
     class Meta:
         model = Livelihood
@@ -41,6 +41,7 @@ class LivelihoodForm(DistrictForm):
     def __init__(self, *args, **kwargs):
         super(LivelihoodForm, self).__init__(*args, **kwargs)
         self.fields['category'].initial = self.instance.category
+        self.fields['category'].widget.choices = categories() 
         self.fields['name'].widget.attrs = {'size': 40}
         self.fields['category'].widget.attrs = {'size': 10}
         self.fields['address'].widget.attrs = {'cols': 40, 'rows': 2}

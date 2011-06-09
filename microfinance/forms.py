@@ -16,6 +16,8 @@ class FinanceForm(GeoForm):
         self.fields['pembukuan'].widget.attrs = {'size': 5}
         self.fields['akses_pasar'].widget.attrs = {'size': 5}
         self.fields['keuangan_mikro'].widget.attrs = {'size': 5}
+        self.fields['jangka_wkt_pinjaman'].widget.attrs = {'size': 5}
+        self.fields['margin_bunga'].widget.attrs = {'size': 5}
         self.fields['ao'].widget.attrs = {'size': 5}
         self.fields['cs'].widget.attrs = {'size': 5}
         self.fields['tl'].widget.attrs = {'size': 5}

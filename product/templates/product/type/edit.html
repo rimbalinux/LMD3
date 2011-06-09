@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
+
+{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Jenis produk baru" %}{% endif %}{% endblock %}
+
+
+{% block content %}
+
+<h2>
+{% if form.instance.id %}
+{% t "Jenis produk" %}
+{% else %}
+{% t "Jenis produk baru" %}
+{% endif %}
+</h2>
+
+{{ form.non_field_errors }}
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="post" enctype="multipart/form-data">
+    
+<div class="fieldset">
+{% formfield form.name %}
+</div>
+
+<div class="fieldset">
+{% include "livecenter/photo_form.html" %}
+</div>
+
+<div class="submit-wrapper">
+    <input type="submit" value="{% t "Simpan" %}" />
+</div>
+
+</form>
+
+{{ form.errors }}
+
+{% endblock %}
+
+
+{% block js %}
+<script type="text/javascript">
+    document.getElementById("id_name").focus();
+</script>
+{% endblock %}

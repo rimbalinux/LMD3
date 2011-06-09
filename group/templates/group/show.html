@@ -47,7 +47,7 @@
         {% endif %}
         <table class="uiListView">
             {% for x in customfields %}
-            <tr><td>{{ x.description|t:request }}</td>
+            <tr><td>{% t x.description %}</td>
                 <td><span>: {{group|metaview:x}}</span></td>
             </tr>
             {% endfor %}

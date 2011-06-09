@@ -1,6 +1,13 @@
 from django import forms
-from .models import Product
 from livecenter.forms import GeoForm, categories
+from attachment.tools import PhotoForm
+from .models import Product, Type
+
+
+class TypeForm(PhotoForm):
+    class Meta:
+        model = Type
+        exclude = ('count',)
 
 
 class ProductForm(GeoForm):

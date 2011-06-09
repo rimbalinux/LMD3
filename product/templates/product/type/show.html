@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load easy_maps_tags %}
+{% load livecenter %}
+{% load pagination_tags %}
+
+{% block title %}{% t product_type.name %}{% endblock %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
+{% endblock %}
+
+{% block content %}
+<h2>{% t product_type.name %}: {{product_type.count}}</h2>
+
+{% easy_map lokasi 600 300 8 using "product/map/show_type.html" %}
+
+<ul class="uiListView icon-left">
+    {% autopaginate products %}
+    {% for product in products %}
+    <li>
+        <span class="avatar"><img src="/img/{{product.photo.id}}" /></span>
+        <span class="block">
+            <span class="title"><a href="/product/show/{{product.id}}">{% t product.name %}</a></span>
+            <span class="body">{{product.info}}
+                {{product.person.name}}, {{product.person.member_type}}, {{product.person.district.name}}
+                <span class="tag">LC</span>
+                <a href="/livecenter/show/{{product.person.livecenter.id}}">{{ product.person.livecenter.name }}</a>
+            </span>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+{% paginate %}
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="profile_pic">
+  <img src="/img/{{product_type.photo.id}}" class="big-pic" />
+</div>
+
+{% if user.is_staff %} 
+<a href="/product/type/edit/{{product_type.id}}?destination=/product/type/show/{{product_type.id}}" class="uiButton">{% t "Ubah" %}</a>
+{% endif %}
+
+{% endblock %}

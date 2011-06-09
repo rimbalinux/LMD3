@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>{{ product.name|t:request }}</h2>
+<h2>{% t product.name %}</h2>
 
 {% easy_map lokasi 600 300 8 using "product/map/show.html" %}
 

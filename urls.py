@@ -29,4 +29,6 @@ urlpatterns = patterns('',
     #(r'^user/migrate', 'user.views.migrate'),
     #(r'^counter/migrate', 'counter.views.migrate'),
     (r'^$', 'home.views.index'),
+    (r'^accounts/', include('registration.backends.default.urls')),
+
 )
