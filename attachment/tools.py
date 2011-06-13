@@ -1,8 +1,8 @@
 from django.db import models
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from counter.tools import BaseModel
-from globalrequest.middleware import get_request
+from counter.tools import BaseModel, BaseForm
+#from globalrequest.middleware import get_request
 from .models import File
 from .utils import save_file_upload
 
@@ -34,13 +34,14 @@ class PhotoModel(BaseModel):
             f.delete()
 
 
-class PhotoForm(forms.ModelForm):
+class PhotoForm(BaseForm):
     def __init__(self, *args, **kwargs):
-        self.request = get_request()
-        if self.request.POST:
-            super(PhotoForm, self).__init__(self.request.POST, *args, **kwargs)
-        else:
-            super(PhotoForm, self).__init__(*args, **kwargs)
+        super(PhotoForm, self).__init__(*args, **kwargs)
+        #self.request = get_request()
+        #if self.request.POST:
+        #    super(PhotoForm, self).__init__(self.request.POST, *args, **kwargs)
+        #else:
+        #    super(PhotoForm, self).__init__(*args, **kwargs)
         if 'photo' in self.fields:
             del self.fields['photo']
 

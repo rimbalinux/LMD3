@@ -50,7 +50,8 @@ class Finance(GeoModel):
     tl = models.IntegerField('kasir', default=0) 
     kelayakan_usaha = models.IntegerField('kelayakan usaha', default=0) 
 
+"""
 class Container(models.Model): # Tabel peralihan
     finance = models.ForeignKey(Finance)
     microfinance = models.CharField(max_length=100, unique=True) # livecenter.MicroFinance.__key__
- 
+"""

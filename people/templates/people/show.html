@@ -166,11 +166,15 @@
 <div class="sidebox">
     <h4><i class="icon_small home"></i><strong>{% t "Gugusan" %}</strong></h4>
     <ul class="uiListView icon-left-small">
+        {% if person.group.cluster %}
         <li>
           <span class="icon"><img src="/img/{{person.group.cluster.photo.id}}" class="small" /></span>
           <span class="title"><a href="/livecenter/show/{{person.livecenter.id}}?tab=cluster">{{ person.group.cluster.name }}</a></span>
           <span class="body">{{person.group.cluster.info}}</span>
         </li>
+        {% else %}
+        <li>{% t "Belum bergabung ke gugusan manapun." %}</li>
+        {% endif %}
     </ul>
 </div>
 
@@ -180,17 +184,20 @@
       {% t "Kelompok" %}
     </h4>
     <ul class="uiListView icon-left-small">
+        {% if person.group %}
           <li>
             <span class="icon"><img src="/img/{{person.group.photo.id}}" class="small" /></span>
             <span class="title"><a href="/group/show/{{person.group.id}}">{{person.group.name}}</a></span>
             <span class="body">{{person.group.info}}</span>
-          </li>
+            </li>
+        {% else %}
+        <li>{% t "Belum bergabung ke kelompok manapun." %}</li>
+        {% endif %}
     </ul>
 </div>
 
 {% if user.is_staff %}
 <div class="sidebox">
-    <h4>{%t "Hati-hati" %}</h4>
     <a href="/people/delete/{{person.id}}" class="uiButton">{% t "Hapus" %} {{person.name}}</a>
 </div>
 {% endif %}

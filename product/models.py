@@ -45,7 +45,8 @@ class Product(GeoModel):
         t.count += value 
         t.save()
 
-
+"""
 class Container(models.Model):
     new = models.ForeignKey(Product)
     old = models.CharField(max_length=100, unique=True) # livecenter.Product.__key__
+"""

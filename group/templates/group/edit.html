@@ -20,21 +20,15 @@
 {{ form.non_field_errors }}
 <form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
     {{ form.livecenter }}
-    {{ form.cluster }}
     <div class="dialog-columns">
         <div class="dialog-column">
+            <div class="fieldset">
+                {% formfield form.cluster %}
+            </div>
             <div class="fieldset">
                 <div class="field-wrapper">
                     <label>{% t "Mata pencaharian" %}</label>
                     {{ form.instance.livecenter }}
-                    {{ form.livecenter.errors }}
-                </div>
-            </div>
-            <div class="fieldset">
-                <div class="field-wrapper">
-                    <label>{% t "Gugusan" %}</label>
-                    {{ form.instance.cluster }}
-                    {{ form.cluster.errors }}
                 </div>
             </div>
             <div class="fieldset">

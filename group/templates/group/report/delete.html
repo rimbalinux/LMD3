@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block title %}{% t "Hapus laporan" %} {% t instance.name %}{% endblock %}
+
+{% block content %}
+<h2>
+    {% t "Hapus laporan" %} {% t instance.name %}
+</h2>
+
+Laporan ini berada di:
+<ul>
+<li>{% t "Kelompok" %} : {{ instance.group }}</li>
+{% if instance.cluster %}
+<li>{% t "Gugusan" %} : {{ instance.cluster }}
+{% endif %}
+<li>{% t "Mata pencaharian" %} : {{ instance.livecenter }}</li>
+</ul>
+
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    <div class="submit-wrapper">
+        <input type="submit" name="cancel" value="{% t "Batalkan" %}" />
+        <input type="submit" name="delete" value="{% t "Hapus" %}" />
+    </div>
+</form>
+
+{% endblock %}
+

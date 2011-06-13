@@ -1,0 +1,9 @@
+Anda telah melakukan pendaftaran di {{site}}. Masukkan kunci aktivasi berikut ini:
+
+  {{activation_key}}
+
+Jika dalam {{expiration_days}} hari tidak juga digunakan, maka nama pengguna akan
+dihapus.
+
+Terima kasih atas kunjungannya.
+

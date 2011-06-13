@@ -11,7 +11,7 @@ class People(DistrictModel): # was livecenter.Person
         )
     name = models.CharField('nama', max_length=100)
     livecenter = models.ForeignKey(Livelihood)
-    group = models.ForeignKey(Group, null=True, verbose_name='kelompok', related_name='+')
+    group = models.ForeignKey(Group, null=True, blank=True, verbose_name='kelompok', related_name='+')
     email = models.EmailField('email', blank=True)
     gender = models.BooleanField('jenis kelamin', choices=GENDERS, default=True)
     birth_year = models.IntegerField('tahun lahir', null=True, blank=True)
@@ -51,11 +51,11 @@ class People(DistrictModel): # was livecenter.Person
         self.group.member_count += 1
         self.group.save()
 
-
+"""
 class Container(models.Model): # Tabel peralihan
     people = models.ForeignKey(People)
     person = models.CharField(max_length=100, unique=True) # livecenter.Person.__key__
-    
+""" 
 
 class Training(BaseModel): # was livecenter.PersonTraining
     person = models.ForeignKey(People)

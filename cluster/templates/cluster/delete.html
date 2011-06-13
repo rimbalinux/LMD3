@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block title %}{% t "Hapus gugusan" %} {% t instance.name %}{% endblock %}
+
+{% block content %}
+<h2>
+    {% t "Hapus gugusan" %} {% t instance.name %}
+</h2>
+
+<ul>
+{% if groups %}
+<li>{% t "Jumlah kelompok" %} : {{ groups|length }}.
+</li>
+{% endif %}
+</ul>
+
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    <div class="submit-wrapper">
+        <input type="submit" name="cancel" value="{% t "Batalkan" %}" />
+        <input type="submit" name="delete" value="{% if groups %}{% t "Hapus, tidak akan menghapus kelompok" %}{% else %}{% t "Hapus" %}{% endif %}" />
+    </div>
+</form>
+
+{% endblock %}
+

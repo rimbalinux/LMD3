@@ -7,7 +7,6 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
 {% endblock %}
 
 {% block content %}
@@ -18,16 +17,10 @@
 
 {% easy_map lokasi 900 400 7 using "group/map/index.html" %}
 
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Kelompok" %}</h4>
         <ul class="uiListView icon-left">
             {% autopaginate groups %}
             {% for group in groups %}
                 <li>
-                  {% if user.is_staff %}
-                  <span class="right"><a href="/group/delete/{{group.id}}" class="uiRemove" title="{% t "Hapus" %} {{group.name}}"></a></span>
-                  {% endif %}
                   <span class="avatar normal"><img src="/img/{{group.photo.id}}" /></span>
                   <span class="block">
                       <span class="title"><a href="/group/show/{{ group.id }}" class="preview">{{ group.name }}</a></span> 
@@ -39,7 +32,5 @@
             {% endfor %}
         </ul>
         {% paginate %}
-    </div>
-</div>
 
 {% endblock %}

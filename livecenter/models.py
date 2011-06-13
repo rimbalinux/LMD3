@@ -1,6 +1,6 @@
 # Sumber: LMD/models.py
 
-from google.appengine.ext import db, search
+#from google.appengine.ext import db, search
 from django.db import models
 from djangotoolbox import fields
 from attachment.models import Attachment
@@ -9,11 +9,12 @@ from counter.tools import BaseModel
 from .tools import GeoModel
 
 
-""" Location data """
+"""
 class LivelihoodLocation(db.Model):
     dl_id = db.IntegerProperty()
     dl_name = db.StringProperty()
     dl_parent = db.IntegerProperty()
+"""
 
 class Location(BaseModel):
     lid = models.IntegerField(unique=True)
@@ -37,8 +38,6 @@ class DistrictModel(GeoModel):
 
 
 """ 
-Category and enterprises
-"""
 class LiveCategory(search.SearchableModel):
     ancestor = db.ListProperty(db.Key, default=[])
     no_ancestor = db.BooleanProperty(default=True)
@@ -60,6 +59,7 @@ class LiveCategory(search.SearchableModel):
     @property
     def metaforms(self):
         return MetaForm.gql("WHERE containers = :1", self.key())
+"""
 
 
 class Category(PhotoModel):
@@ -70,13 +70,12 @@ class Category(PhotoModel):
     def __unicode__(self):
         return self.name
 
+"""
 class CategoryContainer(models.Model): # migrasi
     category = models.ForeignKey(Category)
     livecategory = models.CharField(max_length=100) # references LiveCategory.__key__ 
+"""
  
-""" 
-LC Centers 
-1 LC has many categories
 """
 class LiveCenter(search.SearchableModel):
     category = db.ListProperty(db.Key,default=[])
@@ -112,6 +111,7 @@ class LiveCenter(search.SearchableModel):
     @property
     def groups(self):
         return LiveGroup.gql("WHERE containers = :1", self.key())
+"""
 
 
 class Livelihood(DistrictModel): # was LiveCenter
@@ -139,9 +139,6 @@ class Container(models.Model): # peralihan, temporary
     livecenter = models.CharField(max_length=100) # references LiveCenter.__key__ 
 
 
-"""
-Person Database
-person can have multiple groups, multiple category & clusters in one Livecenter
 """
 class Person(search.SearchableModel):
     livecenter = db.ReferenceProperty(LiveCenter, collection_name='peoples')
@@ -176,10 +173,8 @@ class Person(search.SearchableModel):
     @property
     def clusters(self):
         return LiveCluster.gql("WHERE livecenter = :1", self.livecenter)
-
 """ 
-LC Center Clusters 
-1 cluster has many groups, related to 1 category and many livecenter
+
 """
 class LiveCluster(search.SearchableModel, db.Expando):
     category = db.ReferenceProperty(LiveCategory, collection_name='clusters')
@@ -189,6 +184,7 @@ class LiveCluster(search.SearchableModel, db.Expando):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
+"""
 
 class Cluster(PhotoModel):
     name = models.CharField('nama gugusan', max_length=100)
@@ -212,14 +208,12 @@ class Cluster(PhotoModel):
         self.livecenter.cluster_count += add 
         self.livecenter.save()
 
-
+"""
 class ClusterContainer(models.Model): # migrasi, temporary
     cluster = models.ForeignKey(Cluster, unique=True)
     livecluster = models.CharField(max_length=100, unique=True) # references LiveCluster.__key__ 
-
 """
-LC Cluster Groups
-1 group has 1 cluster and has many members/person
+
 """
 class LiveGroup(search.SearchableModel, db.Expando):
     livecluster = db.ReferenceProperty(LiveCluster, collection_name='groups')
@@ -234,7 +228,6 @@ class LiveGroup(search.SearchableModel, db.Expando):
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
 
-""" Custom Field Storage """
 class MetaForm(db.Model):
     meta_type    = db.StringProperty(choices=('product', 'group'), default='product')
     container    = db.ListProperty(db.Key,default=[])
@@ -251,6 +244,7 @@ class MetaForm(db.Model):
     @property
     def livecenters(self):
         LiveCenter.gql("WHERE __key__ IN :1", self.container)
+"""
 
 class Metaform(BaseModel):
     title = models.CharField(max_length=100) 
@@ -265,14 +259,16 @@ class Metaform(BaseModel):
     class Meta:
         ordering = ['title']
 
+"""
 class MetaformContainer(models.Model):
     new = models.ForeignKey(Metaform)
     old = models.CharField(max_length=100, unique=True)
-
+"""
 
 """
 Micro Finance
 added by Jufri Wahyudi
+"""
 """
 class MicroFinance(search.SearchableModel):
     name_org  = db.StringProperty()
@@ -306,9 +302,11 @@ class MicroFinance(search.SearchableModel):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
+"""
 
 """
 Group Report include the historical database
+"""
 """
 class Report_Group(search.SearchableModel, db.Expando):
     livecluster = db.ReferenceProperty(LiveCluster, collection_name='group_report')
@@ -353,8 +351,10 @@ class GroupTraining(search.SearchableModel):
     kontrol_kualitas = db.IntegerProperty(default=0)
     rawat_mesin = db.IntegerProperty(default=0)
     rescue = db.IntegerProperty(default=0)
+"""
 
 """ Member Products """
+"""
 class Product(search.SearchableModel, db.Expando):
     person = db.ReferenceProperty(Person, collection_name='products')
     livecenter = db.ReferenceProperty(LiveCenter, collection_name='products')
@@ -370,4 +370,4 @@ class Product(search.SearchableModel, db.Expando):
     @property
     def photo(self):
         return Attachment.gql("WHERE containers = :1", self.key())
- 
+""" 

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block title %}{% t "Hapus pelatihan" %} {% t instance.name %}{% endblock %}
+
+{% block content %}
+<h2>
+    {% t "Hapus pelatihan" %} {% t instance.name %}
+</h2>
+
+Pelatihan ini berada di:
+<ul>
+<li>{% t "Kelompok" %} : {{ instance.group }}</li>
+<li>{% t "Mata pencaharian" %} : {{ instance.group.livecenter }}</li>
+</ul>
+
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    <div class="submit-wrapper">
+        <input type="submit" name="cancel" value="{% t "Batalkan" %}" />
+        <input type="submit" name="delete" value="{% t "Hapus" %}" />
+    </div>
+</form>
+
+{% endblock %}
+

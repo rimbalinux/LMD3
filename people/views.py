@@ -1,19 +1,22 @@
 import urllib
-from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 import counter
-from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
-        LiveCenter, Container, Location, Metaform, Livelihood
-from livecenter.utils import redirect, default_location, migrate_photo
+from livecenter.models import Location, Metaform, Livelihood
+from livecenter.utils import redirect, default_location
 from product.models import Product
-from group.models import Group, Container as GroupContainer
-from attachment.utils import save_file_upload
+from group.models import Group
 from transaction.models import Transaction
-from .models import People, Container as PeopleContainer, Training
+from .models import People, Training
 from .settings import GENDERS
 from .forms import PeopleForm
+#from google.appengine.ext import db
+#from group.models import Group
+#from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
+#        LiveCenter, Container
+#from livecenter.utils import migrate_photo
+#from .models import Container as PeopleContainer
 
 
 def index(request):
@@ -50,6 +53,11 @@ def show(request, pid):
         'lokasi': default_location(people.geo_pos),
         })
 
+def create_from_group(request, gid):
+    group = Group.objects.get(pk=gid)
+    person = People(livecenter=group.livecenter, group=group)
+    return show_edit(request, person)
+
 def create(request, lid): # lid = livecenter id 
     lc = Livelihood.objects.get(pk=lid)
     person = People(livecenter=lc)
@@ -70,10 +78,24 @@ def show_edit(request, person):
         })
 
 def delete(request, pid):
-    p = People.objects.get(pk=pid)
-    p.delete()
-    return redirect(request, '/people')
+    person = People.objects.get(pk=pid)
+    if request.POST:
+        if 'delete' in request.POST:
+            _delete(person)
+            return redirect(request, '/people')
+        return redirect(request, '/people/show/%d' % person.id)
+    return direct_to_template(request, 'people/delete.html', {
+        'instance': person,
+        'product_count': len(Product.objects.filter(person=person).all()),
+        })
 
+def _delete(person):
+    for product in Product.objects.filter(person=person):
+        product.delete()
+    person.delete()
+
+
+"""
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
     offset = len(People.objects.all())
@@ -134,11 +156,13 @@ def migrate_delete(request): # danger
     return direct_to_template(request, 'people/migrate.html', {
         'targets': targets, 
         })
+"""
 
 
 # Hitung ulang jumlah anggota pada suatu livecenter. Sebelum fungsi ini
 # dipanggil, pastikan seluruh field member_count = 0 pada tabel
 # livecenter_livelihood.
+"""
 def repair_livecenter_member_count(request):
     counter_name = '__livecenter_member_count_offset'
     offset = counter.get(counter_name)
@@ -151,8 +175,10 @@ def repair_livecenter_member_count(request):
     return direct_to_template(request, 'people/repair/livecenter_member_count.html', {
         'targets': targets,
         })
+"""
 
 # Cari yang lokasinya sudah tidak ada
+"""
 def location_not_found(request):
     for person in Person.all().filter('district', db.Key('ahlsaXZlbGlob29kbWVtYmVyc2RhdGFiYXNlchoLEhJMaXZlbGlob29kTG9jYXRpb24YhpICDA')):
         person.district = None
@@ -160,10 +186,12 @@ def location_not_found(request):
     return direct_to_template(request, 'people/location_not_found.html', {
         'targets': Person.all().filter('district', db.Key('ahlsaXZlbGlob29kbWVtYmVyc2RhdGFiYXNlchoLEhJMaXZlbGlob29kTG9jYXRpb24YhpICDA')),
         })
+"""
 
 # Hitung ulang jumlah anggota pada suatu group. Sebelum fungsi ini
 # dipanggil, pastikan seluruh field member_count = 0 pada tabel
 # group_group.
+"""
 def repair_group_member_count(request):
     counter_name = '__group_member_count_offset'
     offset = counter.get(counter_name)
@@ -178,8 +206,10 @@ def repair_group_member_count(request):
     return direct_to_template(request, 'people/repair/group_member_count.html', {
         'targets': targets,
         })
+"""
 
 # Ubah geo_pos = 0.0,0.0 menjadi string hampa.
+"""
 def repair_geo_pos(request):
     counter_name = '__people_geo_pos_repair'
     offset = counter.get(counter_name)
@@ -192,8 +222,10 @@ def repair_geo_pos(request):
     return direct_to_template(request, 'people/repair/geo_pos.html', {
         'targets': targets,
         })
+"""
 
 # Ubah mobile = 0 menjadi string hampa.
+"""
 def repair_mobile(request):
     counter_name = '__people_mobile_repair'
     offset = counter.get(counter_name)
@@ -206,8 +238,10 @@ def repair_mobile(request):
     return direct_to_template(request, 'people/repair/mobile.html', {
         'targets': targets,
         })
+"""
 
 # Ubah address = None menjadi string hampa.
+"""
 def repair_address(request):
     counter_name = '__people_address_repair'
     offset = counter.get(counter_name)
@@ -222,8 +256,10 @@ def repair_address(request):
     return direct_to_template(request, 'people/repair/address.html', {
         'targets': targets,
         })
+"""
 
 # Ubah monthly_income = 0 menjadi string hampa.
+"""
 def repair_monthly_income(request):
     counter_name = '__people_monthly_income_repair'
     offset = counter.get(counter_name)
@@ -236,8 +272,10 @@ def repair_monthly_income(request):
     return direct_to_template(request, 'people/repair/monthly_income.html', {
         'targets': targets,
         })
+"""
 
 # Ubah spouse_name = 0 menjadi string hampa.
+"""
 def repair_spouse_name(request):
     counter_name = '__people_spouse_name_repair'
     offset = counter.get(counter_name)
@@ -250,4 +288,5 @@ def repair_spouse_name(request):
     return direct_to_template(request, 'people/repair/spouse_name.html', {
         'targets': targets,
         })
+"""
 

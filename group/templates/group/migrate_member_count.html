@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load lang %}
+
+{% block title %}{{ "Group member_count is not null" }}{% endblock %}
+
+{% block extra-head %}
+{% if targets %}
+<meta http-equiv="refresh" content="5" /> 
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<b>Target</b>
+<table border="1">
+    <tr>
+        <th>Name</th>
+    </tr>
+    {% for target in targets %}
+    <tr>
+        <td>{{ target.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

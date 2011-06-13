@@ -7,7 +7,6 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
 {% endblock %}
 
 {% block content %}
@@ -18,21 +17,10 @@
 
 {% easy_map lokasi 900 400 8 using "people/map/index.html" %}
 
-{% if user.is_staff %}
-<p><a href="/people/create" class="uiButton"><span class="iconAdd"></span><span>{% t "Tambah anggota" %}</span></a></p>
-<p>&nbsp;</p>
-{% endif %}
-
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Anggota" %}</h4>
         <ul class="uiListView icon-left">
             {% autopaginate peoples %}
             {% for people in peoples %}
               <li>
-                {% if user.is_staff %}
-                  <span class="right"><a href="/people/delete/{{people.id}}" class="uiRemove" title="{% t "Hapus" %} {{people.name}}"></a></span>
-                {% endif %}
                 <span class="avatar normal"><img src="/img/{{people.photo.id}}" /></span>
                 <span class="block">
                 <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
@@ -45,7 +33,5 @@
             {% endfor %}
         </ul>
         {% paginate %}
-    </div>
-</div>
 
 {% endblock %}

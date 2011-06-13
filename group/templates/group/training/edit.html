@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
+
+{% block title %}{% if form.instance.id %}{% t "Pelatihan" %} {{ form.instance.name }}{% else %}{% t "Pelatihan baru" %}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>
+    {% if form.instance.id %}
+    {% t "Pelatihan" %} {{ form.instance.name }}
+    {% else %}
+    {% t "Pelatihan baru" %}
+    {% endif %}
+</h2>
+{{ form.non_field_errors }}
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    {{ form.group }}
+    <div class="fieldset">
+        <div class="field-wrapper">
+            <label>{% t form.group.label %}:</label>
+            {{ form.instance.group.name }}
+        </div>
+        <div class="field-wrapper">
+            <label>{% t "Mata pencaharian" %}:</label>
+            {{ form.instance.group.livecenter }}
+        </div>
+    </div>
+    <div class="fieldset">
+        {% formfield form.manajemen_usaha %}
+        {% formfield form.pembukuan %}
+        {% formfield form.produksi %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.pemanfaatan_limbah %}
+        {% formfield form.pengemasan %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.akses_pasar %}
+        {% formfield form.keuangan_mikro %}
+        {% formfield form.hitung_hpp_harga_jual %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.navigasi %}
+        {% formfield form.keselamatan_laut %}
+        {% formfield form.penanganan_atas_kapal %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.kontrol_kualitas %}
+        {% formfield form.rawat_mesin %}
+        {% formfield form.rescue %}
+    </div>
+    <div class="submit-wrapper">
+        <input type="submit" value="{% t "Simpan" %}" />
+    </div>
+</form>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    document.getElementById("id_name").focus();
+</script>
+{% endblock %}
+

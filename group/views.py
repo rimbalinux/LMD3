@@ -2,124 +2,54 @@ import urllib
 from datetime import date
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
-from google.appengine.ext import db
-from livecenter.models import Metaform
-from livecenter.utils import redirect, default_location, migrate_photo
+from livecenter.models import Metaform, Cluster, Livelihood
+from livecenter.utils import redirect, default_location
 from people.models import People
+from product.models import Product
 from .models import Group, Report, Training
-from .forms import GroupForm
+from .forms import GroupForm, ReportForm, TrainingForm
 #from livecenter.models import LiveGroup, LiveCenter, MetaForm, Report_Group, \
 #        GroupTraining, LiveCluster, Container, ClusterContainer, Cluster
 #from .models import Container as GroupContainer, ReportContainer, TrainingContainer
+#from livecenter.utils import migrate_photo
+#from google.appengine.ext import db
+#import counter
 
 
 def destination(pid, tabname):
-    return urllib.quote('/group/show/%s?tab=%s' % (pid, tabname))
+    return '/group/show/%d?tab=%s' % (pid, tabname)
+    #return urllib.quote('/group/show/%d?tab=%s' % (pid, tabname))
 
 def index(request):
     return direct_to_template(request, 'group/index.html', {
-        'groups': Group.objects.all(), 
+        'groups': Group.objects.all().order_by('-updated'), 
         'count': Group.counter_value(),
         'lokasi': default_location(), 
         })
 
 def show(request, gid):
     group = Group.objects.get(pk=gid)
+    other_groups = [] 
+    if group.cluster:
+        other_groups = Group.objects.filter(cluster=group.cluster).exclude(pk=group.id)
+    if not other_groups[:1]:
+        other_groups = Group.objects.filter(livecenter=group.livecenter).exclude(pk=group.id)
+    trainings = Training.objects.filter(group=group)[:1]
+    training = trainings and trainings[0] or None
     return direct_to_template(request, 'group/show.html', {
         'group': group,
         'members': People.objects.filter(group=group),
-        'other_groups': Group.objects.filter(cluster=group.cluster).exclude(pk=group.id),
+        'other_groups': other_groups,
         'customfields': Metaform.objects.filter(meta_type='group').\
                 filter(category__in=group.livecenter.category),
         'reports': Report.objects.filter(group=group),
-        'trainings': Training.objects.filter(group=group),
+        'training': training, 
         'lokasi': group.geo_pos or default_location(),
         })
-
-def report_show(request, pid):
-    item = db.get(pid)
-    if not item:
-        return HttpResponseRedirect('/group')
-    category = item.livecluster.category
-    return direct_to_template(request, 'group/report_show.html', {
-        'report': item,
-        'customfields': MetaForm.all().order('__key__').filter('container', category.key()).filter('meta_type', 'group'),
-        'lokasi': str(item.name_group.geo_pos).strip('nan,nan') or ', '.join(DEFAULT_LOCATION),
-        'livecenter': LiveCenter.all().filter('__key__', item.name_group.livecluster.livecenter[0]).get(),
-        })       
-
-def report_delete(request, pid):
-    item = db.get(pid)
-    if item:
-        group = item.name_group.key()
-        item.delete()
-        return redirect(request, '/group/show/%s?tab=laporan' % group)
-    return redirect(request, '/group')
  
-def add_report(request, pid):
-    if request.POST:
-        group = save_report(request, pid)
-        if group:
-            return HttpResponseRedirect('/group/show/%s' % pid)
-        return HttpResponseRedirect('/group')
-    group = db.get(pid)
-    category = group.livecluster.category
-    clusters = LiveCluster.all().filter('livecenter', group.livecluster.livecenter[0]).filter('category', category.key()).fetch(100)
-    customfields = MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()).fetch(100)
-    return direct_to_template(request, 'group/add_report.html', {
-        'group': group,
-        'category': category,
-        'cluster': clusters,
-        'customfields': customfields,
-        })
-
-def add_training(request, pid):
-    if request.POST:
-        training = save_training(request, pid, 'create')
-        if training:
-            return HttpResponseRedirect('/group/show/%s' % pid)
-        return HttpResponseRedirect('/group')
-    group = db.get(pid)
-    return direct_to_template(request, 'group/add_training.html', {
-        'pagetitle': 'Tambah Pelatihan ' + group.name,
-        'groups': group,
-        'training': GroupTraining.all().filter('group =', group.key()),
-        'urls': '/group/add_training/',
-        })
-
-def edit_training(request, pid):
-    if request.POST:
-        training = save_training(request, pid, 'edit')
-        if training:
-            return redirect(request, '/group/show/%s?tab=pelatihan' % training.group.key())
-        return HttpResponseRedirect('/group')
-    training = db.get(pid)
-    return direct_to_template(request, 'group/add_training.html', {
-        'pagetitle': 'Ubah Pelatihan ' + training.group.name,
-        'groups': training,
-        'training': GroupTraining.all().filter('group =', training.group.key()),
-        'urls': '/group/edit_training/',
-        })
-
-def edit_report(request, pid):
-    if request.POST:
-        group = save_edit_report(request, pid)
-        if group:
-            return HttpResponseRedirect('/group/report_show/%s' % pid)
-        return HttpResponseRedirect('/group')
-    group = db.get(pid)
-    category = group.livecluster.category
-    return direct_to_template(request, 'group/edit_report.html', {
-        'pagetitle': 'Edit Report ' + group.name,
-        'group': group,
-        'category': category,
-        'cluster': LiveCluster.all().filter('livecenter', group.livecluster.livecenter[0]).filter('category', category.key()),
-        'customfields': MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()),
-        })
- 
-def create(request, cid):
-    cluster = Cluster.objects.get(pk=cid)
-    group = Group(cluster=cluster, livecenter=cluster.livecenter)
+def create(request, lid):
+    lc = Livelihood.objects.get(pk=lid)
+    group = Group(livecenter=lc)
     return show_edit(request, group)
 
 def edit(request, gid):
@@ -127,125 +57,96 @@ def edit(request, gid):
     return show_edit(request, group)
 
 def show_edit(request, group):
+    form = GroupForm(instance=group)
     if request.POST:
-        form = GroupForm(instance=group.id and group or None)
         if form.is_valid():
             form.save()
-            return redirect(request)
-    else:
-        form = GroupForm(instance=group)
+            return redirect(request, '/group/show/%d' % group.id)
     return direct_to_template(request, 'group/edit.html', {
         'form': form,
         'customfields': Metaform.objects.filter(meta_type='group').\
                 filter(category__in=group.livecenter.category),
         })
 
-def save_report(request, pid=None):
-    item = db.get(pid)
-    lc_key =  item.livecluster.livecenter[0]
-    lc = db.get(lc_key)
-    category = item.livecluster.category
-    customfields = MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()).fetch(100)
-    item = Report_Group()
-    item.name_group = db.Key(request.POST['name_key'])
-    item.name = request.POST['name']
-    item.info = request.POST['info']
-    item.livecluster = db.Key(request.POST['cluster'])
-    item.containers.append(lc.key())
-    if request.POST['date']:
-        item.year = request.POST['date']
-    item.put()
-    metas = {}
-    for meta in customfields:
-        if request.POST[meta.slug]:
-            try:
-                if meta.form_type == 'file':
-                    if not request.POST[meta.slug]:
-                        continue
-                    val = db.Blob(request.POST[meta.slug])
-                    setattr(item, meta.slug, val)
-                else:
-                    setattr(item, meta.slug, request.POST[meta.slug])
-            except: pass
-    item.put()
-    return item
+def delete(request, gid):
+    group = Group.objects.get(pk=gid)
+    if request.POST:
+        if 'delete' in request.POST:
+            _delete(group)
+            return redirect(request, '/group')
+        return redirect(request, '/group/show/%d' % group.id)
+    return direct_to_template(request, 'group/delete.html', {
+        'instance': group,
+        })
 
-def save_edit_report(request, pid=None):
-    item = db.get(pid)
-    lc_key =  item.livecluster.livecenter[0]
-    lc = db.get(lc_key)
-    category = item.livecluster.category
-    customfields = MetaForm.all().order('title').filter('meta_type', 'group').filter('container', category.key()).fetch(100)
-    item.name_group = db.Key(request.POST['name_key'])
-    item.name = request.POST['name']
-    item.info = request.POST['info']
-    item.livecluster = db.Key(request.POST['cluster'])
-    if request.POST['date']:
-        item.year = request.POST['date']
-    item.put()
+def _delete(group):
+    for member in People.objects.filter(group=group):
+        for product in Product.objects.filter(person=member):
+            product.delete()
+        member.delete()
+    group.delete()
 
-    for meta in customfields:
-        if request.POST[meta.slug]:
-            try:
-                if meta.form_type == 'file':
-                    if not request.POST[meta.slug]:
-                        continue
-                    val = db.Blob(request.POST[meta.slug])
-                    setattr(item, meta.slug, val)
-                else:
-                    setattr(item, meta.slug, request.POST[meta.slug])
-            except: pass
-    item.put()
-    return item
+def report_create(request, gid):
+    group = Group.objects.get(pk=gid)
+    report = Report(group=group, livecenter=group.livecenter)
+    return report_show(request, report)
 
-def save_training(request, pid=None, status=None):
-    if status == 'edit':
-        item = db.get(pid)
-        if not item:
-            return
-        item.group = item.group.key()
-    else:
-        item = GroupTraining()
-        item1 = db.get(pid)
-        item.group = item1.key()
-    if request.POST['manajemen_usaha']:
-        item.manajemen_usaha = int(request.POST['manajemen_usaha'])
-    if request.POST['pembukuan']:
-        item.pembukuan = int(request.POST['pembukuan'])
-    if request.POST['produksi']:
-        item.produksi = int(request.POST['produksi'])
-    if request.POST['pemanfaatan_limbah']:
-        item.pemanfaatan_limbah = int(request.POST['pemanfaatan_limbah'])
-    if request.POST['pengemasan']:
-        item.pengemasan = int(request.POST['pengemasan'])
-    if request.POST['akses_pasar']:
-        item.akses_pasar = int(request.POST['akses_pasar'])
-    if request.POST['keuangan_mikro']:
-        item.keuangan_mikro = int(request.POST['keuangan_mikro'])
-    if request.POST['hitung_hpp_harga_jual']:
-        item.hitung_hpp_harga_jual = int(request.POST['hitung_hpp_harga_jual'])
-    if request.POST['navigasi']:
-        item.navigasi = int(request.POST['navigasi'])
-    if request.POST['keselamatan_laut']:
-        item.keselamatan_laut = int(request.POST['keselamatan_laut'])
-    if request.POST['penanganan_atas_kapal']:
-        item.penanganan_atas_kapal = int(request.POST['penanganan_atas_kapal'])
-    if request.POST['kontrol_kualitas']:
-        item.kontrol_kualitas = int(request.POST['kontrol_kualitas'])
-    if request.POST['rawat_mesin']:
-        item.rawat_mesin = int(request.POST['rawat_mesin'])
-    if request.POST['rescue']:
-        item.rescue = int(request.POST['rescue'])
-    item.put()
-    return item
+def report_edit(request, rid):
+    report = Report.objects.get(pk=rid)
+    return report_show(request, report)
 
-def delete(request, pid):
-    item = db.get(pid)
-    if item:
-        item.delete()
-        counter.update('site_group_count', -1)
-    return redirect(request, '/group')
+def report_show(request, report):
+    form = ReportForm(instance=report)
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(request, destination(report.group.id, 'laporan'))
+    return direct_to_template(request, 'group/report/edit.html', {
+        'form': form,
+        })
 
+def report_delete(request, rid):
+    report = Report.objects.get(pk=rid)
+    if request.POST:
+        if 'delete' in request.POST:
+            report.delete()
+        return redirect(request, destination(report.group.id, 'laporan'))
+    return direct_to_template(request, 'group/report/delete.html', {
+        'instance': report,
+        })
+
+def training_create(request, gid):
+    group = Group.objects.get(pk=gid)
+    training = Training(group=group)
+    return training_show_edit(request, training)
+
+def training_edit(request, tid):
+    training = Training.objects.get(pk=tid)
+    return training_show_edit(request, training)
+
+def training_show_edit(request, training):
+    form = TrainingForm(instance=training)
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(request, destination(training.group.id, 'pelatihan'))
+    return direct_to_template(request, 'group/training/edit.html', {
+        'form': form,
+        })
+
+def training_delete(request, tid):
+    training = Training.objects.get(pk=tid)
+    if request.POST:
+        if 'delete' in request.POST:
+            training.delete()
+        return redirect(request, destination(training.group.id, 'pelatihan'))
+    return direct_to_template(request, 'group/training/delete.html', {
+        'instance': training,
+        })
+
+
+
+"""
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20
     #if not Group.objects.all()[:1]:
@@ -298,11 +199,13 @@ def migrate_delete(request): # danger
     return direct_to_template(request, 'group/migrate.html', {
         'targets': targets,
         })
+"""
 
 
 # Hitung ulang jumlah group pada suatu livecenter. Sebelum fungsi ini
 # dipanggil, pastikan seluruh field group_count = 0 pada tabel
 # livecenter_livelihood.
+"""
 def livecenter_group_count(request):
     counter_name = '__livecenter_group_count_offset'
     offset = counter.get(counter_name)
@@ -315,11 +218,13 @@ def livecenter_group_count(request):
     return direct_to_template(request, 'group/livecenter_group_count.html', {
         'targets': targets,
         })
+"""
 
 ##################
 # Migrate Report #
 ##################
 # s = 05-MAY-2010
+"""
 def migrate_date(s):
     months = ['','JAN','FEB','MAR','APR','MAY','JUN','JUL','AGT','SEP','OKT','NOP','DES']
     t = s.split('-')
@@ -366,10 +271,12 @@ def migrate_report_delete(request): # danger
     return direct_to_template(request, 'group/migrate_report.html', {
         'targets': targets,
         })
+"""
 
 ####################
 # Migrate Training #
 ####################
+"""
 def migrate_training(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20
     offset = Training.counter_value()
@@ -411,4 +318,18 @@ def migrate_training(request):
         'errors': errors,
         })
 
+def migrate_member_count(request):
+    counter_name = '__group_member_count_is_not_null_offset'
+    offset = counter.get(counter_name)
+    targets = []
+    for group in Group.objects.order_by('id')[offset:offset+20]:
+        if not group.member_count:
+            group.member_count = 0
+            group.save()
+        counter.increment(counter_name)
+        targets.append(group)
+    return direct_to_template(request, 'group/migrate_member_count.html', {
+        'targets': targets,
+        })
 
+"""

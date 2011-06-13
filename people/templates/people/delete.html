@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load lang %}
+{% load livecenter %}
+
+{% block title %}{% t "Hapus anggota" %} {{ instance.name }}{% endblock %}
+
+{% block content %}
+<h2>
+    {% t "Hapus anggota" %} {{ instance.name }}
+</h2>
+
+<ul>
+{% if product_count %}
+<li>{% t "Jumlah produk" %} : {{ product_count }}</li>
+{% endif %}
+</ul>
+
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    <div class="submit-wrapper">
+        <input type="submit" name="cancel" value="{% t "Batalkan" %}" />
+        <input type="submit" name="delete" value="{% if product_count %}{% t "Hapus semua" %}{% else %}{% t "Hapus" %}{% endif %}" />
+    </div>
+</form>
+
+{% endblock %}
+

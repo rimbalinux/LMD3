@@ -1,6 +1,7 @@
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from django import forms
 from globalrequest.middleware import get_request
 from .utils import reset, get, increment, decrement
 
@@ -40,7 +41,24 @@ class BaseModel(models.Model):
         self.after_save()
 
     def delete(self, *args, **kwargs):
+        self.before_delete()
         super(BaseModel, self).delete(*args, **kwargs)
+        self.after_delete()
+
+    def before_delete(self):
+        pass
+
+    def after_delete(self):
         decrement(self.counter_name())
 
+
+class BaseForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = get_request()
+        if self.request.POST:
+            super(BaseForm, self).__init__(self.request.POST, *args, **kwargs)
+        else:
+            super(BaseForm, self).__init__(*args, **kwargs)
+        if 'photo' in self.fields:
+            del self.fields['photo']
 

@@ -1,13 +1,29 @@
+{% extends 'base.html' %}
 {% load lang %}
 {% load livecenter %}
-<h3>{% if form.instance.id %}{% t "Ubah gugusan" %}{% else %}{% t "Gugusan baru" %}{% endif %}</h3>
+
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
+{% endblock %}
+
+{% block title %}{% if form.instance.id %}{{ form.instance.name }}{% else %}{% t "Gugusan baru" %}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>
+{% if form.instance.id %}
+{% t "Gugusan" %} {{ form.instance.name }}
+{% else %}
+{% t "Gugusan baru" %}
+{% endif %}
+</h2>
+{{ form.non_field_errors }}
+
 <form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
     {{ form.livecenter }}
     <div class="fieldset">
         <div class="field-wrapper">
             <label>{% t "Mata pencaharian" %}:</label>
             {{ form.instance.livecenter }}
-            {{ form.livecenter.errors }}
         </div>
     </div>
     <div class="fieldset">
@@ -26,3 +42,12 @@
         <input type="submit" value="{% t "Simpan" %}" />
     </div>
 </form>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    document.getElementById("id_name").focus();
+</script>
+{% endblock %}
+

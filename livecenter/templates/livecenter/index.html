@@ -7,8 +7,6 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
-{% include "facebox.html" %}
 {% endblock %}
 
 {% block content %}
@@ -20,19 +18,13 @@
 {% easy_map lokasi 900 400 9 using "livecenter/map/index.html" %}
 
 
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Pusat Mata Pencaharian" %}</h4>
         {% if user.is_staff %}
-        <p><a href="/livecenter/create" class="uiButton" rel="facebox"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
+        <p><a href="/livecenter/create" class="uiButton"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
         {% endif %}
         <ul class="uiListView icon-left">
           {% autopaginate livecenters %}
           {% for lc in livecenters %}
             <li>
-              {% if user.is_staff %}
-              <span class="right"><a href="/livecenter/delete/{{lc.id}}" class="uiRemove" title="{% t "Hapus" %} {{lc.name}}"></a></span>
-              {% endif %}
               <span class="avatar normal"><img src="/img/{{ lc.photo.id }}" /></span>
               <span class="block">
               <span class="title"><a href="/livecenter/show/{{ lc.id }}" class="preview">{{ lc.name }}</a></span> 
@@ -43,7 +35,5 @@
           {% endfor %}
         </ul>
         {% paginate %}
-    </div>
-</div>
 
 {% endblock %}

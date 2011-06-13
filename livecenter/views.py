@@ -1,17 +1,18 @@
 import urllib
-from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
 import json
 from microfinance.models import Finance
 from group.models import Group
 from people.models import People
-from .utils import default_location, redirect, migrate_photo
-from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
-        LiveCluster, LiveCategory, MetaForm, \
-        CategoryContainer, Category, Livelihood, Container, Location, Cluster, \
-        Metaform, MetaformContainer
+from product.models import Product
+from .utils import default_location, redirect
+from .models import Category, Livelihood, Location, Cluster, Metaform
 from .forms import LivelihoodForm
+#from .models import LiveCenter, MicroFinance, Person, LivelihoodLocation, \
+#        LiveCluster, LiveCategory, MetaForm, \
+#        CategoryContainer, Container, MetaformContainer
+#from .utils import migrate_photo
 
 
 def index(request):
@@ -51,21 +52,36 @@ def edit(request, lid):
     return show_edit(request, lc)
 
 def show_edit(request, lc):
+    form = LivelihoodForm(instance=lc)
     if request.POST:
-        form = LivelihoodForm(instance=lc.id and lc or None)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/livecenter/show/%d' % lc.id)
-    else:
-        form = LivelihoodForm(instance=lc)
     return direct_to_template(request, 'livecenter/edit.html', {
         'form': form,
         })
 
 def delete(request, lid):
     lc = Livelihood.objects.get(pk=lid)
+    if request.POST:
+        if 'delete' in request.POST:
+            _delete(lc)
+            return redirect(request, '/livecenter')
+        return redirect(request, '/livecenter/show/%d' % lc.id)
+    return direct_to_template(request, 'livecenter/delete.html', {
+        'instance': lc,
+        })
+
+def _delete(lc):
+    for member in People.objects.filter(livecenter=lc):
+        for product in Product.objects.filter(person=member):
+            product.delete()
+        member.delete()
+    for group in Group.objects.filter(livecenter=lc):
+        group.delete()
+    for cluster in Cluster.objects.filter(livecenter=lc):
+        cluster.delete()
     lc.delete()
-    return redirect(request, '/livecenter')
 
 def district(request, pid):
     json_data = []
@@ -79,6 +95,7 @@ def district(request, pid):
                 })
     return HttpResponse(json.encode(json_data))
 
+"""
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20
     if not Livelihood.objects.all()[:1]:
@@ -124,12 +141,13 @@ def migrate_delete(request): # danger
     return direct_to_template(request, 'livecenter/migrate/livecenter.html', {
         'targets': targets, 
         })
-
+"""
 
 
 ############
 # Category #
 ############
+"""
 def category_migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
     offset = len(Category.objects.all())
@@ -175,11 +193,12 @@ def category_migrate_delete(request): # danger
     return direct_to_template(request, 'livecenter/migrate/category.html', {
         'targets': targets, 
         })
-
+"""
 
 ############
 # Location #
 ############
+"""
 def location_migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
     offset = len(Location.objects.all())
@@ -207,11 +226,12 @@ def location_migrate_delete(request): # danger
     return direct_to_template(request, 'livecenter/migrate/location.html', {
         'targets': targets, 
         })
-
+"""
 
 ############
 # Metaform #
 ############
+"""
 def migrate_metaform(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
     offset = len(Metaform.objects.all())
@@ -246,4 +266,4 @@ def migrate_metaform_delete(request): # danger
     return direct_to_template(request, 'livecenter/migrate/metaform.html', {
         'targets': targets, 
         })
-
+"""

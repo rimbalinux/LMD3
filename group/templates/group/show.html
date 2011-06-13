@@ -21,12 +21,14 @@
 
     <div class="tabbertab">
         <h4>{% t "Anggota" %}</h4>
+        {% if user.is_staff %} 
+        <span class="right">
+            <a href="/people/create/group/{{group.id}}?destination=/group/show/{{group.id}}" class="uiButton">{% t "Tambah anggota" %}</a>
+        </span>
+        {% endif %}
         <ul class="uiListView icon-left">
           {% for member in members %}
             <li>
-              {% if user.is_staff %}
-              <span class="right"><a href="/people/delete/{{member.id}}" class="uiRemove acRemove uiTip" title="{% t "Hapus" %} {{member.name}}"></a></span>
-              {% endif %}
               <span class="avatar normal"><img src="/img/{{member.photo.id}}" /></span>
               <span class="block">
                 <span class="title"><a href="/people/show/{{ member.id }}" class="preview">{{ member.name }}</a></span>
@@ -57,20 +59,22 @@
     <div class="tabbertab {% tabdefault "laporan" %}">
         <h4>{% t "Laporan" %}</h4>
         {% if user.is_staff %}
-        <a href="/group/add_report/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+        <span class="right">
+        <a href="/group/report/create/{{group.id}}" class="uiButton">{% t "Tambah" %}</a>
+        </span>
         {% endif %}
         <ul class="uiListView">
           {% for report in reports %}
             <li>
               {% if user.is_staff %}
                 <span class="right">
-                    <a href="/group/report_delete/{{report.id}}" class="uiRemove" title="Delete {{report.name}}"></a>
+                    <a href="/group/report/delete/{{report.id}}" class="uiRemove" title="{% t "Hapus" %} {{report.name}}"></a>
                 </span>
               {% endif %}
               <span class="block">
-                <span class="title"><a href="/group/report_show/{{ report.id }}" class="preview">{{ report.name }}</a></span>
-                <span class="body">{% t "Kelompok" %} {{report.group.name}}</span>
-                <span class="body">{% t "Periode" %} {{ report.date }}</span>
+                <span class="title"><a href="/group/report/edit/{{ report.id }}" class="preview">{{ report.name }}</a></span>
+                <span class="body">{{ report.day }}</span>
+                <span class="body">{{ report.info }}</span>
               </span>
             </li>
           {% empty %}
@@ -82,15 +86,19 @@
     <div class="tabbertab {% tabdefault "pelatihan" %}">
         <h4>{% t "Pelatihan" %}</h4>
         {% if user.is_staff %}
-          {% if trainings.0.key %}
-            <p><a href="/group/edit_training/{{trainings.0.key}}" rel="facebox" class="uiButton uiTip">{% t "Ubah" %}</a></p>
+        <span class="right">
+          {% if training %}
+            <a href="/group/training/edit/{{training.id}}" class="uiButton">{% t "Ubah" %}</a>
           {% else %}
-          <a href="/group/add_training/{{group.id}}" rel="facebox" class="uiButton uiTip">{% t "Tambah" %}</a>
+            <a href="/group/training/create/{{group.id}}" class="uiButton">{% t "Tambah" %}</a>
           {% endif %}
+        </span>
         {% endif %}
 
+        <ul class="uiListView">
+        {% if training %}
+        <li>
         <table class="uiListView">
-          {% for training in trainings %}
             <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{training.manajemen_usaha}} {% t "kali" %}</td></tr>
             <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{training.pembukuan}} {% t "kali" %}</td></tr>
             <tr><td>3.</td><td>{% t "Produksi" %}</td><td>: {{training.produksi}} {% t "kali" %}</td></tr>
@@ -105,10 +113,12 @@
             <tr><td>12.</td><td>{% t "Kontrol Kualitas" %}</td><td>: {{training.kontrol_kualitas}} {% t "kali" %}</td></tr>
             <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{training.rawat_mesin }} {% t "kali" %}</td></tr>
             <tr><td>14.</td><td>{% t "Penyelamatan" %}</td><td>: {{training.rescue}} {% t "kali" %}</td></tr>
-          {% empty %}
-            <tr><td>{% t "Belum ada pelatihan" %}</td></tr>
-          {% endfor %}
         </table>
+        </li>
+        {% else %}
+        <li>{% t "Belum ada pelatihan" %}</li>
+        {% endif %}
+        </ul>
     </div>
 
 </div>
@@ -121,13 +131,17 @@
     <img src="/img/{{group.photo.id}}" />
 </div>
 <div class="sidebox">
-    <h4><i class="icon_small contact"></i>{% t "Keterangan singkat" %}</h4>
+    <h4><i class="icon_small contact"></i>{% t "Keterangan singkat" %}
+    {% if user.is_staff %} 
+    <a href="/group/edit/{{group.id}}?destination=/group/show/{{group.id}}" class="uiButton">{% t "Ubah" %}</a>
+    {% endif %}
+    </h4>
     <p>{{group.info}}</p>
     <p><label>{% t "Koordinat GPS" %}</label>{{ group.geo_pos }}</p>
 </div>
 
 <div class="sidebox">
-    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {{ group.member_count }}</h4>
+    <h4><i class="icon_small user"></i><strong>{% t "Jumlah anggota" %}</strong>: {% firstof group.member_count "0" %}</h4>
 </div>
 
 <div class="sidebox">
@@ -144,7 +158,7 @@
     <h4><i class="icon_small category"></i><strong>Livecenter</strong></h4>
     <ul class="uiListView icon-left-small">
         <li><span class="icon"><img src="/img/{{group.livecenter.photo.id}}" class="small" /></span>
-            <span class="title"><a href="/livecenter/show/{{group.livecenter.id}}">{{ livecenter.name }}</a></span>
+            <span class="title"><a href="/livecenter/show/{{group.livecenter.id}}">{{ group.livecenter.name }}</a></span>
             <span class="body">{{group.livecenter.district.name}}</span>
         </li>
     </ul>
@@ -164,5 +178,11 @@
       {% endfor %}
     </ul>
 </div>
+
+{% if user.is_staff %}
+<div class="sidebox">
+    <a href="/group/delete/{{group.id}}" class="uiButton">{% t "Hapus" %} {{ group.name }}</a>
+</div>
+{% endif %}
 
 {% endblock %}
