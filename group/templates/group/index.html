@@ -26,6 +26,7 @@
                       <span class="title"><a href="/group/show/{{ group.id }}" class="preview">{{ group.name }}</a></span> 
                       <span class="body">{{ group.cluster.category.name }}</span>
                       <span class="body">{{ group.info }}</span>
+                      <span class="body">{{ group.member_count }} {% t "anggota" %}</span>
               </li>
             {% empty %}
               <li>{% t "Belum ada kelompok" %}</li>

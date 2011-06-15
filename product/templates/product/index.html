@@ -16,6 +16,10 @@
 
 {% easy_map lokasi 900 400 8 using "product/map/index.html" %}
 
+{% if user.is_staff %}
+<a href="/product/type/create" class="uiButton right">{% t "Tambah tipe produk" %}</a>
+{% endif %}
+
         <ul class="uiListView icon-left">
             {% for type in types %}
             <li>
@@ -24,7 +28,7 @@
                 </span>
                 <span class="block">
                     <span class="body">
-                        <a href="/product/type/show/{{ type.id }}">{{ type.name }}</a>
+                        <a href="/product/type/show/{{ type.id }}">{% t type.name %}</a>
                     </span>
                     <span class="body">
                         {{ type.count }} {% t "anggota" %}
