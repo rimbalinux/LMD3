@@ -2,14 +2,19 @@ import re
 from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
-from livecenter.models import LiveGroup, Metaform, Product as OldProduct, \
-        CategoryContainer, ClusterContainer
-from livecenter.utils import default_location, migrate_photo, redirect
-from people.models import People, Container as PersonContainer
-from .models import Product, Container, Type
+from livecenter.utils import default_location, redirect
+from livecenter.models import Metaform
+from people.models import People
+from .models import Product, Type
 from .forms import ProductForm, TypeForm
+#from livecenter.utils import migrate_photo
+#from .models import Container
+#from people.models import Container as PersonContainer
+#from livecenter.models import LiveGroup, Product as OldProduct, \
+#        CategoryContainer, ClusterContainer
 
 # migrasi
+"""
 pola = [
         ['^tuna|^nelayan|^pedagang','Tuna'],
         ['^bandeng|^ikan bandeng|^buruh tambak','Bandeng'],
@@ -31,7 +36,7 @@ pola = [
         ['^k macan','Kepiting Macan'],
         ['^coklat|^nasri','Coklat'],
        ]
-
+"""
 
 
 def index(request):
@@ -48,7 +53,6 @@ def show(request, pid):
         'customfields': Metaform.objects.filter(meta_type='product').\
                 filter(category=product.category),
         'product': product, 
-        'person': product.person,
         'lokasi': default_location(product.geo_pos), 
         })
 
@@ -66,17 +70,15 @@ def edit(request, pid): # product id
 def show_edit(request, product):
     form = ProductForm(instance=product)
     if request.POST:
+        if 'delete' in request.POST:
+            product.delete()
+            return redirect(request, '/product')
         if form.is_valid():
             form.save()
             return redirect(request, '/product/show/%d' % product.id)
     return direct_to_template(request, 'product/edit.html', {
         'form': form, 
         })
-
-def delete(request, pid):
-    p = Product.objects.get(pk=pid)
-    p.delete()
-    return redirect(request, '/product')
 
 def type_show(request, tid):
     return direct_to_template(request, 'product/type/show.html', {
@@ -93,7 +95,7 @@ def type_edit(request, tid):
     return type_show_edit(request, type_)
 
 def type_show_edit(request, type_):
-    form = TypeForm(instance=type_.id and type_ or None)
+    form = TypeForm(instance=type_)
     if request.POST:
         if form.is_valid():
             form.save()
@@ -102,7 +104,7 @@ def type_show_edit(request, type_):
         'form': form,
         })
 
-
+"""
 def migrate(request):
     def intval(n):
         try:
@@ -174,3 +176,4 @@ def types(request):
     return direct_to_template(request, 'product/type/created.html', {
         'targets': Type.objects.all(),
         })
+"""

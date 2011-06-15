@@ -24,7 +24,7 @@ class Product(GeoModel):
     person = models.ForeignKey(People, verbose_name='nama anggota')
     cluster = models.ForeignKey(Cluster, null=True, verbose_name='gugusan')
     info = models.TextField('keterangan')
-    year = models.IntegerField('tahun', null=True)
+    year = models.IntegerField('tahun', null=True, blank=True)
     type = models.ForeignKey(Type, verbose_name='tipe')
 
     def before_save(self, *args, **kwargs):

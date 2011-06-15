@@ -1,41 +1,44 @@
-{% extends 'form.html' %}
+{% extends 'base.html' %}
 {% load lang %}
+{% load livecenter %}
 
-{% block title %}{% t "Transaksi" %}{% endblock %}
-
-{% block fieldset %}
-  <div class="form-row">
-    <div>
-      <label>{% t "Nama" %}:</label>
-      <label>{{person.name}}</label>
-    </div>
-  </div>
-  <div class="form-row">
-    <div>
-        <label for="id_date" class="required">{% t "Tanggal" %}:</label>
-        <input id="id_date" type="text" class="vDateField" name="date" size="10" value="{% now "Y-m-d" %}"/>
-    </div>
-  </div>
-  <div class="form-row">
-    <div>
-        <label for="id_description" class="required">{% t "Keterangan" %}:</label>
-        <input id="id_date" type="text" class="vTextField" name="description" maxlength="100" value="{{transaction.description}}"/>
-    </div>
-  </div>
-  <div class="form-row">
-    <div>
-        <label class="required">{% t "Nominal" %}:</label>
-        <input type="text" name="nominal" size="20" value="{{transaction.nominal}}"/>
-    </div>
-  </div>
+{% block extra-head %}
+<link rel="stylesheet" type="text/css" href="/stylesheets/form.css" />
 {% endblock %}
 
-{% block submit %}
-    <input type="submit" value="{% t "Simpan" %}" />
+{% block title %}{% if form.instance.id %}{{ form.instance.description }}{% else %}{% t "Transaksi baru" %}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>
+    {% if form.instance.id %}
+    {% t "Transaksi" %} {{ form.instance.description }}
+    {% else %}
+    {% t "Transaksi baru" %}
+    {% endif %}
+</h2>
+{{ form.non_field_errors }}
+<form action="{{request.path}}?{{request.GET|dictquery}}" method="POST" enctype="multipart/form-data">
+    {{ form.person }}
+    <div class="fieldset">
+        {% formfield form.day %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.description %}
+    </div>
+    <div class="fieldset">
+        {% formfield form.nominal %}
+    </div>
+    <div class="submit-wrapper">
+        <input type="submit" value="{% t "Simpan" %}" />
+        {% if form.instance.id %}
+        <input type="submit" name="delete" value="{% t "Hapus" %}" />
+        {% endif %}
+    </div>
+</form>
 {% endblock %}
 
-{% block extra-footer %}
+{% block js %}
 <script type="text/javascript">
-    document.faceboxform.date.focus();
+    document.getElementById("id_day").focus();
 </script>
 {% endblock %}

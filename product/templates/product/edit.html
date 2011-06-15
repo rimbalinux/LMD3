@@ -33,7 +33,7 @@
         </div>
         <div class="fieldset">
             <div class="field-wrapper">
-                <label>{% t "Anggota" %}</label>
+                <label>{% t "Anggota" %}:</label>
                 {{ form.instance.person.name }}
             </div>
         </div>
@@ -66,9 +66,10 @@
 
 <div class="submit-wrapper">
     <input type="submit" value="{% t "Simpan" %}" />
+    {% if form.instance.id %}
+    <input type="submit" name="delete" value="{% t "Hapus" %}" />
+    {% endif %}
 </div>
-
-{{ form.errors }}
 
 </form>
 

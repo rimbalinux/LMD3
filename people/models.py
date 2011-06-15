@@ -1,13 +1,14 @@
 from django.db import models
 from livecenter.models import Livelihood, DistrictModel
-from group.models import Group
+from group.models import Group, training_choices
 from counter.tools import BaseModel
+from translate.lang import tr
 
 
 class People(DistrictModel): # was livecenter.Person
     GENDERS = (
-        (True, 'Male'),
-        (False, 'Female'),
+        (True, tr('Laki-laki')),
+        (False, tr('Perempuan')),
         )
     name = models.CharField('nama', max_length=100)
     livecenter = models.ForeignKey(Livelihood)
@@ -58,19 +59,19 @@ class Container(models.Model): # Tabel peralihan
 """ 
 
 class Training(BaseModel): # was livecenter.PersonTraining
-    person = models.ForeignKey(People)
-    manajemen_usaha = models.IntegerField()
-    pembukuan = models.IntegerField()
-    produksi = models.IntegerField()
-    pemanfaatan_limbah = models.IntegerField()
-    pengemasan = models.IntegerField()
-    akses_pasar = models.IntegerField()
-    keuangan_mikro = models.IntegerField()
-    hitung_hpp_harga_jual = models.IntegerField()
-    navigasi = models.IntegerField() 
-    keselamatan_laut = models.IntegerField()
-    penanganan_atas_kapal = models.IntegerField()
-    kontrol_kualitas = models.IntegerField()
-    rawat_mesin = models.IntegerField()
-    rescue = models.IntegerField()
+    person = models.ForeignKey(People, verbose_name='nama anggota')
+    manajemen_usaha = models.IntegerField('manajemen usaha', choices=training_choices(), default=0)
+    pembukuan = models.IntegerField('pembukuan', choices=training_choices(), default=0)
+    produksi = models.IntegerField('produksi', choices=training_choices(), default=0)
+    pemanfaatan_limbah = models.IntegerField('pemanfaatan limbah', choices=training_choices(), default=0)
+    pengemasan = models.IntegerField('pengemasan', choices=training_choices(), default=0)
+    akses_pasar = models.IntegerField('akses pasar', choices=training_choices(), default=0)
+    keuangan_mikro = models.IntegerField('keuangan mikro', choices=training_choices(), default=0)
+    hitung_hpp_harga_jual = models.IntegerField('perhitungan harga pokok produksi dan harga jual', choices=training_choices(), default=0)
+    navigasi = models.IntegerField('navigasi', choices=training_choices(), default=0) 
+    keselamatan_laut = models.IntegerField('keselamatan di laut', choices=training_choices(), default=0)
+    penanganan_atas_kapal = models.IntegerField('penanganan di atas kapal', choices=training_choices(), default=0)
+    kontrol_kualitas = models.IntegerField('kontrol kualitas', choices=training_choices(), default=0)
+    rawat_mesin = models.IntegerField('perawatan mesin', choices=training_choices(), default=0)
+    rescue = models.IntegerField('penyelamatan', choices=training_choices(), default=0)
 

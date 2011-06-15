@@ -7,7 +7,6 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
 {% endblock %}
 
 {% block content %}
@@ -15,21 +14,22 @@
 
 {% easy_map lokasi 600 300 8 using "product/map/show.html" %}
 
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Produk" %}</h4>
+{% if user.is_staff %}
+<a href="/product/edit/{{product.id}}" class="uiButton right">{% t "Ubah" %}</a>
+{% endif %}
+
         <table class="uiListView">
-            <tr><td class="label">{% t "Siklus laporan" %}</td><td>{{product.year}}</td></tr>
-            <tr><td class="label">{% t "Nama produk" %}</td><td>{{product.name}}</td></tr>
+            {% if product.year %}
+            <tr><td class="label">{% t "Periode laporan" %}</td><td>:</td><td>{{product.year}}</td></tr>
+            {% endif %}
+            <tr><td class="label">{% t "Catatan" %}</td><td>:</td><td>{{product.info}}</td></tr>
             {% for i in customfields %}
               <tr><td class="label">{{i.title}}</td>
+                  <td>:</td>
                   <td>{{product|metaview:i}}</td>
               </tr>
             {% endfor %}
-            <tr><td class="label">{% t "Catatan" %}</td><td>{{product.info}}</td></tr>
         </table>
-    </div>
-</div>
 {% endblock %}
 
 {% block sidebar %}
@@ -40,34 +40,37 @@
 
 <ul class="uiListView icon-left">
     <li>
-      <span class="avatar normal"><img src="/img/{{person.photo.id}}" /></span>
-      <span class="title"><a href="/people/show/{{person.id}}">{{ person.name }}</a></span>
-      <span class="body">{{person.member_type}} / {{person.district.name}}</span>
+      <span class="avatar normal"><img src="/img/{{product.person.photo.id}}" /></span>
+      <span class="title"><a href="/people/show/{{product.person.id}}">{{ product.person.name }}</a></span>
+      <span class="body">
+          {% if product.person.member_type %}{{product.person.member_type}} / {% endif %}
+          {{product.person.district.name}}
+      </span>
       <span class="body">
         <span class="tag">LC</span>
-        <a href="/livecenter/show/{{person.livecenter.id}}">{{ person.livecenter.name }}</a>
+        <a href="/livecenter/show/{{product.livecenter.id}}">{{ product.livecenter.name }}</a>
       </span>
    </li>
 </ul>
 
 <div class="sidebox">
     <h4><i class="icon_small contact"></i><strong>{% t "Kontak" %}</strong></h4>
-    <p><label>{% t "Alamat" %}</label>{{person.address}}</p>
-    <p><label>{% t "Kabupaten" %}</label>{{person.district.name}}</p>
-    <p><label>{% t "Kecamatan" %}</label>{{person.sub_district.name}}</p>
-    <p><label>{% t "Desa" %}</label>{{person.village.name}}</p>
-    <p><label>{% t "Telepon selular" %}</label>{{person.mobile}}</p>
-    <p><label>{% t "Koordinat GPS" %}</label>{{person.geo_pos}}</p>
+    <p><label>{% t "Alamat" %}</label>{{product.person.address}}</p>
+    <p><label>{% t "Kabupaten" %}</label>{{product.person.district.name}}</p>
+    <p><label>{% t "Kecamatan" %}</label>{{product.person.sub_district.name}}</p>
+    <p><label>{% t "Desa" %}</label>{{product.person.village.name}}</p>
+    <p><label>{% t "Telepon selular" %}</label>{{product.person.mobile}}</p>
+    <p><label>{% t "Koordinat GPS" %}</label>{{product.person.geo_pos}}</p>
 </div>
 
-{% if person.group %}
+{% if product.person.group %}
 <div class="sidebox">
-    <h4><i class="icon_small category"></i><strong>{% t "Kategori / Gugusan" %}</strong></h4>
+    <h4><i class="icon_small category"></i><strong>{% t "Kelompok" %}</strong></h4>
     <ul class="uiListView icon-left-small">
       <li>
-        <span class="icon"><img src="/img/{{person.group.cluster.photo.id}}" class="small" /></span>
-        <span class="title"><a href="/livecenter/show/{{person.livecenter.id}}">{{ person.livecluster.name }}</a></span>
-        <span class="body">{{person.livecenter.info}}</span>
+        <span class="icon"><img src="/img/{{product.person.group.photo.id}}" class="small" /></span>
+        <span class="title"><a href="/group/show/{{product.person.group.id}}">{{ product.person.group.name }}</a></span>
+        <span class="body">{{product.person.group.info}}</span>
       </li>
     </ul>
 </div>

@@ -10,7 +10,7 @@ from group.models import Group
 from transaction.models import Transaction
 from .models import People, Training
 from .settings import GENDERS
-from .forms import PeopleForm
+from .forms import PeopleForm, TrainingForm
 #from google.appengine.ext import db
 #from group.models import Group
 #from livecenter.models import Person, PersonTraining, LivelihoodLocation, \
@@ -27,8 +27,8 @@ def index(request):
         'lokasi': default_location(),
         })
 
-def destination(pid, tabname):
-    return urllib.quote('/people/show/%s?tab=%s' % (pid, tabname))
+#def destination(pid, tabname):
+#    return urllib.quote('/people/show/%s?tab=%s' % (pid, tabname))
 
 def show(request, pid):
     try:
@@ -36,22 +36,32 @@ def show(request, pid):
     except ObjectDoesNotExist:
         return HttpResponseRedirect('/people')
     customfields = boat = None 
-    if people.group and people.group.cluster.category.name.upper() == 'CAPTURE FISHERIES':
+    if people.group and people.group.cluster and \
+        people.group.cluster.category.name.upper() == 'CAPTURE FISHERIES':
         customfields = Metaform.objects.order_by('id').\
             filter(category=people.group.cluster.category).\
             filter(meta_type='group')
         boat = people.group
+    trainings = Training.objects.filter(person=people)[:1]
+    training = trainings and trainings[0] or None
     return direct_to_template(request, 'people/show.html', {
         'person': people,
         'boat': boat,
         'customfields': customfields,
-        'trainings': Training.objects.filter(person=people),
+        'training': training, 
         'transactions': Transaction.objects.filter(person=people),
+        'saldo': saldo(people),
         'products': Product.objects.filter(person=people),
-        'tab_product': destination(people.id, 'product'),
-        'tab_transaction': destination(people.id, 'transaction'),
+        #'tab_product': destination(people.id, 'product'),
+        #'tab_transaction': destination(people.id, 'transaction'),
         'lokasi': default_location(people.geo_pos),
         })
+
+def saldo(person):
+    t = 0
+    for trx in Transaction.objects.filter(person=person):
+        t += trx.nominal
+    return t
 
 def create_from_group(request, gid):
     group = Group.objects.get(pk=gid)
@@ -92,7 +102,29 @@ def delete(request, pid):
 def _delete(person):
     for product in Product.objects.filter(person=person):
         product.delete()
+    for training in Training.objects.filter(person=person):
+        training.delete()
     person.delete()
+
+def training_create(request, pid):
+    person = People.objects.get(pk=pid)
+    training = Training(person=person)
+    return training_show(request, training)
+
+def training_edit(request, tid):
+    training = Training.objects.get(pk=tid)
+    return training_show(request, training)
+ 
+def training_show(request, training):
+    form = TrainingForm(instance=training)
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(request, '/people/show/%d?tab=pelatihan' % training.person.id)
+    return direct_to_template(request, 'people/training/edit.html', {
+        'form': form, 
+        })
+
 
 
 """

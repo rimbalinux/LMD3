@@ -7,14 +7,12 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "facebox.html" %}
 {% include "tabber.html" %}
 {% endblock %}
 
 
 {% block content %}
-<h2>{{ person.name }}
-</h2>
+<h2>{{ person.name }}</h2>
 
 {% easy_map lokasi 600 300 8 using "people/map/show.html" %} 
 
@@ -27,14 +25,11 @@
         <ul class="uiListView icon-left"> 
             {% for product in products %}
                 <li>
-                {% if user.is_staff %}
-                <span class="right"><a href="/product/delete/{{product.id}}?destination={{tab_product}}" class="uiRemove"></a></span>
-                {% endif %}
                 <span class="avatar normal"><img src="/img/{{product.photo.id}}" class="small-pic" /></span>
                 <span class="block">
                     <span class="title"><a href="/product/show/{{product.id}}" class="preview">{{product.name}}</a></span>
                     <span class="body">{{ product.category.name }}</span>
-                    <span class="year">{% t "Laporan" %} &#64;{{ product.year }}</span>
+                    {% if product.year %}<span class="year">{% t "Laporan" %} &#64;{{ product.year }}</span>{% endif %}
                 </span>
             {% empty %}
                 <li>{% t "Belum ada produk" %}</li>
@@ -44,8 +39,15 @@
 
     <div class="tabbertab {% tabdefault "pelatihan" %} ">
         <h2>{% t "Pelatihan" %}</h2>
+        {% if user.is_staff %}
+        {% if training %}
+        <a href="/people/training/edit/{{training.id}}?destination=/people/show/{{person.id}}?tab=pelatihan" class="uiButton right">{% t "Ubah" %}</a>
+        {% else %}
+        <a href="/people/training/create/{{person.id}}?destination=/people/show/{{person.id}}?tab=pelatihan" class="uiButton right">{% t "Tambah" %}</a>
+        {% endif %}
+        {% endif %}
+        {% if training %}
         <table class="uiListView">
-            {% for training in trainings %}
                 <tr><td>1.</td><td>{% t "Manajemen Usaha" %}</td><td>: {{training.manajemen_usaha}} {% t "kali" %}</td></tr>
                 <tr><td>2.</td><td>{% t "Pembukuan" %}</td><td>: {{training.pembukuan}} {% t "kali" %}</td></tr>
                 <tr><td>3.</td><td>{% t "Produksi" %} </td><td>: {{training.produksi}} {% t "kali" %}</td></tr>
@@ -62,19 +64,19 @@
                   <tr><td>13.</td><td>{% t "Perawatan Mesin" %}</td><td>: {{training.rawat_mesin }} {% t "kali" %}</td></tr>
                   <tr><td>14.</td><td>{% t "Penyelamatan" %} </td><td>: {{training.rescue}} {% t "kali" %}</td></tr>
                 {% endif %}
-            {% empty %}
-                <tr><td>{% t "Belum ada data" %}</td></tr>
-            {% endfor %}
-
         </table>
+        {% else %}
+            {% t "Belum ada data" %}
+        {% endif %}
     </div>
 
     <div class="tabbertab {% tabdefault "keterangan" %} ">
         <h2>{% t "Keterangan" %}</h2>
         <table class="uiListView">
-            <tr><td class="label">{% t "Tipe anggota" %}</td><td>{{person.member_type}}</td></tr>
+            <tr><td class="label">{% t "Tipe anggota" %}</td><td>:</td><td>{{person.member_type}}</td></tr>
             <tr>
                 <td class="label">{% t "Jenis kelamin" %}</td>
+                <td>:</td>
                 <td>
                         {% if person.gender %}
                             {% t "Laki-laki" %}
@@ -83,13 +85,13 @@
                         {% endif %}
                 </td>
             </tr>
-            <tr><td class="label">{% t "Tempat dan tahun lahir" %}</td><td>{{person.birth_place}} {{person.birth_year|s}}</td></tr>
-            <tr><td class="label">{% t "Nama pasangan" %}</td><td>{{person.spouse_name}}</td></tr>
-            <tr><td class="label">{% t "Jumlah tanggungan" %}</td><td>{{person.children_num|s}}</td></tr>
+            <tr><td class="label">{% t "Tempat dan tahun lahir" %}</td><td>:</td><td>{{person.birth_place}} {{person.birth_year|s}}</td></tr>
+            <tr><td class="label">{% t "Nama pasangan" %}</td><td>:</td><td>{{person.spouse_name}}</td></tr>
+            <tr><td class="label">{% t "Jumlah tanggungan" %}</td><td>:</td><td>{{person.children_num|s}}</td></tr>
             {% if user.is_staff %}
-              <tr><td class="label">{% t "Email" %}</td><td>{{person.email|s}}</td></tr>
-              <tr><td class="label">{% t "Pendidikan terakhir" %}</td><td>{{person.education}}</td></tr>
-              <tr><td class="label">{% t "Penghasilan bulanan" %}</td><td>{% money person.monthly_income %}</td></tr>
+            <tr><td class="label">{% t "Email" %}</td><td>:</td><td>{{person.email|s}}</td></tr>
+            <tr><td class="label">{% t "Pendidikan terakhir" %}</td><td>:</td><td>{{person.education}}</td></tr>
+            <tr><td class="label">{% t "Penghasilan bulanan" %}</td><td>:</td><td>{% money person.monthly_income %}</td></tr>
             {% endif %}
         </table>
     </div>
@@ -97,7 +99,7 @@
     <div class="tabbertab {% tabdefault "transaction" %}">
         <h2>{% t "Pinjaman" %}</h2>
         {% if user.is_staff %}
-        <a href="/transaction/create/{{person.key}}?destination={{tab_transaction|urlencode}}" rel="facebox" class="uiButton right">{% t "Tambah" %}</a>
+        <a href="/transaction/create/{{person.id}}" class="uiButton right">{% t "Tambah" %}</a>
         {% endif %}
         {% if transactions %}
           <table class="uiListView">
@@ -108,14 +110,22 @@
             </tr>
             {% for t in transactions %}
             <tr>
-                <td class="label">{{ t.date }}</td>
-                <td class="label"><a href="/transaction/edit/{{t.id}}?destination={{tab_transaction|urlencode}}" rel="facebox">{{ t.description }}</a></td>
+                <td class="label">{{ t.day }}</td>
+                <td class="label">
+                    {% if user.is_staff %}
+                    <a href="/transaction/edit/{{t.id}}">{{ t.description }}</a>
+                    {% else %}
+                    {{ t.description }}
+                    {% endif %}
+                </td>
                 <td class="label" align="right">{% money t.nominal %}</td>
-                {% if user.is_staff %}
-                <td><span class="right"><a href="/transaction/delete/{{t.id}}?destination={{tab_transaction|urlencode}}" class="uiRemove" title="{% t "Hapus" %} {{t.date}} {{t.description}} {% money t.nominal %}"></a></span></td>
-                {% endif %}
             </tr>
             {% endfor %}
+            <tr>
+                <th></th>
+                <th>{% t "Saldo" %}</th>
+                <th align="right">{% money saldo %}</th>
+            </tr>
           </table>
         {% else %}
           <p>{% t "Belum ada pinjaman" %}</p>

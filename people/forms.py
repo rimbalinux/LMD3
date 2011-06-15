@@ -1,8 +1,9 @@
 from django import forms
-from .models import People
 from group.models import Group
 from livecenter.models import Location, Livelihood
 from livecenter.forms import DistrictForm
+from counter.tools import BaseForm
+from .models import People, Training
 
 
 def groups(lc):
@@ -29,3 +30,12 @@ class PeopleForm(DistrictForm):
         #    filter(livecenter=self.instance.livecenter),
         #    label='Kelompok',
         #    required=False)
+
+class TrainingForm(BaseForm):
+    class Meta:
+        model = Training
+        widgets = {
+            'person': forms.HiddenInput(),
+            }
+
+

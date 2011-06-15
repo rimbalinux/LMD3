@@ -41,6 +41,7 @@
         <a href="/people/create/{{livecenter.id}}?destination={{tab_member}}" class="uiButton right">{% t "Tambah" %}</a>
         {% endif %}
         <ul class="uiListView icon-left">
+            {% autopaginate peoples %}
             {% for people in peoples %}
                     <li>
                         <span class="avatar normal"><img src="/img/{{ people.photo.id }}" /></span>
@@ -54,6 +55,7 @@
                 <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}
         </ul>
+        {% paginate %}
     </div>
 
     <div class="tabbertab {% tabdefault "cluster" %}">
