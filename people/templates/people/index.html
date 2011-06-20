@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
-{% load pagination_tags %}
 
 {% block title %}{% t "Anggota" %}{% endblock %}
 
@@ -18,20 +17,24 @@
 {% easy_map lokasi 900 400 8 using "people/map/index.html" %}
 
         <ul class="uiListView icon-left">
-            {% autopaginate peoples %}
             {% for people in peoples %}
               <li>
                 <span class="avatar normal"><img src="/img/{{people.photo.id}}" /></span>
                 <span class="block">
-                <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
-                <span class="body">{{ people.district.name }} / {{ people.member_type }}</span>
-                <span class="body"><span class="tag">LC</span> <a href="/livecenter/show/{{ people.livecenter.id }}">{{ people.livecenter.name }}</a></span>
+                    <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
+                    <span class="body">{{ people.district.name }} / {{ people.member_type }}</span>
+                    <span class="body">
+                        <span class="tag">LC</span>
+                        <a href="/livecenter/show/{{ people.livecenter.id }}">{{ people.livecenter.name }}</a>,
+                        {% t "oleh" %} {{people.user}}, {{people.updated}}
+                    </span>
                 </span>
               </li>
             {% empty %}
               <li>{% t "Belum ada anggota" %}</li>
             {% endfor %}
         </ul>
-        {% paginate %}
+        {% if prev %}<a href="{{request.path}}?page={{prev}}">{% t "Sebelumnya" %}</a>{% endif %}
+        {% if next %}<a href="{{request.path}}?page={{next}}">{% t "Selanjutnya" %}</a>{% endif %}
 
 {% endblock %}

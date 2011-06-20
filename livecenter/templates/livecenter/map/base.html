@@ -32,6 +32,7 @@
 
             {% block extra_js %}
             var positions = new Array();
+            var icon = '/images/map_marker_segitiga.png';
 
             {% block set-positions %}{% endblock %}
 
@@ -39,12 +40,14 @@
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(positions[i][0], positions[i][1]),
                     map: map,
-                    icon: '/images/map_marker_segitiga.png'
+                    icon: icon,
+                    title: positions[i][2],
+                    url: positions[i][3]
                 });
 
-                if (positions[i][2]) {
+                if (positions[i][3]) {
                     google.maps.event.addListener(marker, 'click', function() {
-                        window.location = positions[i][2]; 
+                        window.location = this.url; 
                         });
                 }
             }

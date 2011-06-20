@@ -1,12 +1,12 @@
 # Sumber: LMD/models.py
 
-#from google.appengine.ext import db, search
 from django.db import models
 from djangotoolbox import fields
-from attachment.models import Attachment
 from attachment.tools import PhotoModel
 from counter.tools import BaseModel
 from .tools import GeoModel
+#from google.appengine.ext import db, search
+#from attachment.models import Attachment
 
 
 """

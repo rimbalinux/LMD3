@@ -1,11 +1,8 @@
-from google.appengine.ext import db
 from django.db import models
 from djangotoolbox import fields
 from counter.tools import BaseModel
+#from google.appengine.ext import db
 
-"""
-Attachment Storage Center 
-User uploaded file storage
 """
 class Attachment(db.Model):
     containers  = db.ListProperty(db.Key,default=[])
@@ -13,6 +10,7 @@ class Attachment(db.Model):
     filename    = db.StringProperty()
     filesize    = db.IntegerProperty()  #in byte
     file        = db.BlobProperty()
+"""
 
 class File(BaseModel):
     name = models.CharField(max_length=255)

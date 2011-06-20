@@ -2,6 +2,7 @@ import urllib
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
+from authority.decorators import permission_required_or_403
 import counter
 from livecenter.models import Location, Metaform, Livelihood
 from livecenter.utils import redirect, default_location
@@ -20,11 +21,20 @@ from .forms import PeopleForm, TrainingForm
 
 
 def index(request):
+    limit = 20
+    page = 'page' in request.GET and int(request.GET['page']) or 1 
+    offset = page * limit - limit
+    peoples = []
+    q = People.objects.all().order_by('-updated')
+    for people in q[offset:offset+limit]:
+        if people.allowed:
+            peoples.append(people)
     return direct_to_template(request, 'people/index.html', {
-        'peoples': People.objects.all().order_by('-updated'),
-        #'positions': People.objects.all().exclude(geo_pos='').order_by('-updated'),
+        'peoples': peoples, 
         'count': People.counter_value(),
         'lokasi': default_location(),
+        'next': q[offset+limit:offset+limit+2] and page+1 or None,
+        'prev': q[offset and offset-1 or 0:offset] and page-1,
         })
 
 #def destination(pid, tabname):
@@ -77,6 +87,7 @@ def edit(request, pid): # pid = people id
     person = People.objects.get(pk=pid)
     return show_edit(request, person)
  
+@permission_required_or_403('people.change_people')
 def show_edit(request, person):
     form = PeopleForm(instance=person)
     if request.POST:
@@ -87,6 +98,7 @@ def show_edit(request, person):
         'form': form, 
         })
 
+@permission_required_or_403('people.change_people')
 def delete(request, pid):
     person = People.objects.get(pk=pid)
     if request.POST:
@@ -115,6 +127,7 @@ def training_edit(request, tid):
     training = Training.objects.get(pk=tid)
     return training_show(request, training)
  
+@permission_required_or_403('people.change_people')
 def training_show(request, training):
     form = TrainingForm(instance=training)
     if request.POST:

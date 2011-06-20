@@ -29,7 +29,7 @@
               <span class="block">
               <span class="title"><a href="/livecenter/show/{{ lc.id }}" class="preview">{{ lc.name }}</a></span> 
               <span class="body">{% t lc.description %}</span>
-              <span class="body">{{ lc.district.name }}</span>
+              <span class="body">{{ lc.district.name }}, {% t "oleh" %} {{lc.user}}</span>
               </span>
             </li>
           {% endfor %}

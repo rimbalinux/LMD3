@@ -47,6 +47,10 @@
                 <div class="description">{{ x.description }}</div>
             </div>
             {% endfor %}
+
+            <div class="fieldset">
+                {% formfield form.publish %}
+            </div>
         </div>
 
         <div id="location" class="dialog-column">

@@ -167,3 +167,7 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+GAE_SETTINGS_MODULES = (
+    'gae_settings',
+    )

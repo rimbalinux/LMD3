@@ -2,6 +2,7 @@ import urllib
 from datetime import date
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
+from authority.decorators import permission_required_or_403
 from livecenter.models import Metaform, Cluster, Livelihood
 from livecenter.utils import redirect, default_location
 from people.models import People
@@ -21,10 +22,20 @@ def destination(pid, tabname):
     #return urllib.quote('/group/show/%d?tab=%s' % (pid, tabname))
 
 def index(request):
+    limit = 20
+    page = 'page' in request.GET and int(request.GET['page']) or 1
+    offset = page * limit - limit
+    groups = []
+    q = Group.objects.all().order_by('-updated')
+    for group in q[offset:offset+limit]:
+        if group.allowed:
+            groups.append(group)
     return direct_to_template(request, 'group/index.html', {
-        'groups': Group.objects.all().order_by('-updated'), 
+        'groups': groups, 
         'count': Group.counter_value(),
-        'lokasi': default_location(), 
+        'lokasi': default_location(),
+        'next': q[offset+limit:offset+limit+2] and page+1 or None,
+        'prev': q[offset and offset-1 or 0:offset] and page-1,
         })
 
 def show(request, gid):
@@ -56,6 +67,7 @@ def edit(request, gid):
     group = Group.objects.get(pk=gid)
     return show_edit(request, group)
 
+@permission_required_or_403('group.change_group')
 def show_edit(request, group):
     form = GroupForm(instance=group)
     if request.POST:
@@ -68,6 +80,7 @@ def show_edit(request, group):
                 filter(category__in=group.livecenter.category),
         })
 
+@permission_required_or_403('group.change_group')
 def delete(request, gid):
     group = Group.objects.get(pk=gid)
     if request.POST:

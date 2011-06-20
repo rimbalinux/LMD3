@@ -8,7 +8,23 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
+<link rel="stylesheet" type="text/css" href="/js/tabber/tabber.css" />
+<script type="text/javascript">
+    var tabberOptions = {
+        'onClick': function(obj){
+            for (var i = 0; i < markers_tab.length; i++) {
+                for (var j = 0; j < markers_tab[i].length; j++) {
+                    if (obj.index == i) {
+                        markers_tab[i][j].setVisible(true);
+                    } else {
+                        markers_tab[i][j].setVisible(false);
+                    }
+                }
+            }
+        }
+    };
+</script>
+<script type="text/javascript" src="/js/tabber/tabber.js"></script>
 {% include "facebox.html" %}
 {% endblock %}
 
@@ -16,15 +32,9 @@
 {% block content %}
 <h2>{{ livecenter.name }}</h2>
 
-{% easy_map lokasi 600 300 8 using "livecenter/map/show.html" %} 
+{% include "livecenter/map/show.html" %}
 
 {% if user.is_staff %}
-    <p>
-    <a href="/livecenter/member/{{livecenter.id}}" class="uiButton" title="View Members Map">{% t "Peta anggota" %}</a>
-    <a href="/livecenter/map/{{livecenter.id}}" class="uiButton" title="View Groups Map">{% t "Peta kelompok" %}</a><br />
-    </p>
-    <p>
-    <br />
     <a href="/livecenter/nogroup/{{livecenter.id}}" class="uiButton" title="View Ungrouped Members">{% t "Anggota tanpa kelompok" %}</a>
     <a href="/livecenter/nomobile/{{livecenter.id}}" class="uiButton" title="View Members haven't Mobile">{% t "Anggota tanpa telepon selular" %}</a> 
     <a href="/livecenter/mobile_list/{{livecenter.id}}" class="uiButton" title="View List of Member's Mobile">{% t "Daftar telepon selular" %}</a>
@@ -34,7 +44,7 @@
 {% endif %}
 
 <div class="tabber">
-    <div class="tabbertab {% tabdefault "member" %}">
+    <div class="tabbertab {% tabdefault "member" %}" id="member">
         <h2>{% t "Anggota" %}</h2>
         {% if user.is_staff %}
         <a href="/people/create/{{livecenter.id}}?destination={{tab_member}}" class="uiButton right">{% t "Tambah" %}</a>
@@ -57,7 +67,7 @@
         {% paginate %}
     </div>
 
-    <div class="tabbertab {% tabdefault "cluster" %}">
+    <div class="tabbertab {% tabdefault "cluster" %}" id="cluster">
         <h2>{% t "Gugusan" %}</h2>
         {% if user.is_staff %}
         <a href="/cluster/create/{{livecenter.id}}?destination={{tab_cluster}}" class="uiButton right">{% t "Tambah gugusan" %}</a>
@@ -86,7 +96,7 @@
         </ul>
     </div>
 
-    <div class="tabbertab {% tabdefault "group" %}">
+    <div class="tabbertab {% tabdefault "group" %}" id="group">
         <h2>{% t "Kelompok" %}</h2>
         <ul class="uiListView icon-left">
             {% if user.is_staff %}
@@ -113,7 +123,7 @@
         </ul>
     </div>
 
-    <div class="tabbertab {% tabdefault "microfinance" %}">
+    <div class="tabbertab {% tabdefault "microfinance" %}" id="microfinance">
         <h2>{% t "Keuangan mikro" %}</h2>
             <ul class="uiListView icon-left">
                 {% for finance in finances %}

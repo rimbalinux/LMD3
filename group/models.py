@@ -44,6 +44,9 @@ class Group(GeoModel): # was LiveGroup
         self.livecenter.group_count += add 
         self.livecenter.save()
 
+    @property
+    def allowed(self):
+        return super(Group, self).allowed and self.livecenter.allowed
 
 """
 class Container(models.Model): # temporary migration

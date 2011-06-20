@@ -2,6 +2,7 @@ import urllib
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
 import json
+from authority.decorators import permission_required_or_403
 from microfinance.models import Finance
 from group.models import Group
 from people.models import People
@@ -15,9 +16,25 @@ from .forms import LivelihoodForm
 #from .utils import migrate_photo
 
 
+def get_livecenters():
+    lcs = []
+    limit = 20
+    offset = 0
+    while True:
+        found = False
+        for lc in Livelihood.objects.all().order_by('name')[offset:offset+limit]:
+            found = True
+            if lc.allowed:
+                lcs.append(lc)
+                if len(lcs) == limit:
+                    return lcs
+        if not found:
+            return lcs
+        offset += limit
+
 def index(request):
     return direct_to_template(request, 'livecenter/index.html', {
-        'livecenters': Livelihood.objects.all().order_by('name'),
+        'livecenters': get_livecenters(), 
         'count': Livelihood.counter_value(),
         'lokasi': default_location(), 
         })
@@ -40,7 +57,7 @@ def show(request, lid):
         'tab_member': destination(lid, 'member'),
         'tab_cluster': destination(lid, 'cluster'),
         'tab_group': destination(lid, 'group'),
-        'lokasi': lc.geo_pos or default_location(),
+        'lokasi': default_location(lc.geo_pos),
         })
 
 def create(request):
@@ -51,6 +68,7 @@ def edit(request, lid):
     lc = Livelihood.objects.get(pk=lid)
     return show_edit(request, lc)
 
+@permission_required_or_403('livecenter.change_livelihood')
 def show_edit(request, lc):
     form = LivelihoodForm(instance=lc)
     if request.POST:
@@ -61,6 +79,7 @@ def show_edit(request, lc):
         'form': form,
         })
 
+@permission_required_or_403('livecenter.change_livelihood')
 def delete(request, lid):
     lc = Livelihood.objects.get(pk=lid)
     if request.POST:

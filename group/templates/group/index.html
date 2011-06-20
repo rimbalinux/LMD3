@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
-{% load pagination_tags %}
 
 {% block title %}{% t "Kelompok" %}{% endblock %}
 
@@ -18,7 +17,6 @@
 {% easy_map lokasi 900 400 7 using "group/map/index.html" %}
 
         <ul class="uiListView icon-left">
-            {% autopaginate groups %}
             {% for group in groups %}
                 <li>
                   <span class="avatar normal"><img src="/img/{{group.photo.id}}" /></span>
@@ -26,12 +24,16 @@
                       <span class="title"><a href="/group/show/{{ group.id }}" class="preview">{{ group.name }}</a></span> 
                       <span class="body">{{ group.cluster.category.name }}</span>
                       <span class="body">{{ group.info }}</span>
-                      <span class="body">{{ group.member_count }} {% t "anggota" %}</span>
+                      <span class="body">
+                          {{ group.member_count }} {% t "anggota" %},
+                          {% t "oleh" %} {{group.user}}, {{group.updated}}
+                      </span>
               </li>
             {% empty %}
               <li>{% t "Belum ada kelompok" %}</li>
             {% endfor %}
         </ul>
-        {% paginate %}
+        {% if prev %}<a href="{{request.path}}?page={{prev}}">{% t "Sebelumnya" %}</a>{% endif %}
+        {% if next %}<a href="{{request.path}}?page={{next}}">{% t "Selanjutnya" %}</a>{% endif %}
 
 {% endblock %}

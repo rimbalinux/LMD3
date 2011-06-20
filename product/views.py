@@ -2,6 +2,7 @@ import re
 from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
+from authority.decorators import permission_required_or_403
 from livecenter.utils import default_location, redirect
 from livecenter.models import Metaform
 from people.models import People
@@ -59,14 +60,14 @@ def show(request, pid):
 def create(request, pid): # person id
     person = People.objects.get(pk=pid)
     product = Product(person=person,
-        livecenter=person.livecenter,
-        cluster=person.group.cluster)
+        livecenter=person.livecenter)
     return show_edit(request, product)
 
 def edit(request, pid): # product id
     product = Product.objects.get(pk=pid)
     return show_edit(request, product)
  
+@permission_required_or_403('product.change_product')
 def show_edit(request, product):
     form = ProductForm(instance=product)
     if request.POST:

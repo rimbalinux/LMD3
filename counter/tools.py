@@ -3,13 +3,20 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 from globalrequest.middleware import get_request
+from translate.lang import tr
 from .utils import reset, get, increment, decrement
 
+
+PUBLISH_CHOICES = (
+        (True, tr('Terbitkan')),
+        (False, tr('Jangan terbitkan'))
+    )
 
 class BaseModel(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, null=True, blank=True)
+    publish = models.BooleanField('terbitkan', null=True, default=True, choices=PUBLISH_CHOICES)
 
     class Meta:
         abstract = True
@@ -50,6 +57,12 @@ class BaseModel(models.Model):
 
     def after_delete(self):
         decrement(self.counter_name())
+
+    @property
+    def allowed(self):
+        request = get_request()
+        return self.publish or get_request().user == self.user or self.publish is None
+
 
 
 class BaseForm(forms.ModelForm):

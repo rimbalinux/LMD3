@@ -29,7 +29,7 @@
 {% if user.is_staff %}
 <p><a href="/people/create" class="uiButton"><span class="iconAdd"></span>{% t "Tambah anggota" %}</a></p>
 {% endif %}
-<h2><i class="icon_small user"></i>{% t "Anggota" %}</h2>
+<h2><i class="icon_small user"></i>{% t "Jumlah anggota" %} {% money people_count %}</h2>
 <ul id="mycarousel" class="jcarousel-skin-ie7">
   {% for people in peoples %}
   <li><img src="/img/{{people.photo.id}}" title="{{ people.name }}" width="75" height="75"/></li>
@@ -37,8 +37,7 @@
 </ul><br />
 
 <div id="about">
-{% t "<strong>Livelihood Members Database</strong> adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
-
+    {% t "Livelihood Members Database (LMD) adalah tempat produksi dan potensi sumber daya manusia dimana para penjual dan pembeli bisa bertemu. Menyediakan fasilitas untuk sertifikasi produk yang dapat ditelusuri keberadaannya, lengkap dengan koordinat GPS para anggota." %}
 </div>
 
 {% endblock %}

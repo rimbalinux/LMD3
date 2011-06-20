@@ -52,6 +52,10 @@ class People(DistrictModel): # was livecenter.Person
         self.group.member_count += 1
         self.group.save()
 
+    @property
+    def allowed(self):
+        return super(People, self).allowed and self.livecenter.allowed
+
 """
 class Container(models.Model): # Tabel peralihan
     people = models.ForeignKey(People)

@@ -22,7 +22,7 @@ class Product(GeoModel):
     livecenter = models.ForeignKey(Livelihood)
     category = models.ForeignKey(Category, verbose_name='kategori')
     person = models.ForeignKey(People, verbose_name='nama anggota')
-    cluster = models.ForeignKey(Cluster, null=True, verbose_name='gugusan')
+    cluster = models.ForeignKey(Cluster, null=True, blank=True, verbose_name='gugusan')
     info = models.TextField('keterangan')
     year = models.IntegerField('tahun', null=True, blank=True)
     type = models.ForeignKey(Type, verbose_name='tipe')
