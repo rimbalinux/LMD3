@@ -32,7 +32,7 @@
 <h2><i class="icon_small user"></i>{% t "Jumlah anggota" %} {% money people_count %}</h2>
 <ul id="mycarousel" class="jcarousel-skin-ie7">
   {% for people in peoples %}
-  <li><img src="/img/{{people.photo.id}}" title="{{ people.name }}" width="75" height="75"/></li>
+  <li><a href="/people/show/{{people.id}}"><img src="/people/img/{{people.id}}" title="{{ people.name }}" width="75" height="75"/></a></li>
   {% endfor %}
 </ul><br />
 

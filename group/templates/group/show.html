@@ -29,7 +29,7 @@
         <ul class="uiListView icon-left">
           {% for member in members %}
             <li>
-              <span class="avatar normal"><img src="/img/{{member.photo.id}}" /></span>
+              <span class="avatar normal"><img src="/people/img/{{member.id}}" /></span>
               <span class="block">
                 <span class="title"><a href="/people/show/{{ member.id }}" class="preview">{{ member.name }}</a></span>
                 <span class="body">{{ member.member_type }}</span>

@@ -40,6 +40,12 @@ def index(request):
 #def destination(pid, tabname):
 #    return urllib.quote('/people/show/%s?tab=%s' % (pid, tabname))
 
+def image(request, pid):
+    people = People.objects.get(id=pid)
+    return people.photo and HttpResponseRedirect('/img/%d' % people.photo.id) or \
+        (people.gender and HttpResponseRedirect('/images/male.png') or \
+         HttpResponseRedirect('/images/female.png'))
+
 def show(request, pid):
     try:
         people = People.objects.get(id=pid)

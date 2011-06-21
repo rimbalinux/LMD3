@@ -12,14 +12,14 @@
 
 <h2>{% t "Anggota" %}</h2>
 
-<span id="total">{% t "Jumlah" %}: {{ count }}</span>
+<span id="total">{% t "Jumlah anggota" %}: {{ count }}</span>
 
 {% easy_map lokasi 900 400 8 using "people/map/index.html" %}
 
         <ul class="uiListView icon-left">
             {% for people in peoples %}
               <li>
-                <span class="avatar normal"><img src="/img/{{people.photo.id}}" /></span>
+                <span class="avatar normal"><img src="/people/img/{{people.id}}" /></span>
                 <span class="block">
                     <span class="title"><a href="/people/show/{{ people.id }}" class="preview">{{ people.name }}</a></span> 
                     <span class="body">{{ people.district.name }} / {{ people.member_type }}</span>
