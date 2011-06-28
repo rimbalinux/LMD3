@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load lang %}
 {% load easy_maps_tags %}
-{% load pagination_tags %}
 
 {% block title %}{% t "Pusat Mata Pencaharian" %}{% endblock %}
 
@@ -17,23 +16,22 @@
 
 {% easy_map lokasi 900 400 9 using "livecenter/map/index.html" %}
 
-
-        {% if user.is_staff %}
-        <p><a href="/livecenter/create" class="uiButton"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
-        {% endif %}
-        <ul class="uiListView icon-left">
-          {% autopaginate livecenters %}
-          {% for lc in livecenters %}
-            <li>
-              <span class="avatar normal"><img src="/img/{{ lc.photo.id }}" /></span>
-              <span class="block">
-              <span class="title"><a href="/livecenter/show/{{ lc.id }}" class="preview">{{ lc.name }}</a></span> 
-              <span class="body">{% t lc.description %}</span>
-              <span class="body">{{ lc.district.name }}, {% t "oleh" %} {{lc.user}}</span>
-              </span>
-            </li>
-          {% endfor %}
-        </ul>
-        {% paginate %}
+{% if user.is_staff %}
+<p><a href="/livecenter/create" class="uiButton"><span class="iconAdd"></span>{% t "Tambah" %}</a></p>
+{% endif %}
+<ul class="uiListView icon-left">
+    {% for lc in livecenters %}
+    <li>
+        <span class="avatar normal"><img src="/img/{{ lc.photo.id }}" /></span>
+        <span class="block">
+            <span class="title"><a href="/livecenter/show/{{ lc.id }}" class="preview">{{ lc.name }}</a></span> 
+            <span class="body">{% t lc.description %}</span>
+            <span class="body">{{ lc.district.name }}, {% t "oleh" %} {{lc.user}}</span>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+{% if prev %}<a href="{{request.path}}?page={{prev}}">{% t "Sebelumnya" %}</a>{% endif %}
+{% if next %}<a href="{{request.path}}?page={{next}}">{% t "Selanjutnya" %}</a>{% endif %}
 
 {% endblock %}

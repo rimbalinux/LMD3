@@ -16,7 +16,7 @@ class ProductForm(GeoForm):
         exclude = ('person','livecenter','cluster')
         widgets = {
             'address': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
-            'info': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
+            'info': forms.Textarea(attrs={'cols': 40, 'rows': 2}),
             }
 
     def __init__(self, *args, **kwargs):

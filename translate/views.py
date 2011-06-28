@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from .models import Dictionary
+#from .models import Dictionary
 
 
 def lang(request, lang_id):
@@ -8,6 +8,7 @@ def lang(request, lang_id):
     dest = 'destination' in request.GET and request.GET['destination'] or '/'
     return HttpResponseRedirect(dest)
 
+"""
 DICT = [
     ['Beranda', 'Home'],
     ]
@@ -26,4 +27,5 @@ def dictionary(request):
                 output=to)
         d.save()
     return HttpResponseRedirect('/')
+"""
 

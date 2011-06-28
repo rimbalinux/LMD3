@@ -3,6 +3,6 @@
 {% block set-positions %}
 var icon = "/images/communitycentre.png";
 {% for lc in livecenters %}
-  {% if lc.geo_pos %}positions.push(Array({{ lc.geo_pos }}));{% endif %}
+{% if lc.geo_pos %}positions.push(Array({{lc.geo_pos}},"{{lc.name}}","/livecenter/show/{{lc.id}}"));{% endif %}
 {% endfor %}
 {% endblock %}

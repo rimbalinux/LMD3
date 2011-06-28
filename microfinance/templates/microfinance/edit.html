@@ -123,10 +123,17 @@
                 {{ form.tl }}
             </div>
         </div>
+        
+        <div class="field-wrapper">
+            {% formfield form.publish %}
+        </div>
     </div>
 
     <div class="submit-wrapper">
         <input type="submit" value="{% t "Simpan" %}" />
+        {% if form.instance.id %}
+        <input type="submit" name="delete" value="{% t "Hapus" %}" />
+        {% endif %}
     </div>
 </form>
 

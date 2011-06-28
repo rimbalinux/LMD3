@@ -7,16 +7,17 @@ from translate.lang import tr
 from .utils import reset, get, increment, decrement
 
 
-PUBLISH_CHOICES = (
+def publish_choices():
+    return (
         (True, tr('Terbitkan')),
         (False, tr('Jangan terbitkan'))
-    )
+        )
 
 class BaseModel(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, null=True, blank=True)
-    publish = models.BooleanField('terbitkan', null=True, default=True, choices=PUBLISH_CHOICES)
+    publish = models.BooleanField('terbitkan', null=True, default=True, choices=publish_choices())
 
     class Meta:
         abstract = True
@@ -36,7 +37,8 @@ class BaseModel(models.Model):
     def before_save(self, is_insert=True):
         self.is_insert = is_insert
         self.updated = datetime.now()
-        self.user = get_request().user
+        if is_insert:
+            self.user = get_request().user
 
     def after_save(self):
         if self.is_insert:
@@ -74,4 +76,5 @@ class BaseForm(forms.ModelForm):
             super(BaseForm, self).__init__(*args, **kwargs)
         if 'photo' in self.fields:
             del self.fields['photo']
+        self.fields['publish'].choices = publish_choices()
 

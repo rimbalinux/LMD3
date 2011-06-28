@@ -7,7 +7,6 @@
 
 {% block extra-head %}
 <link rel="stylesheet" type="text/css" href="/stylesheets/livecenter.css" />
-{% include "tabber.html" %}
 {% endblock %}
 
 {% block content %}
@@ -23,16 +22,10 @@
 <p>&nbsp;</p>
 {% endif %}
 
-<div class="tabber">
-    <div class="tabbertab">
-        <h4>{% t "Keuangan Mikro" %}</h4>
         <ul class="uiListView icon-left">
             {% autopaginate finances %}
             {% for finance in finances %}
               <li>
-                {% if user.is_staff %}
-                <span class="right"><a href="/microfinance/delete/{{finance.id}}" class="uiRemove" title="{% t "Hapus" %} {{finance.name_org}}"></a></span>
-                {% endif %}
                 <span class="avatar normal"><img src="/img/{{finance.photo.id}}" /></span>
                 <span class="block">
                 <span class="title"><a href="/microfinance/show/{{finance.id}}" class="preview">{{ finance.name_org }}</a></span> 
@@ -44,7 +37,5 @@
             {% endfor %}
         </ul>
         {% paginate %}
-    </div>
-</div>
 
 {% endblock %}

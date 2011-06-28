@@ -1,5 +1,6 @@
 from django import forms
 from livecenter.tools import GeoForm
+from livecenter.forms import districts
 from .models import Finance
 
 
@@ -22,3 +23,6 @@ class FinanceForm(GeoForm):
         self.fields['cs'].widget.attrs = {'size': 5}
         self.fields['tl'].widget.attrs = {'size': 5}
         self.fields['kelayakan_usaha'].widget.attrs = {'size': 5}
+        self.fields['district'].widget.choices = districts()
+        self.fields['sub_district'].widget.choices = [] 
+ 

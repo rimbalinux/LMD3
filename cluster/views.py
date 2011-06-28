@@ -1,4 +1,5 @@
 from django.views.generic.simple import direct_to_template
+from authority.decorators import permission_required_or_403
 from livecenter.models import Cluster, Livelihood
 from livecenter.utils import redirect
 from group.models import Group
@@ -29,6 +30,7 @@ def show(request, cl):
         'form': form,
         })
 
+@permission_required_or_403('livecenter.change_cluster')
 def delete(request, cid):
     cluster = Cluster.objects.get(pk=cid)
     if request.POST:

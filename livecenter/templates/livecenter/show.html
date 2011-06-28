@@ -25,7 +25,6 @@
     };
 </script>
 <script type="text/javascript" src="/js/tabber/tabber.js"></script>
-{% include "facebox.html" %}
 {% endblock %}
 
 
@@ -38,7 +37,6 @@
     <a href="/livecenter/nogroup/{{livecenter.id}}" class="uiButton" title="View Ungrouped Members">{% t "Anggota tanpa kelompok" %}</a>
     <a href="/livecenter/nomobile/{{livecenter.id}}" class="uiButton" title="View Members haven't Mobile">{% t "Anggota tanpa telepon selular" %}</a> 
     <a href="/livecenter/mobile_list/{{livecenter.id}}" class="uiButton" title="View List of Member's Mobile">{% t "Daftar telepon selular" %}</a>
-    <a href="/livecenter/lc_report/{{livecenter.id}}" rel="facebox" class="uiButton" title="View Report Livecenter's Product">{% t "Buat laporan" %}</a>
     </p>
     <p>&nbsp;</p>
 {% endif %}

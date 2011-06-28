@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
+from authority.decorators import permission_required_or_403
 from livecenter.utils import default_location, redirect
 import counter
 from .models import Finance
@@ -68,23 +69,22 @@ def edit(request, mid):
     mf = Finance.objects.get(pk=mid)
     return show_edit(request, mf)
 
+@permission_required_or_403('microfinance.change_finance')
 def show_edit(request, mf):
+    form = FinanceForm(instance=mf)
     if request.POST:
-        form = FinanceForm(instance=mf.id and mf or None)
+        if 'delete' in request.POST:
+            mf.delete()
+            return redirect(request, '/microfinance')
         if form.is_valid():
             form.save()
             return redirect(request, '/microfinance/show/%d' % mf.id)
-    else:
-        form = FinanceForm(instance=mf)
     return direct_to_template(request, 'microfinance/edit.html', {
         'form': form
         })
 
-def delete(request, mid):
-    mf = Finance.objects.get(pk=mid)
-    mf.delete()
-    return HttpResponseRedirect('/microfinance')
 
+"""
 def migrate(request):
     limit = 'limit' in request.GET and int(request.GET['limit']) or 20 
     offset = len(Finance.objects.all())
@@ -142,4 +142,5 @@ def migrate_delete(request): # danger
     return direct_to_template(request, 'microfinance/migrate.html', {
         'targets': targets, 
         })
+"""
 

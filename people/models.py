@@ -4,17 +4,19 @@ from group.models import Group, training_choices
 from counter.tools import BaseModel
 from translate.lang import tr
 
-
-class People(DistrictModel): # was livecenter.Person
-    GENDERS = (
+def genders():
+    return (
         (True, tr('Laki-laki')),
         (False, tr('Perempuan')),
         )
+
+
+class People(DistrictModel): # was livecenter.Person
     name = models.CharField('nama', max_length=100)
     livecenter = models.ForeignKey(Livelihood)
     group = models.ForeignKey(Group, null=True, blank=True, verbose_name='kelompok', related_name='+')
     email = models.EmailField('email', blank=True)
-    gender = models.BooleanField('jenis kelamin', choices=GENDERS, default=True)
+    gender = models.BooleanField('jenis kelamin', choices=genders(), default=True)
     birth_year = models.IntegerField('tahun lahir', null=True, blank=True)
     birth_place = models.CharField('tempat lahir', max_length=100, blank=True)
     address = models.TextField('alamat', blank=True)

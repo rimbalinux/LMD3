@@ -45,6 +45,10 @@ class Product(GeoModel):
         t.count += value 
         t.save()
 
+    @property
+    def allowed(self):
+        return super(Product, self).allowed and self.person.allowed
+
 """
 class Container(models.Model):
     new = models.ForeignKey(Product)

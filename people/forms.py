@@ -3,7 +3,7 @@ from group.models import Group
 from livecenter.models import Location, Livelihood
 from livecenter.forms import DistrictForm
 from counter.tools import BaseForm
-from .models import People, Training
+from .models import People, Training, genders
 
 
 def groups(lc):
@@ -18,12 +18,13 @@ class PeopleForm(DistrictForm):
         widgets = {
             'livecenter': forms.HiddenInput(),
             'address': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
-            'info': forms.Textarea(attrs={'cols': 20, 'rows': 2}),
+            'info': forms.Textarea(attrs={'cols': 40, 'rows': 2}),
             }
 
     def __init__(self, *args, **kwargs):
         super(PeopleForm, self).__init__(*args, **kwargs)
         self.fields['gender'].initial = True # default male
+        self.fields['gender'].choices = genders()
         self.fields['group'].choices = groups(self.instance.livecenter)
         #self.fields['group'].required = False
         #self.fields['group'] = forms.ModelChoiceField(queryset=Group.objects.\

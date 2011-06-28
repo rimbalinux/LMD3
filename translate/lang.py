@@ -1,6 +1,7 @@
 import re, urllib
 import simplejson as json
 from django.utils.encoding import force_unicode
+from django.core.exceptions import ObjectDoesNotExist
 from globalrequest.middleware import get_request
 from .models import Dictionary
 
@@ -15,12 +16,16 @@ def translate(phrase, src="id", to="en"):
     if src == to:
         return phrase
     # Cari dulu di database
-    ds = Dictionary.objects.filter(input_lang=src).\
-            filter(output_lang=to).\
-            filter(input=phrase)[:1]
-    d = ds and ds[0]
-    if d:
-        return d.output
+    # Entah kenapa ada error kalau panjang phrase lebih dari 500 karakter
+    # Caught DatabaseError while rendering: Property   is 537 bytes long;
+    # it must be 500 or less. Consider Text instead, which can store strings
+    # of any length.
+    if len(phrase) <= 500:
+        try:
+            return Dictionary.objects.get(input_lang=src,
+                output_lang=to, input=phrase).output
+        except ObjectDoesNotExist:
+            pass
     data = urllib.urlencode({'v': '1.0', 'langpair': '%s|%s' % (src, to), 'q': phrase.encode('utf-8')})
     resp = json.load(UrlOpener().open('%s?%s' % (base_uri, data)))
     try:

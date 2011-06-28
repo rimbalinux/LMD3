@@ -35,6 +35,12 @@ indexes:
     direction: desc
   - name: name
 
+- kind: product_product
+  properties:
+  - name: type_id
+  - name: updated
+    direction: desc
+
 - kind: people_people
   properties:
   - name: livecenter_id

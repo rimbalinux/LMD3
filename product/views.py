@@ -82,9 +82,17 @@ def show_edit(request, product):
         })
 
 def type_show(request, tid):
+    limit = 20
+    page = 'page' in request.GET and int(request.GET['page']) or 1
+    offset = page * limit - limit
+    products = []
+    q = Product.objects.filter(type=tid).order_by('-updated')
+    for product in q[offset:offset+limit]:
+        if product.allowed:
+            products.append(product)
     return direct_to_template(request, 'product/type/show.html', {
         'product_type': Type.objects.get(pk=tid),
-        'products': Product.objects.filter(type=tid),
+        'products': products, 
         'lokasi': default_location(), 
         })
 

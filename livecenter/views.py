@@ -16,27 +16,21 @@ from .forms import LivelihoodForm
 #from .utils import migrate_photo
 
 
-def get_livecenters():
-    lcs = []
-    limit = 20
-    offset = 0
-    while True:
-        found = False
-        for lc in Livelihood.objects.all().order_by('name')[offset:offset+limit]:
-            found = True
-            if lc.allowed:
-                lcs.append(lc)
-                if len(lcs) == limit:
-                    return lcs
-        if not found:
-            return lcs
-        offset += limit
-
 def index(request):
+    limit = 20
+    page = 'page' in request.GET and int(request.GET['page']) or 1
+    offset = page * limit - limit
+    lcs = []
+    q = Livelihood.objects.all().order_by('name')
+    for lc in q[offset:offset+limit]:
+        if lc.allowed:
+            lcs.append(lc)
     return direct_to_template(request, 'livecenter/index.html', {
-        'livecenters': get_livecenters(), 
+        'livecenters': lcs, 
         'count': Livelihood.counter_value(),
-        'lokasi': default_location(), 
+        'lokasi': default_location(),
+        'next': q[offset+limit:offset+limit+2] and page+1 or None,
+        'prev': q[offset and offset-1 or 0:offset] and page-1,
         })
 
 def destination(lid, tabname):

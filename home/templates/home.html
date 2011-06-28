@@ -26,9 +26,6 @@
 {% endblock %}
 
 {% block sidebar %}
-{% if user.is_staff %}
-<p><a href="/people/create" class="uiButton"><span class="iconAdd"></span>{% t "Tambah anggota" %}</a></p>
-{% endif %}
 <h2><i class="icon_small user"></i>{% t "Jumlah anggota" %} {% money people_count %}</h2>
 <ul id="mycarousel" class="jcarousel-skin-ie7">
   {% for people in peoples %}
